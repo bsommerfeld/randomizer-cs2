@@ -93,8 +93,8 @@ If you find Randomizer-CS2 useful, please consider:
 
 ## 👥 Team
 
-* **UX Design**: [bustolio](https://www.github.com/CuzIamBusted)
-* **Programming**: [Metaphoriker](https://www.github.com/Metaphoriker)
+* **UX Design**: [bustolio](https://www.github.com/bustolio)
+* **Programming**: [bsommerfeld](https://www.github.com/bsommerfeld)
 
 ---
 
