@@ -9,9 +9,51 @@
     <packaging>pom</packaging>
     <version>1.0</version>
 
+    <name>Randomizer-CS2</name>
+    <description>
+        A JavaFX application that allows you to create custom sequences of random actions 
+        to trigger them randomly in Counter-Strike 2.
+    </description>
+    <url>https://github.com/Metaphoriker/randomizer-cs2</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>metaphoriker</id>
+            <name>Metaphoriker</name>
+            <url>https://github.com/Metaphoriker</url>
+            <roles>
+                <role>Programming</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>bustolio</id>
+            <name>bustolio</name>
+            <url>https://github.com/CuzIamBusted</url>
+            <roles>
+                <role>UX</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/Metaphoriker/randomizer-cs2.git</connection>
+        <developerConnection>scm:git:https://github.com/Metaphoriker/randomizer-cs2.git</developerConnection>
+        <url>https://github.com/Metaphoriker/randomizer-cs2</url>
+    </scm>
+
     <properties>
         <maven.compiler.source>22</maven.compiler.source>
         <maven.compiler.target>22</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <modules>
@@ -19,5 +61,26 @@
         <module>randomizer-model</module>
         <module>updater</module>
     </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.11.0</version>
+                    <configuration>
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.6.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
 </project>
