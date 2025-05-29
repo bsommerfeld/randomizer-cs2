@@ -1,20 +1,18 @@
 package com.revortix.randomizer.config;
 
 import com.revortix.model.config.keybind.KeyBindType;
-import de.metaphoriker.jshepherd.BaseConfiguration;
-import de.metaphoriker.jshepherd.ConfigurationType;
-import de.metaphoriker.jshepherd.annotation.Comment;
-import de.metaphoriker.jshepherd.annotation.Configuration;
-import de.metaphoriker.jshepherd.annotation.Key;
 import java.util.ArrayList;
 import java.util.List;
+
+import de.bsommerfeld.jshepherd.annotation.Comment;
+import de.bsommerfeld.jshepherd.annotation.Key;
+import de.bsommerfeld.jshepherd.core.ConfigurablePojo;
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
-@Configuration(fileName = "config", type = ConfigurationType.YAML)
-public class RandomizerConfig extends BaseConfiguration {
+public class RandomizerConfig extends ConfigurablePojo<RandomizerConfig> {
 
   @Key("min.interval")
   private int minInterval = 15;

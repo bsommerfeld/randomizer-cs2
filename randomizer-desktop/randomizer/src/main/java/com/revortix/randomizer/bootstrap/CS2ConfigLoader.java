@@ -7,13 +7,13 @@ import com.revortix.randomizer.config.RandomizerConfig;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class RandomizerConfigLoader {
+public class CS2ConfigLoader {
 
   private final RandomizerConfig randomizerConfig;
   private final KeyBindRepository keyBindRepository;
 
   @Inject
-  public RandomizerConfigLoader(
+  public CS2ConfigLoader(
       RandomizerConfig randomizerConfig, KeyBindRepository keyBindRepository) {
     this.randomizerConfig = randomizerConfig;
     this.keyBindRepository = keyBindRepository;

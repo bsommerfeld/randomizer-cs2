@@ -3,7 +3,6 @@ package com.revortix.randomizer.bootstrap;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
 import com.google.inject.Inject;
-import com.revortix.model.ApplicationContext;
 import com.revortix.model.action.Action;
 import com.revortix.model.action.ActionKey;
 import com.revortix.model.action.impl.BaseAction;
@@ -35,7 +34,7 @@ public class RandomizerBootstrap {
   private final ActionSequenceExecutorRunnable actionSequenceExecutorRunnable;
   private final RandomizerConfig randomizerConfig;
   private final RandomizerUpdater randomizerUpdater;
-  private final RandomizerConfigLoader randomizerConfigLoader;
+  private final CS2ConfigLoader CS2ConfigLoader;
 
   @Inject
   public RandomizerBootstrap(
@@ -45,14 +44,14 @@ public class RandomizerBootstrap {
       ActionSequenceExecutorRunnable actionSequenceExecutorRunnable,
       RandomizerConfig randomizerConfig,
       RandomizerUpdater randomizerUpdater,
-      RandomizerConfigLoader randomizerConfigLoader) {
+      CS2ConfigLoader CS2ConfigLoader) {
     this.actionSequenceRepository = actionSequenceRepository;
     this.actionRepository = actionRepository;
     this.keyBindRepository = keyBindRepository;
     this.actionSequenceExecutorRunnable = actionSequenceExecutorRunnable;
     this.randomizerConfig = randomizerConfig;
     this.randomizerUpdater = randomizerUpdater;
-    this.randomizerConfigLoader = randomizerConfigLoader;
+    this.CS2ConfigLoader = CS2ConfigLoader;
   }
 
   public void initializeApplication() {
@@ -73,20 +72,20 @@ public class RandomizerBootstrap {
   }
 
   private void temporarilyLoadUserConfigPath() {
-    randomizerConfig.setConfigPath(randomizerConfigLoader.ladeUserConfigPath().replace("\\", "/"));
+    randomizerConfig.setConfigPath(CS2ConfigLoader.ladeUserConfigPath().replace("\\", "/"));
     randomizerConfig.save();
   }
 
   private void loadUserKeyBindsByConfig() {
-    randomizerConfigLoader.ladeDefaultKeyBinds();
+    CS2ConfigLoader.ladeDefaultKeyBinds();
     if (randomizerConfig.getConfigPath() != null && !randomizerConfig.getConfigPath().isEmpty())
-      randomizerConfigLoader.ladeUserKeyBinds();
+      CS2ConfigLoader.ladeUserKeyBinds();
   }
 
   private void loadConfiguration() {
     log.info("Lade Konfiguration...");
-    randomizerConfig.setDirectory(ApplicationContext.getAppdataFolder().toPath());
-    randomizerConfig.initialize();
+
+    randomizerConfig.reload();
 
     ActionSequenceExecutorRunnable.setMinWaitTime(randomizerConfig.getMinInterval());
     ActionSequenceExecutorRunnable.setMaxWaitTime(randomizerConfig.getMaxInterval());
