@@ -1,0 +1,50 @@
+{
+  "bin": {
+    "randomizer": "jdeploy-bundle/jdeploy.js"
+  },
+  "author": "Benjamin Sommerfeld",
+  "description": "A Randomizer to have more fun in CS2.",
+  "main": "index.js",
+  "preferGlobal": true,
+  "repository": "",
+  "version": "1.2.0",
+  "jdeploy": {
+    "jdk": false,
+    "publishTargets": [
+      {
+        "name": "npm: randomizer-cs2",
+        "type": "NPM",
+        "url": ""
+      },
+      {
+        "name": "npm: randomizer-cs2",
+        "type": "NPM",
+        "url": ""
+      },
+      {
+        "name": "github: randomizer-cs2",
+        "type": "GITHUB",
+        "url": "https://github.com/bsommerfeld/randomizer-cs2/releases"
+      }
+    ],
+    "javaVersion": "24",
+    "jar": "target/randomizer.jar",
+    "javafx": true,
+    "title": "Randomizer-CS2"
+  },
+  "dependencies": {
+    "command-exists-promise": "^2.0.2",
+    "node-fetch": "2.6.7",
+    "tar": "^4.4.8",
+    "yauzl": "^2.10.0",
+    "shelljs": "^0.8.4"
+  },
+  "license": "ISC",
+  "name": "randomizer-cs2",
+  "files": [
+    "jdeploy-bundle"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
