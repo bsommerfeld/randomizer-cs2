@@ -5,13 +5,13 @@
     <parent>
         <artifactId>randomizer-cs2</artifactId>
         <groupId>de.bsommerfeld</groupId>
-        <version>1.0</version>
+        <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <packaging>pom</packaging>
     <artifactId>randomizer-desktop</artifactId>
-    <version>1.0</version>
+    <version>${revision}</version>
 
     <properties>
         <javafx.version>23.0.2</javafx.version>
@@ -48,7 +48,7 @@
             <dependency>
                 <groupId>de.bsommerfeld</groupId>
                 <artifactId>randomizer-model</artifactId>
-                <version>1.0</version>
+                <version>${revision}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
