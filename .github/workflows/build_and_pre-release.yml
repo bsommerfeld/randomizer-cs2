@@ -23,7 +23,7 @@ jobs:
         with:
           distribution: 'corretto'
           java-package: 'jdk+fx'
-          java-version: '22'
+          java-version: '24'
 
       - name: Set up Maven
         uses: stCarolas/setup-maven@v4.4
