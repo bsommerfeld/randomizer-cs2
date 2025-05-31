@@ -28,7 +28,7 @@
       }
     ],
     "javaVersion": "24",
-    "jar": "target/randomizer.jar",
+    "jar": "randomizer-desktop/randomizer/target/randomizer.jar",
     "javafx": true,
     "title": "Randomizer-CS2"
   },
