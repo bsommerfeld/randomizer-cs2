@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefHeight="504.0" prefWidth="48.0" styleClass="navigation-bar" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.bsommerfeld.randomizer.ui.view.controller.NavigationBarController">
+   <children>
+        <ToggleButton fx:id="homeButton" mnemonicParsing="false" prefHeight="28" prefWidth="38" styleClass="navigation-bar-home" />
+      <Separator maxWidth="32.0" styleClass="navigation-bar-separator" />
+        <ToggleButton fx:id="randomizerButton" mnemonicParsing="false" prefHeight="28" prefWidth="38" styleClass="navigation-bar-randomizer" />
+        <ToggleButton fx:id="builderButton" mnemonicParsing="false" prefHeight="28" prefWidth="38" styleClass="navigation-bar-builder">
+         <VBox.margin>
+            <Insets />
+         </VBox.margin></ToggleButton>
+      <VBox VBox.vgrow="ALWAYS" />
+      <Button fx:id="updateIndicatorButton" visible="false" styleClass="navigation-bar-update-indicator" mnemonicParsing="false" />
+      <ToggleButton fx:id="settingsButton" mnemonicParsing="false" prefHeight="28" prefWidth="38" styleClass="navigation-bar-settings" />
+   </children>
+</VBox>

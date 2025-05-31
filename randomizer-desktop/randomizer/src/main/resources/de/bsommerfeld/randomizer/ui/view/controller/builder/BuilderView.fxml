@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="504.0" prefWidth="656.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.bsommerfeld.randomizer.ui.view.controller.builder.BuilderViewController">
+    <children>
+        <HBox prefHeight="504.0" prefWidth="656.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <VBox prefHeight="504.0" prefWidth="128.0" styleClass="builder-sequences" VBox.vgrow="ALWAYS">
+                <children>
+                    <HBox prefHeight="24.0" prefWidth="128.0" styleClass="builder-sequences-top">
+                        <children>
+                            <Label styleClass="builder-sequences-label" text="Sequences" />
+                            <HBox alignment="CENTER_RIGHT" prefHeight="34.0" prefWidth="14.0" styleClass="builder-sequences-buttons" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Button fx:id="addSequenceButton" mnemonicParsing="false" onAction="#onAddSequence" styleClass="builder-sequences-add-sequence-button" />
+                                    <Button fx:id="sequenceFolderButton" mnemonicParsing="false" onAction="#onOpenSequenceFolder" styleClass="builder-sequences-folder-button" />
+                                </children>
+                            </HBox>
+                        </children>
+                    </HBox>
+                    <Separator styleClass="builder-separator" />
+                    <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefWidth="128.0" styleClass="builder-sequences-scrollpane" VBox.vgrow="ALWAYS">
+                        <content>
+                            <VBox fx:id="actionSequencesVBox" styleClass="builder-actions-sequences" />
+                        </content>
+                    </ScrollPane>
+                </children>
+            </VBox>
+         <GridPane fx:id="contentPane" prefHeight="504.0" prefWidth="528.0" HBox.hgrow="ALWAYS">
+           <columnConstraints>
+             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+           </columnConstraints>
+           <rowConstraints>
+             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+           </rowConstraints>
+         </GridPane>
+        </HBox>
+    </children>
+</AnchorPane>

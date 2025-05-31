@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+
+<BorderPane styleClass="randomizer-window" fx:id="root" prefHeight="504.0" prefWidth="704.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.bsommerfeld.randomizer.ui.view.controller.RandomizerWindowController">
+   <left>
+      <VBox fx:id="navigationBarHolder" prefHeight="504.0" prefWidth="48.0" BorderPane.alignment="CENTER" />
+   </left>
+   <center>
+      <GridPane fx:id="contentPane" prefHeight="504.0" prefWidth="656.0" BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+      </GridPane>
+   </center>
+</BorderPane>

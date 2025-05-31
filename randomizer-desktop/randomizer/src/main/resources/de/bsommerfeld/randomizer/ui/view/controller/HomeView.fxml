@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="504.0" prefWidth="656.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.bsommerfeld.randomizer.ui.view.controller.HomeViewController">
+    <children>
+        <VBox alignment="CENTER" prefHeight="504.0" prefWidth="656.0" styleClass="home-view" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <VBox alignment="CENTER" prefHeight="291.0" prefWidth="256.0" VBox.vgrow="ALWAYS">
+                    <children>
+                  <ImageView fitHeight="256.0" fitWidth="256.0" pickOnBounds="true" preserveRatio="true" styleClass="home-view-image">
+                     <image>
+                        <Image url="@../../../images/homeView/randomizerLogo.png" />
+                     </image></ImageView>
+                        <HBox alignment="CENTER" prefHeight="20.0" prefWidth="162.0" styleClass="home-view-socials-container">
+                            <children>
+                                <Label onMouseClicked="#onDiscordOpen" styleClass="home-view-discord" text="Discord">
+                                    <cursor>
+                                        <Cursor fx:constant="HAND" />
+                                    </cursor>
+                                </Label>
+                                <Label onMouseClicked="#onGitHubOpen" styleClass="home-view-github" text="GitHub">
+                                    <cursor>
+                                        <Cursor fx:constant="HAND" />
+                                    </cursor>
+                                </Label>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

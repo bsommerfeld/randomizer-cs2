@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.bsommerfeld.randomizer.ui.view.component.MinMaxSlider?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<VBox prefHeight="344.0" prefWidth="480.0" styleClass="updater-settings" xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="de.bsommerfeld.randomizer.ui.view.controller.settings.GeneralSettingsController">
+    <children>
+        <HBox styleClass="settings-auto-update" HBox.hgrow="ALWAYS">
+            <children>
+                <VBox styleClass="settings-auto-update-container" VBox.vgrow="ALWAYS">
+                    <children>
+                        <Label styleClass="settings-title" text="Show Intro"/>
+                        <Label styleClass="settings-description" text="Show the Intro when starting the Randomizer"/>
+                    </children>
+                </VBox>
+                <HBox HBox.hgrow="ALWAYS"/>
+                <HBox prefHeight="16.0" prefWidth="48.0" styleClass="settings-toggle-button-container">
+                    <children>
+                        <ToggleButton fx:id="showIntroToggleButton" mnemonicParsing="false"
+                                      styleClass="settings-toggle-button"/>
+                    </children>
+                </HBox>
+            </children>
+        </HBox>
+        <Separator styleClass="settings-separator"/>
+        <HBox styleClass="settings-auto-update">
+            <children>
+                <VBox styleClass="settings-auto-update-container" VBox.vgrow="ALWAYS">
+                    <children>
+                        <Label styleClass="settings-title" text="Sequence Interval"/>
+                        <Label styleClass="settings-description" text="Changes the Interval between each Sequence"/>
+                        <MinMaxSlider fx:id="minMaxSlider" styleClass="range-slider-action-interval"/>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+        <Separator styleClass="settings-separator"/>
+        <VBox styleClass="settings-auto-update-container">
+            <children>
+                <Label styleClass="settings-title" text="Config Path"/>
+                <Label styleClass="settings-description" text="The path of the CS2 config used to load the keybinds"/>
+                <HBox styleClass="sync-path-container" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Button fx:id="syncConfigButton" styleClass="sync-config-path" mnemonicParsing="false" onAction="#onConfigSync"/>
+                        <TextField fx:id="configPathTextField" styleClass="config-path-textfield" editable="false"/>
+                        <Button styleClass="config-folder-path" mnemonicParsing="false" onAction="#onConfigChoose"/>
+                        <HBox HBox.hgrow="ALWAYS"/>
+                    </children>
+                </HBox>
+                <Label fx:id="syncFailedIndicator" visible="false" styleClass="sync-failed-indicator" text="Config could not be loaded. Please try again or enter it manually"/>
+            </children>
+        </VBox>
+        <VBox VBox.vgrow="ALWAYS"/>
+        <HBox alignment="CENTER_RIGHT">
+            <Label fx:id="spentTimeLabel" styleClass="settings-playtime"/>
+        </HBox>
+    </children>
+</VBox>

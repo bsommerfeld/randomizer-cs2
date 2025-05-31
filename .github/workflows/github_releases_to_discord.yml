@@ -14,10 +14,10 @@ jobs:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
           color: "2105893"
           username: "Randomizer-CS2"
-          avatar_url: "https://raw.githubusercontent.com/revortix/randomizer-cs2/refs/heads/master/.randomizer/design/logo/randomizer.png"
+          avatar_url: "https://raw.githubusercontent.com/bsommerfeld/randomizer-cs2/refs/heads/master/.randomizer/design/logo/randomizer.png"
           content: "@everyone"
           footer_title: "Changelog"
-          footer_icon_url: "https://raw.githubusercontent.com/revortix/randomizer-cs2/refs/heads/master/.randomizer/design/logo/randomizer.png"
+          footer_icon_url: "https://raw.githubusercontent.com/bsommerfeld/randomizer-cs2/refs/heads/master/.randomizer/design/logo/randomizer.png"
           footer_timestamp: true
           max_description: '4096'
           reduce_headings: true

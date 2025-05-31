@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="504.0" prefWidth="528.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.bsommerfeld.randomizer.ui.view.controller.builder.BuilderEditorViewController">
+    <children>
+        <BorderPane prefHeight="504.0" prefWidth="528.0" styleClass="builder-content" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <right>
+                <VBox prefHeight="320.0" prefWidth="172.0" styleClass="builder-settings-holder" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets bottom="6.0" left="6.0" />
+               </BorderPane.margin>
+               <children>
+                  <VBox fx:id="settingsHolder" prefHeight="184.0" prefWidth="172.0" styleClass="builder-sequence-settings" VBox.vgrow="ALWAYS" />
+                  <VBox fx:id="actionSettingsHolder" prefHeight="124.0" prefWidth="172.0" styleClass="builder-action-settings" VBox.vgrow="ALWAYS" />
+               </children></VBox>
+            </right>
+            <bottom>
+                <VBox fx:id="builderActionsPlaceholder" prefHeight="148.0" prefWidth="504.0" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets top="6.0" />
+               </BorderPane.margin></VBox>
+            </bottom>
+            <center>
+                <VBox styleClass="sequence-builder" BorderPane.alignment="CENTER">
+                    <children>
+                        <HBox HBox.hgrow="ALWAYS" styleClass="sequence-naming-container">
+                            <children>
+                                <HBox prefHeight="30.0" HBox.hgrow="ALWAYS">
+                                    <VBox VBox.vgrow="ALWAYS" styleClass="sequence-naming">
+                                        <children>
+                                            <Label fx:id="sequenceNameLabel" styleClass="sequence-name-label" />
+                                            <Label fx:id="sequenceDescriptionLabel" styleClass="sequence-description-label" />
+                                        </children>
+                                    </VBox> </HBox>
+                                    <HBox prefHeight="30.0" HBox.hgrow="ALWAYS" />
+                                    <HBox alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="76.0" styleClass="sequence-builder-buttons">
+                                        <children>
+                                            <Button fx:id="saveSequenceButton" mnemonicParsing="false" onAction="#onSaveSequence" styleClass="builder-save-sequence-button" />
+                                            <Button fx:id="randomizeButton" mnemonicParsing="false" onAction="#onRandomize" styleClass="builder-randomize-button" />
+                                            <Separator orientation="VERTICAL" prefHeight="14.0" styleClass="builder-buttons-separator" />
+                                            <Button fx:id="actionsClearButton" mnemonicParsing="false" onAction="#onActionsClear" styleClass="builder-actions-clear-button" />
+                                        </children>
+                                    </HBox>
+                            </children>
+                        </HBox>
+                            <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefHeight="272.0" prefWidth="312.0" styleClass="builder-selected-actions-scrollpane" VBox.vgrow="ALWAYS">
+                                <content>
+                                    <VBox fx:id="builderVBox" prefHeight="244.0" prefWidth="296.0" styleClass="builder-selected-actions-vbox" VBox.vgrow="ALWAYS" />
+                                </content>
+                        </ScrollPane>
+                    </children>
+               <BorderPane.margin>
+                  <Insets bottom="6.0" right="6.0" />
+               </BorderPane.margin>
+                </VBox>
+            </center>
+        </BorderPane>
+    </children>
+</AnchorPane>
