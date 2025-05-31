@@ -114,3 +114,5 @@ buildNumber.properties
 # Common working directory
 run/
 /.idea/
+.jdeploy/
+jdeploy/publish/
