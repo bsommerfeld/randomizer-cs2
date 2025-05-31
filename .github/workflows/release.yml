@@ -1,0 +1,120 @@
+# This workflow builds a Java project, generates a categorized changelog,
+# creates a release with jDeploy, combines changelogs, and then notifies Discord.
+
+name: Release CI
+
+on:
+  push:
+    tags:
+      - '*' # Triggers on any tag push, e.g., v1.0.0, 1.2.3
+
+permissions:
+  contents: write # Required for creating/editing GitHub releases and for jDeploy
+
+jobs:
+  build_and_release:
+    name: Build, Release and Notify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required for conventional-changelog to access full commit history
+
+      - name: Set up JDK 24
+        uses: actions/setup-java@v4
+        with:
+          java-version: '24'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      - name: Generate categorized changelog
+        id: changelog_generator
+        uses: TriPSs/conventional-changelog-action@v5 # Using a popular action for conventional changelogs
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          output-file: "false" # Get the changelog as a step output, not written to a file
+          skip-version-file: "true" # Don't create/update a version file
+          skip-commit: "true" # Don't commit a CHANGELOG.md file
+          skip-tag: "true" # Don't create a new tag; the workflow is triggered by a tag
+            # preset: "conventionalcommits" # This is the default and usually what you want for fix:, feat:, etc.
+          # tag-prefix: "v" # Uncomment and adjust if your tags are consistently prefixed (e.g., v1.0.0).
+          # If tags are 1.0.0, this is usually not needed or should be empty.
+
+      - name: Build App Installer Bundles and Create/Update GitHub Release (jDeploy)
+        id: jdeploy_release
+        uses: shannah/jdeploy@master # Using the jDeploy action as specified
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # jDeploy will create or update a GitHub release for the current tag (github.ref_name).
+          # It will populate it with its own release notes (e.g., from a release-notes.md in your project or auto-generated)
+          # and attach the built application bundles.
+
+      - name: Combine jDeploy notes with categorized changelog and Update GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ github.ref_name }} # This is the tag that triggered the workflow, e.g., "v1.0.0"
+          # Pass the multiline categorized changelog as an environment variable
+          CATEGORIZED_CHANGELOG: ${{ steps.changelog_generator.outputs.changelog }}
+        run: |
+          echo "Attempting to update release for tag: ${TAG_NAME}"
+
+          # Fetch the current release body content that jDeploy might have set.
+          # Using 'gh release view --template' is robust for getting the raw body.
+          JDEPLOY_NOTES=$(gh release view "${TAG_NAME}" --json body --template '{{.body}}')
+
+          if [ -z "${JDEPLOY_NOTES}" ]; then
+            echo "jDeploy did not add any specific release notes, or the notes were empty."
+            JDEPLOY_NOTES="*jDeploy artifacts and installers attached.*" # Provide a default if jDeploy's notes are empty
+          else
+            echo "Successfully fetched jDeploy notes."
+          fi
+
+          echo "-------------------------------------------------"
+          echo "Categorized Changelog (from conventional-commits):"
+          echo "${CATEGORIZED_CHANGELOG}"
+          echo "-------------------------------------------------"
+          echo "jDeploy Notes (fetched from GitHub release created/updated by jDeploy):"
+          echo "${JDEPLOY_NOTES}"
+          echo "-------------------------------------------------"
+
+          # Prepare the new combined body.
+          # The categorized changelog comes first, then jDeploy's information.
+          # Using a temporary file for --notes-file is the most reliable way to handle multiline content.
+          {
+            echo "${CATEGORIZED_CHANGELOG}"
+            echo "" # Ensure a blank line for separation
+            echo "---" # Markdown horizontal rule as a separator
+            echo "" # Ensure a blank line for separation
+            echo "**jDeploy Information & Artifacts:**"
+            echo "" # Ensure a blank line
+            echo "${JDEPLOY_NOTES}"
+          } > combined_release_notes.md
+
+          echo "Combined notes to be uploaded to GitHub release:"
+          cat combined_release_notes.md
+          echo "-------------------------------------------------"
+
+          # Edit the GitHub release to set the new combined notes.
+          gh release edit "${TAG_NAME}" --notes-file combined_release_notes.md
+          
+          echo "GitHub release notes for ${TAG_NAME} have been updated successfully."
+
+      - name: Send GitHub Release to Discord
+        # This step runs last, after the GitHub release notes have been finalized.
+        uses: SethCohen/github-releases-to-discord@v1.16.2 # Using the Discord action as specified
+        with:
+          webhook_url: ${{ secrets.WEBHOOK_URL }}
+          color: "2105893"
+          username: "Randomizer-CS2"
+          avatar_url: "https://raw.githubusercontent.com/bsommerfeld/randomizer-cs2/refs/heads/master/.randomizer/design/logo/randomizer.png"
+          content: "@everyone" # Message content outside the embed
+          # The action will automatically fetch the title and the (now combined) body of the GitHub release.
+          footer_title: "Changelog" # Footer title for the Discord embed
+          footer_icon_url: "https://raw.githubusercontent.com/bsommerfeld/randomizer-cs2/refs/heads/master/.randomizer/design/logo/randomizer.png"
+          footer_timestamp: true
+          max_description: '4096' # Max length of the release notes in the Discord message
+          reduce_headings: true # Reduces markdown heading levels (e.g., H1 to H2)
