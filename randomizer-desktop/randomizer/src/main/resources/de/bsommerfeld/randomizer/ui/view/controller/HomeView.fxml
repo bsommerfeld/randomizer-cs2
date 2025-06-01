@@ -39,7 +39,7 @@
                                 </Label>
                             </children>
                         </HBox>
-                        <Button mnemonicParsing="false" text="Hector"/>
+                        <Button mnemonicParsing="false" styleClass="home-view-hector" text="Hector"/>
                     </children>
                 </VBox>
             </children>
