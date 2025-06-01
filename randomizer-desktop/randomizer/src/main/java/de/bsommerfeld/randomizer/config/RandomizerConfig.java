@@ -1,6 +1,7 @@
 package de.bsommerfeld.randomizer.config;
 
 import de.bsommerfeld.jshepherd.annotation.Comment;
+import de.bsommerfeld.jshepherd.annotation.CommentSection;
 import de.bsommerfeld.jshepherd.annotation.Key;
 import de.bsommerfeld.jshepherd.core.ConfigurablePojo;
 import de.bsommerfeld.model.config.keybind.KeyBindType;
@@ -17,29 +18,38 @@ public class RandomizerConfig extends ConfigurablePojo<RandomizerConfig> {
 
   private final StringProperty configPathProperty = new SimpleStringProperty();
 
+  @CommentSection({"Randomizer Specific Configuration", "------"})
+  @Comment({"The Min Interval, for determining a random number in a span."})
   @Key("min.interval")
   private int minInterval = 15;
 
+  @Comment({"The Max Interval, for determining a random number in a span."})
   @Key("max.interval")
   private int maxInterval = 70;
 
-  @Key("autoupdate.enabled")
-  private boolean autoupdateEnabled = false;
-
-  @Key("update.notifier")
-  private boolean updateNotifier = true;
-
+  @CommentSection({"General Settings", "------"})
+  @Comment({"Whether or not the intro screen should be shown."})
   @Key("show.intro")
   private boolean showIntro = true;
 
+  @CommentSection({"Functional Settings", "------"})
+  @Comment({"The config path of the CS2 configuration."})
   @Key("config.path")
   private String configPath = "";
 
+  @CommentSection({"Builder Settings", "------"})
+  @Comment({
+    "The list of filters that should be activated for the builder.",
+    "Personal Preference that is stored."
+  })
   @Key("builder.filters.activated")
   private List<String> builderFiltersActivated = new ArrayList<>(KeyBindType.values().length);
 
   @Key("time.tracked")
-  @Comment({"Basically this is just to see, how many hours you've spent with the Randomizer on.", "Please do not change this specific value, it would just be self-sabotage"})
+  @Comment({
+    "Basically this is just to see, how many hours you've spent with the Randomizer on.",
+    "Please do not change this specific value, it would just be self-sabotage"
+  })
   private long timeTracked = 0L;
 
   public void setConfigPath(String configPath) {
