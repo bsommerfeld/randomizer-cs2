@@ -44,6 +44,7 @@ jobs:
           skip-bump: "true" # Crucial: Use the current tag as the version, don't bump it
           tag-prefix: "" # Set to empty if your tags are like 1.0.0, 1.2.0 (no "v" prefix)
           # preset: "conventionalcommits" # This is the default and usually what you want for fix:, feat:, etc.
+          # release-count: 1 # Consider setting to 1 if you only want the changelog for the current tag
 
       - name: Build App Installer Bundles and Create/Update GitHub Release (jDeploy)
         id: jdeploy_release
@@ -55,9 +56,25 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: ${{ github.ref_name }}
-          CATEGORIZED_CHANGELOG: ${{ steps.changelog_generator.outputs.changelog }}
+          # Pass the multiline categorized changelog as an environment variable
+          RAW_CATEGORIZED_CHANGELOG: ${{ steps.changelog_generator.outputs.changelog }}
         run: |
+          echo "Raw categorized changelog output: <<EOF"
+          echo "${RAW_CATEGORIZED_CHANGELOG}"
+          echo "EOF"
+
+          FINAL_CATEGORIZED_CHANGELOG="${RAW_CATEGORIZED_CHANGELOG}"
+          # Check if the raw changelog is empty or contains only whitespace or just the typical empty header
+          if [ -z "${FINAL_CATEGORIZED_CHANGELOG}" ] || \
+             ! echo "${FINAL_CATEGORIZED_CHANGELOG}" | grep -qE "(\*|Features|Bug Fixes|Performance Improvements|BREAKING CHANGES)"; then
+            echo "Categorized changelog is effectively empty or contains no standard sections. Using default message."
+            FINAL_CATEGORIZED_CHANGELOG="### Changelog\n\nNo user-facing changes (e.g., features, fixes) noted in conventional commits for this release."
+          else
+            echo "Using generated categorized changelog."
+          fi
+          
           echo "Attempting to update release for tag: ${TAG_NAME}"
+          # Fetch the current release body content that jDeploy might have set.
           JDEPLOY_NOTES=$(gh release view "${TAG_NAME}" --json body --template '{{.body}}')
 
           if [ -z "${JDEPLOY_NOTES}" ]; then
@@ -68,41 +85,48 @@ jobs:
           fi
 
           echo "-------------------------------------------------"
-          echo "Categorized Changelog (for tag ${TAG_NAME}):"
-          echo "${CATEGORIZED_CHANGELOG}"
+          echo "Final Categorized Changelog (for tag ${TAG_NAME}):"
+          echo "${FINAL_CATEGORIZED_CHANGELOG}"
           echo "-------------------------------------------------"
           echo "jDeploy Notes (fetched from GitHub release created/updated by jDeploy):"
           echo "${JDEPLOY_NOTES}"
           echo "-------------------------------------------------"
           
+          # Prepare the new combined body.
+          # The categorized changelog comes first, then jDeploy's information.
           {
-            echo "${CATEGORIZED_CHANGELOG}"
+            echo -e "${FINAL_CATEGORIZED_CHANGELOG}" # Use -e to interpret backslashes if any, e.g. \n
             echo "" 
             echo "---" 
             echo "" 
             echo "**jDeploy Information & Artifacts:**"
             echo "" 
-            echo "${JDEPLOY_NOTES}"
+            echo -e "${JDEPLOY_NOTES}" # Use -e here as well for consistency
           } > combined_release_notes.md
 
           echo "Combined notes to be uploaded to GitHub release:"
           cat combined_release_notes.md
           echo "-------------------------------------------------"
 
+          # Edit the GitHub release to set the new combined notes.
           gh release edit "${TAG_NAME}" --notes-file combined_release_notes.md
           
           echo "GitHub release notes for ${TAG_NAME} have been updated successfully."
+          echo "Release URL: https://github.com/${GITHUB_REPOSITORY}/releases/tag/${TAG_NAME}"
+
 
       - name: Send GitHub Release to Discord
+        # This step runs last, after the GitHub release notes have been finalized.
         uses: SethCohen/github-releases-to-discord@v1.16.2
         with:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
           color: "2105893"
           username: "Randomizer-CS2"
           avatar_url: "https://raw.githubusercontent.com/bsommerfeld/randomizer-cs2/refs/heads/master/.randomizer/design/logo/randomizer.png"
-          content: "@everyone"
-          footer_title: "Changelog"
+          content: "@everyone" # Message content outside the embed
+          # The action will automatically fetch the title and the (now combined) body of the GitHub release.
+          footer_title: "Changelog" # Footer title for the Discord embed
           footer_icon_url: "https://raw.githubusercontent.com/bsommerfeld/randomizer-cs2/refs/heads/master/.randomizer/design/logo/randomizer.png"
           footer_timestamp: true
-          max_description: '4096'
-          reduce_headings: true
+          max_description: '4096' # Max length of the release notes in the Discord message
+          reduce_headings: true # Reduces markdown heading levels (e.g., H1 to H2)
