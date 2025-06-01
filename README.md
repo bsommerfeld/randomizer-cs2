@@ -4,16 +4,17 @@
 # <img src="https://github.com/user-attachments/assets/ab28eba7-4b88-47b4-be10-ac4487d66e23" alt="randomizer" width="24" height="24" style="vertical-align: middle;" />andomizer-CS2
 
 [![Build Status](https://github.com/Luziferium/randomizer-csgo/actions/workflows/build_and_pre-release.yml/badge.svg?branch=stage)](https://github.com/Luziferium/randomizer-csgo/actions/workflows/build_and_pre-release.yml)
-[![Visitor Count](https://visitor-badge.laobi.icu/badge?page_id=Metaphoriker.randomizer-cs2)](https://visitor-badge.laobi.icu/badge?page_id=Metaphoriker.randomizer-cs2)
-![Downloads](https://img.shields.io/github/downloads/metaphoriker/randomizer-cs2/total)
+[![Visitor Count](https://visitor-badge.laobi.icu/badge?page_id=bsommerfeld.randomizer-cs2)](https://visitor-badge.laobi.icu/badge?page_id=bsommerfeld.randomizer-cs2)
+![Downloads](https://img.shields.io/github/downloads/bsommerfeld/randomizer-cs2/total)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Java Version](https://img.shields.io/badge/Java-22%2B-blue)](https://www.oracle.com/de/java/technologies/downloads/#jdk23-windows)
 
 ---
 
 ## 🎮 About
 
-Randomizer-CS2 is a JavaFX application that allows you to create custom sequences of random actions to trigger them randomly in Counter-Strike 2. Make your friends in the game jump, shoot, reload, or drop their weapons at unfavorable moments – all without injecting into the game itself.
+Randomizer-CS2 is a JavaFX application that allows you to create custom sequences of random actions to trigger them
+randomly in Counter-Strike 2. Make your friends in the game jump, shoot, reload, or drop their weapons at unfavorable
+moments – all without injecting into the game itself.
 
 ### ✨ Key Features
 
@@ -28,7 +29,10 @@ Randomizer-CS2 is a JavaFX application that allows you to create custom sequence
 <div style="background-color: #f8f8f8; padding: 10px; border-left: 3px solid #2196F3; margin: 10px 0;">
 <p style="color: #555;">
 
-> The origin of Randomizer-CS2 stemmed from our desire to playfully troll each other while spectating matches. Imagine forcing someone to jump at the worst moment, making them fire unexpectedly, or even dropping their weapon mid-fight! Lacking the resources for a dedicated server, we opted for a software solution that everyone could use to trigger these random actions. This marked the birth of Randomizer-CSGO, now known as Randomizer-CS2.
+> The origin of Randomizer-CS2 stemmed from our desire to playfully troll each other while spectating matches. Imagine
+> forcing someone to jump at the worst moment, making them fire unexpectedly, or even dropping their weapon mid-fight!
+> Lacking the resources for a dedicated server, we opted for a software solution that everyone could use to trigger these
+> random actions. This marked the birth of Randomizer-CSGO, now known as Randomizer-CS2.
 
 </p>
 </div>
@@ -46,18 +50,18 @@ Randomizer-CS2 is a JavaFX application that allows you to create custom sequence
 
 ### Pre-made Sequences
 
-Save time by downloading our [pre-made and playtested sequences](https://github.com/Metaphoriker/randomizer-cs2/tree/master/.randomizer/sequences)!
+Save time by downloading
+our [pre-made and playtested sequences](https://github.com/Metaphoriker/randomizer-cs2/tree/master/.randomizer/sequences)!
 
 ### System Requirements
 
-* **OS**: Windows 10/11, macOS 10.10+, or Linux
+* **OS**: Windows 10/11
 * **Memory**: 100MB minimum
 * **Disk Space**: 50MB minimum
 
 ---
 
 ## 📸 Preview
-
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/a130ae15-ee0c-4e75-bb77-341905cadb96" alt="Randomizer Startup Animation" width=500>
