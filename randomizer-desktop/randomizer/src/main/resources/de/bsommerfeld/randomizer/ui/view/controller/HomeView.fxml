@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.Cursor?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="504.0" prefWidth="656.0"
-            xmlns="http://javafx.com/javafx/17.0.12"
-            fx:controller="de.bsommerfeld.randomizer.ui.view.controller.HomeViewController">
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="504.0" prefWidth="656.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.bsommerfeld.randomizer.ui.view.controller.HomeViewController">
     <children>
-        <VBox alignment="CENTER" prefHeight="504.0" prefWidth="656.0" styleClass="home-view"
-              AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-              AnchorPane.topAnchor="0.0">
+        <VBox alignment="CENTER" prefHeight="504.0" prefWidth="656.0" styleClass="home-view" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                <VBox alignment="CENTER" prefHeight="291.0" prefWidth="256.0" VBox.vgrow="ALWAYS">
-                    <children>
-                        <ImageView fitHeight="256.0" fitWidth="256.0" pickOnBounds="true" preserveRatio="true"
-                                   styleClass="home-view-image">
-                            <image>
-                                <Image url="@../../../images/homeView/randomizerLogo.png"/>
-                            </image>
-                        </ImageView>
-                        <HBox alignment="CENTER" prefHeight="20.0" prefWidth="162.0"
-                              styleClass="home-view-socials-container">
+            <HBox styleClass="home-view-header" VBox.vgrow="ALWAYS">
+               <children>
+                        <HBox styleClass="home-view-socials-container" HBox.hgrow="ALWAYS">
                             <children>
-                                <Label onMouseClicked="#onDiscordOpen" styleClass="home-view-discord" text="Discord">
-                                    <cursor>
-                                        <Cursor fx:constant="HAND"/>
-                                    </cursor>
-                                </Label>
-                                <Label onMouseClicked="#onGitHubOpen" styleClass="home-view-github" text="GitHub">
-                                    <cursor>
-                                        <Cursor fx:constant="HAND"/>
-                                    </cursor>
-                                </Label>
+                                <Label onMouseClicked="#onGitHubOpen" styleClass="home-view-github" text="GitHub" />
+                                <Label onMouseClicked="#onDiscordOpen" styleClass="home-view-discord" text="Discord" />
                             </children>
                         </HBox>
-                        <Button mnemonicParsing="false" styleClass="home-view-hector" text="Coming Soon..."
-                                disable="true"/>
+                  <HBox styleClass="home-view-settings-container" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Button styleClass="home-view-settings" mnemonicParsing="false" />
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
+                <VBox styleClass="home-view-section" alignment="CENTER"  VBox.vgrow="ALWAYS">
+                    <children>
+                        <ImageView pickOnBounds="true" preserveRatio="true" styleClass="home-view-image">
+                            <image>
+                                <Image url="@../../../images/homeView/randomizerLogo.png" />
+                            </image>
+                        </ImageView>
+                  <HBox styleClass="home-view-modes-container">
+                     <children>
+                         <Button disable="true" mnemonicParsing="false" styleClass="home-view-hector" text="Victor" />
+                         <Button disable="true" mnemonicParsing="false" styleClass="home-view-hector" text="Hector" />
+                     </children>
+                  </HBox>
                     </children>
                 </VBox>
+            <HBox styleClass="home-view-footer" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Button mnemonicParsing="false" styleClass="home-view-releaselogs" text="Releaselogs" />
+               </children>
+            </HBox>
             </children>
         </VBox>
     </children>

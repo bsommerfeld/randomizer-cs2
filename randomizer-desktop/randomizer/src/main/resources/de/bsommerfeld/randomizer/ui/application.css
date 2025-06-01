@@ -89,17 +89,19 @@
     -fx-alignment: center;
 }
 
-.home-view-image {
-    -fx-pref-width: 256;
-    -fx-pref-height: 256;
+.home-view-header {
+    -fx-pref-width: 656;
+    -fx-pref-height: 32;
+    -fx-min-height: 32;
+    -fx-alignment: center-left;
+    -fx-padding: 4 8;
 }
 
 .home-view-socials-container {
-    -fx-pref-width: 162;
+    -fx-min-width: 200;
     -fx-pref-height: 20;
-    -fx-padding: 16 0;
     -fx-spacing: 16;
-    -fx-alignment: center;
+    -fx-alignment: center-left;
 }
 
 .home-view-github, .home-view-discord {
@@ -128,9 +130,48 @@
     -fx-graphic: url("../images/homeView/discordIconSelected.png");
 }
 
-.home-view-github:pressed, .home-view-discord:pressed {
+.home-view-github:pressed, .home-view-discord:pressed, .home-view-releaselogs:pressed, .home-view-settings:pressed {
     -fx-scale-x: 0.9;
     -fx-scale-y: 0.9;
+}
+
+.home-view-settings-container {
+    -fx-pref-width: 656;
+    -fx-pref-height: 32;
+    -fx-alignment: center-right;
+}
+
+.home-view-settings {
+    -fx-pref-width: 24;
+    -fx-min-width: 24;
+    -fx-background-color: transparent;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-size: 24;
+    -fx-background-image: url("../images/homeView/settingsIcon.png");
+    -fx-cursor: hand;
+}
+
+.home-view-settings:hover {
+    -fx-background-image: url("../images/homeView/settingsSelectedIcon.png");
+}
+
+.home-view-section {
+    -fx-pref-width: 656;
+    -fx-pref-height: 440;
+    -fx-alignment: center;
+    -fx-spacing: 16;
+}
+
+.home-view-image {
+    -fx-pref-width: 256;
+    -fx-pref-height: 256;
+}
+
+.home-view-modes-container {
+    -fx-pref-height: 32;
+    -fx-alignment: center;
+    -fx-spacing: 12;
 }
 
 .home-view-hector {
@@ -191,6 +232,24 @@
     innershadow(one-pass-box, rgba(255, 255, 255, 1.0), 2, 0.0, 0, 1);
 }
 
+.home-view-footer {
+    -fx-pref-width: 656;
+    -fx-pref-height: 32;
+    -fx-alignment: center-left;
+    -fx-padding: 4 8;
+}
+
+.home-view-releaselogs {
+    -fx-background-color: transparent;
+    -fx-font-family: SansSerif;
+    -fx-font-size: 16;
+    -fx-text-fill: #A9A5F3;
+    -fx-cursor: hand;
+}
+
+.home-view-releaselogs:hover {
+    -fx-text-fill: #2F27CE;
+}
 
 /* Randomizer View */
 .randomizer-view {
