@@ -3,8 +3,6 @@
 
 # <img src="https://github.com/user-attachments/assets/ab28eba7-4b88-47b4-be10-ac4487d66e23" alt="randomizer" width="24" height="24" style="vertical-align: middle;" />andomizer-CS2
 
-[![Build Status](https://github.com/Luziferium/randomizer-csgo/actions/workflows/build_and_pre-release.yml/badge.svg?branch=stage)](https://github.com/Luziferium/randomizer-csgo/actions/workflows/build_and_pre-release.yml)
-[![Visitor Count](https://visitor-badge.laobi.icu/badge?page_id=bsommerfeld.randomizer-cs2)](https://visitor-badge.laobi.icu/badge?page_id=bsommerfeld.randomizer-cs2)
 ![Downloads](https://img.shields.io/github/downloads/bsommerfeld/randomizer-cs2/total)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -31,7 +29,8 @@ moments – all without injecting into the game itself.
 
 > The origin of Randomizer-CS2 stemmed from our desire to playfully troll each other while spectating matches. Imagine
 > forcing someone to jump at the worst moment, making them fire unexpectedly, or even dropping their weapon mid-fight!
-> Lacking the resources for a dedicated server, we opted for a software solution that everyone could use to trigger these
+> Lacking the resources for a dedicated server, we opted for a software solution that everyone could use to trigger
+> these
 > random actions. This marked the birth of Randomizer-CSGO, now known as Randomizer-CS2.
 
 </p>
