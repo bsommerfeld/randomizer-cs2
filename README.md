@@ -39,11 +39,10 @@ Randomizer-CS2 is a JavaFX application that allows you to create custom sequence
 
 ### Quick Start
 
-1. [Download randomizer.jar](https://github.com/Metaphoriker/randomizer-cs2/releases/tag/latest)
-2. Ensure you have [Java 22+](https://www.oracle.com/de/java/technologies/downloads/#jdk23-windows) installed
-3. Double-click the JAR file or run `java -jar randomizer.jar`
-4. Configure your action sequences
-5. Start the randomizer and enjoy!
+1. [Download randomizer](https://github.com/bsommerfeld/randomizer-cs2/releases/tag/1.2.1)
+2. Double-click the Randomizer-CS2 Installer
+3. Configure your action sequences
+4. Start the randomizer and enjoy!
 
 ### Pre-made Sequences
 
@@ -52,7 +51,7 @@ Save time by downloading our [pre-made and playtested sequences](https://github.
 ### System Requirements
 
 * **Java**: Version 22 or higher
-* **OS**: Windows 10/11, macOS 10.15+, or Linux
+* **OS**: Windows 10/11, macOS 10.10+, or Linux
 * **Memory**: 100MB minimum
 * **Disk Space**: 50MB minimum
 
