@@ -17,10 +17,8 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 @View
@@ -33,7 +31,6 @@ public class RandomizerWindowController implements Initializable {
 
   @FXML private BorderPane root;
   @FXML private GridPane contentPane;
-  @FXML private VBox navigationBarHolder;
 
   @Inject
   public RandomizerWindowController(ViewProvider viewProvider, RandomizerConfig randomizerConfig) {
@@ -43,10 +40,7 @@ public class RandomizerWindowController implements Initializable {
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    loadNavigationBar();
-
     registerViewListener();
-    setupControlBarClickTransparency();
 
     if (randomizerConfig.isShowIntro()) addPreloadingGif();
 
@@ -74,17 +68,6 @@ public class RandomizerWindowController implements Initializable {
     delay.play();
   }
 
-  // note: for this pickOnBounds have to be false
-  private void setupControlBarClickTransparency() {
-    navigationBarHolder.addEventFilter(
-        MouseEvent.MOUSE_CLICKED,
-        event -> {
-          if (event.getTarget() == navigationBarHolder) {
-            event.consume();
-          }
-        });
-  }
-
   private void registerViewListener() {
     viewProvider.registerViewChangeListener(HomeViewController.class, _ -> loadHomeView());
     viewProvider.registerViewChangeListener(BuilderViewController.class, _ -> loadBuilderView());
@@ -96,11 +79,6 @@ public class RandomizerWindowController implements Initializable {
   private void loadSettingsView() {
     Parent settingsViewParent = viewProvider.requestView(SettingsViewController.class).parent();
     setContent(settingsViewParent);
-  }
-
-  private void loadNavigationBar() {
-    Parent controlBarParent = viewProvider.requestView(NavigationBarController.class).parent();
-    navigationBarHolder.getChildren().add(controlBarParent);
   }
 
   private void loadHomeView() {
