@@ -1,28 +1,29 @@
-# This workflow builds a Java project, generates a categorized changelog,
-# lets jDeploy create a release, then combines notes and updates the release, and finally notifies Discord.
+# THIS IS A DEBUGGING WORKFLOW - Step 1: Isolate Discord Action Issue
+# It lets jDeploy create the release, then verifies, then tries to send to Discord.
+# Custom changelog generation and our body modification are temporarily disabled.
 
-name: Release CI
+name: Release CI - DEBUG Discord
 
 on:
   push:
     tags:
-      - '*' # Triggers on any tag push, e.g., v1.0.0, 1.2.3
+      - '*'
 
 permissions:
   contents: write # Required for creating/editing GitHub releases and for jDeploy
 
 jobs:
   build_and_release:
-    name: Build, Release and Notify
+    name: Build, Release and Notify (Debug Discord Only)
     runs-on: ubuntu-latest
     outputs:
-      release_body_verified: ${{ steps.verify_final_release_body.outputs.body_is_set }}
+      release_body_verified_by_jdeploy: ${{ steps.verify_jdeploy_release_body.outputs.body_is_set }}
       release_tag: ${{ github.ref_name }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Required for conventional-changelog to access full commit history
+          fetch-depth: 0 # Required for full history if changelog were active
 
       - name: Set up JDK 24
         uses: actions/setup-java@v4
@@ -34,150 +35,58 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
-      - name: Determine Previous SemVer Tag for Changelog (Diagnosis)
-        id: previous_tag_detector
-        shell: bash
-        run: |
-          echo "Current tag (GITHUB_REF_NAME): ${{ github.ref_name }}"
-          CURRENT_TAG="${{ github.ref_name }}"
-          git fetch --tags --force
-          echo "Listing all tags sorted by version (semver, most recent first):"
-          git tag -l --sort=-v:refname | grep -E '^([0-9]+)\.([0-9]+)\.([0-9]+)((-[a-zA-Z0-9.-]+)?)$' > semver_tags_sorted.txt
-          echo "--- Filtered SemVer Tags (sorted -v:refname) ---"
-          cat semver_tags_sorted.txt
-          echo "--- End Filtered SemVer Tags ---"
-          PREVIOUS_TAG=""
-          if grep -q "^${CURRENT_TAG}$" semver_tags_sorted.txt; then
-            PREVIOUS_TAG=$(grep -A1 -m1 "^${CURRENT_TAG}$" semver_tags_sorted.txt | tail -n1)
-            if [ "${PREVIOUS_TAG}" == "${CURRENT_TAG}" ]; then PREVIOUS_TAG=""; fi
-          else
-            echo "Warning: Current tag ${CURRENT_TAG} not found in filtered semver list or is not standard X.Y.Z."
-            echo "Fallback: Trying 'git describe --tags --abbrev=0 ${CURRENT_TAG}^'"
-            PREVIOUS_TAG_CANDIDATE=$(git describe --tags --abbrev=0 "${CURRENT_TAG}^" 2>/dev/null)
-            if [ -n "${PREVIOUS_TAG_CANDIDATE}" ] && [ "${PREVIOUS_TAG_CANDIDATE}" != "${CURRENT_TAG}" ]; then
-                PREVIOUS_TAG="${PREVIOUS_TAG_CANDIDATE}"
-            else PREVIOUS_TAG=""; fi
-          fi
-          if [ -n "${PREVIOUS_TAG}" ]; then
-            echo "Determined previous tag for changelog: ${PREVIOUS_TAG}"
-            echo "::set-output name=previous_tag::${PREVIOUS_TAG}"
-            echo "Commits between ${PREVIOUS_TAG} and ${CURRENT_TAG}:"
-            git log --pretty=format:"%h %ai %s" "${PREVIOUS_TAG}".."${CURRENT_TAG}" || echo "Failed to list commits or range is empty."
-          else
-            echo "No distinct previous tag found. Changelog may be from beginning of history."
-            echo "::set-output name=previous_tag::"
-            git log --pretty=format:"%h %ai %s" "${CURRENT_TAG}" -n 20
-          fi
-          echo "-------------------------------------------------"
-
-      - name: Generate categorized changelog to file
-        id: changelog_generator
-        uses: TriPSs/conventional-changelog-action@v5
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          output-file: "GENERATED_CHANGELOG.md"
-          skip-version-file: "true"
-          skip-commit: "true"
-          skip-tag: "true"
-          skip-git-pull: "true"
-          skip-bump: "true"
-          tag-prefix: ""
-          release-count: 1
-          preset: "angular" # Explicitly set, though it's default
-          skip-on-empty: "false" # Force creation of the output file
-
-      - name: Display Generated Changelog
-        run: |
-          echo "Contents of GENERATED_CHANGELOG.md:"
-          cat GENERATED_CHANGELOG.md || echo "GENERATED_CHANGELOG.md is empty or not found."
-          echo "-------------------------------------------------"
+      # -----------------------------------------------------------------------------------
+      # --- Custom Changelog Generation and Body Modification ARE TEMPORARILY DISABLED ---
+      # - name: Determine Previous SemVer Tag for Changelog (Diagnosis)
+      #   id: previous_tag_detector
+      #   ...
+      # - name: Generate categorized changelog to file
+      #   id: changelog_generator
+      #   ...
+      # - name: Display Generated Changelog
+      #   ...
+      # - name: Combine Our Changelog with jDeploy Notes and Update Release Body
+      #   id: combine_and_update_release
+      #   ...
+      # -----------------------------------------------------------------------------------
 
       - name: Build App Installer Bundles and Create/Update GitHub Release (jDeploy)
         id: jdeploy_release
         uses: shannah/jdeploy@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Let jDeploy create the release with its default notes. We'll modify it next.
+          # jDeploy will create/update the release for GITHUB_REF_NAME
+          # and set its own default release notes.
 
-      - name: Combine Our Changelog with jDeploy Notes and Update Release Body
-        id: combine_and_update_release
+      - name: Verify jDeploy-Set Release Body
+        id: verify_jdeploy_release_body
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Crucial for gh cli commands
-          TAG_NAME: ${{ github.ref_name }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Fetching release body set by jDeploy for tag: ${TAG_NAME}"
-          JDEPLOY_BODY=$(gh release view "${TAG_NAME}" --json body --template '{{.body}}')
-
-          if [ -z "$(echo -e "${JDEPLOY_BODY}" | tr -d '[:space:]')" ]; then # Check if empty after removing all whitespace
-            echo "Warning: jDeploy did not set a release body, or it was empty/whitespace. Using default."
-            JDEPLOY_BODY="*jDeploy artifacts and installers attached.*"
-          else
-            echo "Successfully fetched release body set by jDeploy."
-          fi
+          echo "VERIFYING Release Body Content AFTER jDeploy has run (no modification by our workflow):"
+          TAG_NAME="${{ github.ref_name }}"
+          echo "Fetching release for tag: ${TAG_NAME}"
           
-          echo "------------------- jDeploy Body Fetched -------------------"
-          echo -e "${JDEPLOY_BODY}"
-          echo "------------------------------------------------------------"
-
-          OUR_CHANGELOG_CONTENT=$(cat GENERATED_CHANGELOG.md || echo "")
+          VERIFIED_BODY=$(gh release view "${TAG_NAME}" --json body --template '{{.body}}')
           
-          FINAL_CATEGORIZED_CHANGELOG="${OUR_CHANGELOG_CONTENT}"
-          # Check if our changelog is effectively empty (only whitespace or just the typical empty header without list items)
-          if echo "${FINAL_CATEGORIZED_CHANGELOG}" | awk 'NF' | grep -qE "(\\* |Features|Bug Fixes|Performance Improvements|BREAKING CHANGES)"; then
-            echo "Using generated categorized changelog as it appears to have content."
-          else
-            echo "Our generated changelog is effectively empty. Using default message for changelog part."
-            FINAL_CATEGORIZED_CHANGELOG="### Changelog\n\nNo specific user-facing changes (e.g., features, fixes) were automatically detected in conventional commits for this release. Please see commit history for details."
-          fi
-
-          echo "------------------- Final Categorized Changelog Part -------------------"
-          echo -e "${FINAL_CATEGORIZED_CHANGELOG}"
-          echo "----------------------------------------------------------------------"
-
-          # Prepare the new combined body.
-          {
-            echo -e "${FINAL_CATEGORIZED_CHANGELOG}"
-            echo "" 
-            echo "---" 
-            echo "" 
-            echo "**jDeploy Information & Artifacts (as generated by jDeploy):**"
-            echo "" 
-            echo -e "${JDEPLOY_BODY}" 
-          } > combined_release_notes.md
-
-          echo "Combined notes to be uploaded to GitHub release (content of combined_release_notes.md):"
-          cat combined_release_notes.md
-          echo "-------------------------------------------------"
-
-          gh release edit "${TAG_NAME}" --notes-file combined_release_notes.md
-          
-          echo "GitHub release notes for ${TAG_NAME} have been updated."
-          echo "Release URL: https://github.com/${GITHUB_REPOSITORY}/releases/tag/${TAG_NAME}"
-
-      - name: Verify Final Release Body
-        id: verify_final_release_body
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Crucial for gh cli commands
-        run: |
-          echo "VERIFYING Final Release Body Content AFTER our update:"
-          VERIFIED_BODY=$(gh release view "${{ github.ref_name }}" --json body --template '{{.body}}')
           if [ -z "$(echo -e "${VERIFIED_BODY}" | tr -d '[:space:]')" ]; then
-            echo "ERROR: Final release body appears EMPTY or whitespace-only!"
-            echo "Raw verified body: <<EOF"
+            echo "ERROR: Release body set by jDeploy appears EMPTY or whitespace-only!"
+            echo "Raw verified body by jDeploy: <<EOF"
             echo "${VERIFIED_BODY}"
             echo "EOF"
             echo "::set-output name=body_is_set::false"
           else
-            echo "SUCCESS: Final release body is NOT empty. Content:"
-            echo "------------------- VERIFIED FINAL BODY START -------------------"
+            echo "SUCCESS: Release body set by jDeploy is NOT empty. Content:"
+            echo "------------------- VERIFIED JDEPLOY BODY START -------------------"
             echo -e "${VERIFIED_BODY}"
-            echo "-------------------- VERIFIED FINAL BODY END --------------------"
+            echo "-------------------- VERIFIED JDEPLOY BODY END --------------------"
             echo "::set-output name=body_is_set::true"
           fi
           echo "-------------------------------------------------"
 
-      - name: Send GitHub Release to Discord
-        if: steps.verify_final_release_body.outputs.body_is_set == 'true'
+      - name: Send GitHub Release to Discord (using jDeploy's original body)
+        # This step now uses the release body as set *only* by jDeploy.
+        if: steps.verify_jdeploy_release_body.outputs.body_is_set == 'true'
         uses: SethCohen/github-releases-to-discord@v1.16.2
         with:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
@@ -185,7 +94,7 @@ jobs:
           username: "Randomizer-CS2"
           avatar_url: "https://raw.githubusercontent.com/bsommerfeld/randomizer-cs2/refs/heads/master/.randomizer/design/logo/randomizer.png"
           content: "@everyone"
-          footer_title: "Changelog"
+          footer_title: "Changelog (jDeploy Default)"
           footer_icon_url: "https://raw.githubusercontent.com/bsommerfeld/randomizer-cs2/refs/heads/master/.randomizer/design/logo/randomizer.png"
           footer_timestamp: true
           max_description: '4096'
