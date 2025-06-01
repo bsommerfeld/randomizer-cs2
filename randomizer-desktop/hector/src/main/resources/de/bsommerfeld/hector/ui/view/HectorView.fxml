@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="280.0" prefWidth="480.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox alignment="CENTER_LEFT" minHeight="32.0" prefHeight="32.0" prefWidth="480.0">
+         <children>
+            <HBox alignment="CENTER_LEFT" prefHeight="21.0" prefWidth="120.0" spacing="8.0">
+               <children>
+                  <ImageView fitHeight="21.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/randomizerLogo.png" />
+                     </image></ImageView>
+                  <Label text="Randomizer">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </HBox>
+            <HBox alignment="CENTER" maxHeight="32.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <HBox alignment="CENTER" maxHeight="24.0" prefHeight="24.0" prefWidth="160.0" style="-fx-border-color: black; -fx-border-radius: 8;" />
+               </children></HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="24.0" prefWidth="120.0" spacing="8.0">
+               <children>
+                  <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="24.0" style="-fx-background-color: transparent; -fx-background-image: url(../../images/onTopIcon.png); -fx-background-size: 24; -fx-background-repeat: no-repeat; -fx-cursor: hand; -fx-background-position: center;" />
+                  <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="24.0" style="-fx-background-color: transparent; -fx-background-repeat: no-repeat; -fx-background-size: 24; -fx-background-image: url(../../images/closeIcon.png); -fx-cursor: hand; -fx-background-position: center;" />
+               </children>
+            </HBox>
+         </children>
+         <opaqueInsets>
+            <Insets bottom="4.0" left="8.0" right="8.0" top="4.0" />
+         </opaqueInsets>
+      </HBox>
+      <HBox maxHeight="208.0" minHeight="208.0" prefHeight="208.0" prefWidth="480.0" spacing="12.0">
+         <children>
+            <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="24.0" style="-fx-background-image: url(../../images/goBackIcon.png); -fx-background-color: transparent; -fx-background-position: center; -fx-background-repeat: no-repeat; -fx-cursor: hand; -fx-background-size: 24;" />
+            <VBox prefHeight="192.0" prefWidth="420.0" style="-fx-background-color: #E6E5FF; -fx-border-color: #847EE7; -fx-border-width: 2; -fx-background-radius: 8; -fx-border-radius: 8;" />
+         </children>
+         <padding>
+            <Insets bottom="8.0" left="12.0" right="12.0" top="8.0" />
+         </padding>
+      </HBox>
+      <HBox alignment="CENTER_LEFT" maxHeight="40.0" minHeight="40.0" prefHeight="40.0" prefWidth="480.0" spacing="12.0">
+         <children>
+            <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="24.0" style="-fx-background-color: transparent; -fx-background-position: center; -fx-background-repeat: no-repeat; -fx-background-size: 24; -fx-cursor: hand; -fx-background-image: url(../../images/playIcon.png);" />
+            <ProgressBar maxHeight="20.0" minHeight="20.0" prefHeight="20.0" prefWidth="420.0" progress="0.5" />
+         </children>
+         <padding>
+            <Insets bottom="8.0" left="12.0" right="12.0" top="8.0" />
+         </padding>
+      </HBox>
+   </children>
+</VBox>
