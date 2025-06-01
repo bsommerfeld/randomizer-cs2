@@ -7,14 +7,16 @@ import de.bsommerfeld.model.ModelModule;
 import de.bsommerfeld.randomizer.bootstrap.RandomizerBootstrap;
 import de.bsommerfeld.randomizer.bootstrap.RandomizerModule;
 import de.bsommerfeld.randomizer.ui.RandomizerApplication;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import javafx.application.Application;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Main entry point for the Randomizer-CS2 application.
- * This class initializes the application context, dependency injection,
- * and launches the JavaFX user interface.
+ * Main entry point for the Randomizer-CS2 application. This class initializes the application
+ * context, dependency injection, and launches the JavaFX user interface.
  */
 @Slf4j
 public class Main {
@@ -22,23 +24,26 @@ public class Main {
   /** Command line flag to enable test mode */
   private static final String TEST_MODE_FLAG = "-testMode=";
 
+  /** The name of the properties file used by the application to load the randomizer version. */
+  private static final String PROPERTIES_FILE = "randomizer.properties";
+
   /** Guice injector for dependency injection */
   @Getter private static final Injector injector = initializeInjector();
 
   /** Flag indicating whether the application is running in test mode */
   @Getter private static boolean testMode = false;
 
-  /**
-   * Static initializer block to create necessary application directories
-   */
+  @Getter private static String randomizerVersion = "UNLOADED";
+
+  /** Static initializer block to create necessary application directories */
   static {
     ApplicationContext.getAppdataFolder().mkdirs();
     ApplicationContext.getAppdataLibsFolder().mkdirs();
   }
 
   /**
-   * Main entry point for the application.
-   * Sets up the environment, initializes the application, and launches the UI.
+   * Main entry point for the application. Sets up the environment, initializes the application, and
+   * launches the UI.
    *
    * @param args Command line arguments
    */
@@ -47,8 +52,34 @@ public class Main {
         "jnativehook.lib.path", ApplicationContext.getAppdataLibsFolder().getAbsolutePath());
 
     verifyTestMode(args);
+    loadRandomizerVersion();
     initializeApplication();
     launchApplication(args);
+  }
+
+  /**
+   * Loads the randomizer version from a properties file and sets the value to the {@code
+   * randomizerVersion} field. The properties file is expected to be located in the application's
+   * classpath and defined by the {@code PROPERTIES_FILE} constant.
+   *
+   * <p>This method uses a {@code Properties} object to read the version information specified by
+   * the "engine.version" key. If the file cannot be read or an I/O error occurs, a {@code
+   * RuntimeException} is thrown.
+   *
+   * <p>Exceptions: - {@code RuntimeException} if an {@code IOException} is encountered during the
+   * process of loading properties.
+   */
+  private static void loadRandomizerVersion() {
+    try (InputStream inputStream =
+        Main.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE)) {
+      Properties properties = new Properties();
+      properties.load(inputStream);
+
+      randomizerVersion = properties.getProperty("randomizer.version");
+      if (isTestMode()) randomizerVersion = randomizerVersion + "-TEST";
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
@@ -61,9 +92,7 @@ public class Main {
     Application.launch(RandomizerApplication.class, args);
   }
 
-  /**
-   * Initializes the application by bootstrapping required components.
-   */
+  /** Initializes the application by bootstrapping required components. */
   private static void initializeApplication() {
     RandomizerBootstrap randomizerBootstrap = injector.getInstance(RandomizerBootstrap.class);
     randomizerBootstrap.initializeApplication();

@@ -59,16 +59,7 @@ public class RandomizerApplication extends Application {
   }
 
   private void setupStage(Stage stage, Scene scene) {
-    try {
-      if (Main.isTestMode()) {
-        stage.setTitle("Randomizer-CS2 - DEVELOPMENT");
-      } else {
-        stage.setTitle("Randomizer-CS2");
-      }
-    } catch (Exception e) {
-      log.error("Fehler beim Laden der Version für Titel", e);
-    }
-
+    stage.setTitle("Randomizer " + Main.getRandomizerVersion());
     stage.getIcons().add(new Image("de/bsommerfeld/randomizer/images/randomizer.png"));
     scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
     stage.setMinWidth(MIN_WIDTH);
