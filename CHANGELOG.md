@@ -1,12 +1,10 @@
-## --- Changelog ---
+## Changelog
 
-### -- Added --
+### Added
 
-### -- Changed --
+### Changed
 
-### -- Fixed --
+### Fixed
 
-- Fixed config missing indicator while config is set
-
-### -- Removed --
+### Removed
 
