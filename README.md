@@ -60,8 +60,9 @@ Save time by downloading our [pre-made and playtested sequences](https://github.
 
 ## 📸 Preview
 
+
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/a66d5992-1797-490c-a814-2f439f18aded" alt="Randomizer Startup Animation" width=500>
+  <img src="https://github.com/user-attachments/assets/a130ae15-ee0c-4e75-bb77-341905cadb96" alt="Randomizer Startup Animation" width=500>
   <br>
   <small>Our custom startup animation showcasing the Randomizer-CS2 experience</small>
 </p>
