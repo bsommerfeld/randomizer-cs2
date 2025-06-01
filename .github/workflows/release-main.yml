@@ -1,0 +1,117 @@
+# .github/workflows/release-main.yml
+# Dieser Workflow baut das Projekt, generiert einen Changelog und erstellt eine GitHub-Release mit jDeploy.
+name: Release CI - Main
+
+on:
+  push:
+    tags:
+      - '*' # Wird bei jedem Tag-Push ausgelöst
+
+permissions:
+  contents: write # Notwendig für das Erstellen von GitHub-Releases und für jDeploy
+
+jobs:
+  build_and_release:
+    name: Build and Create GitHub Release
+    runs-on: ubuntu-latest
+    outputs:
+      # Dieser Output wird vom nachfolgenden Discord-Workflow verwendet, um den korrekten Tag zu kennen.
+      release_tag: ${{ github.ref_name }}
+      release_id: ${{ steps.get_release_info.outputs.release_id }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Erforderlich für die vollständige Commit-Historie für den Changelog-Generator
+
+      - name: Set up JDK 24
+        uses: actions/setup-java@v4
+        with:
+          java-version: '24'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4 # Verwendung von v4 für Node.js Setup
+        with:
+          node-version: '18' # Eine aktuelle LTS-Version von Node.js
+
+      - name: Install Conventional Changelog CLI and Angular Preset
+        run: npm install -g conventional-changelog-cli conventional-changelog-angular
+
+      - name: Create .jdeploy directory if it doesn't exist
+        run: mkdir -p ./.jdeploy # jDeploy sucht hier nach einer release-notes.md
+
+      - name: Generate Changelog for jDeploy
+        id: generate_changelog_file
+        shell: bash
+        run: |
+          echo "Generating changelog for tag ${{ github.ref_name }}..."
+          # -p angular: Verwendet das Angular-Preset für die Commit-Formatierung.
+          # -o ./.jdeploy/release-notes.md: Schreibt den Output in diese Datei (überschreibt sie).
+          # --release-count 1: Generiert den Changelog nur für den neuesten Tag (d.h. seit dem vorherigen Tag).
+          # --commit-path .: Sucht Commits im aktuellen Verzeichnis.
+          # --verbose: Gibt mehr Debugging-Informationen aus.
+          npx conventional-changelog -p angular -o ./.jdeploy/release-notes.md --release-count 1 --commit-path . --verbose
+
+          echo "--- Generated .jdeploy/release-notes.md (raw from conventional-changelog) ---"
+          cat ./.jdeploy/release-notes.md || echo ".jdeploy/release-notes.md is empty or not found after conventional-changelog."
+          echo "------------------------------------------------------------------------------"
+
+          # Sicherheitsprüfung: Wenn der Changelog leer ist oder nur einen Header ohne Inhalt hat,
+          # ersetze ihn durch eine Standardnachricht, um sicherzustellen, dass jDeploy Inhalt hat.
+          if ! grep -qE "(\\* |<a name=|<h[1-4]>)|\\[[0-9]+\\.[0-9]+\\.[0-9]+\\]" ./.jdeploy/release-notes.md; then
+            echo "Generated changelog appears to be empty or lacks standard sections. Replacing with a default message."
+            echo -e "### Changelog\n\nNo specific user-facing changes (e.g., features, fixes) were automatically detected in conventional commits for this release. Please see commit history for details.\n" > ./.jdeploy/release-notes.md
+            echo "--- Default .jdeploy/release-notes.md (used as fallback) ---"
+            cat ./.jdeploy/release-notes.md
+            echo "------------------------------------------------------------"
+          fi
+          # Stelle sicher, dass die Datei existiert, auch wenn sie leer sein sollte (sollte durch obige Logik nicht passieren)
+          touch ./.jdeploy/release-notes.md
+
+
+      - name: Build App Installer Bundles and Create/Update GitHub Release (jDeploy)
+        id: jdeploy_release
+        uses: shannah/jdeploy@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # jDeploy sollte automatisch ./.jdeploy/release-notes.md aufgreifen
+          # und seine eigenen Installer-Informationen darunter anhängen.
+
+      - name: Get Release Info (ID and Body)
+        id: get_release_info
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          echo "Fetching release ID and body for tag: ${TAG_NAME}"
+          # Kurze Wartezeit, um sicherzustellen, dass die Release-API-Daten konsistent sind
+          sleep 10 
+          RELEASE_INFO_JSON=$(gh release view "${TAG_NAME}" --json id,body --template '{{json .}}')
+          echo "Release Info JSON: ${RELEASE_INFO_JSON}"
+          
+          RELEASE_ID=$(echo "${RELEASE_INFO_JSON}" | jq -r '.id')
+          VERIFIED_BODY=$(echo "${RELEASE_INFO_JSON}" | jq -r '.body')
+
+          if [ "${RELEASE_ID}" == "null" ] || [ -z "${RELEASE_ID}" ]; then
+            echo "ERROR: Could not fetch release ID for tag ${TAG_NAME}!"
+            exit 1
+          fi
+          echo "::set-output name=release_id::${RELEASE_ID}"
+          
+          if [ -z "$(echo -e "${VERIFIED_BODY}" | tr -d '[:space:]')" ]; then
+            echo "WARNING: Release body for ${TAG_NAME} (ID: ${RELEASE_ID}) appears EMPTY or whitespace-only after jDeploy!"
+            echo "::set-output name=body_is_set::false"
+          else
+            echo "SUCCESS: Release body for ${TAG_NAME} (ID: ${RELEASE_ID}) is NOT empty."
+            echo "::set-output name=body_is_set::true"
+            echo "------------------- VERIFIED FINAL BODY (from jDeploy) START -------------------"
+            echo -e "${VERIFIED_BODY}"
+            echo "-------------------- VERIFIED FINAL BODY (from jDeploy) END --------------------"
+          fi
+          echo "-------------------------------------------------"

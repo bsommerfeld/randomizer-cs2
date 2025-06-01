@@ -1,0 +1,62 @@
+# .github/workflows/notify-discord.yml
+# Dieser Workflow sendet eine Benachrichtigung an Discord, nachdem der Haupt-Release-Workflow erfolgreich war.
+name: Notify Discord on Release
+
+on:
+  workflow_run:
+    workflows: [ "Release CI - Main" ] # Muss exakt dem 'name' des Haupt-Release-Workflows entsprechen
+    types:
+      - completed # Wird nur ausgeführt, wenn der Hauptworkflow abgeschlossen ist
+
+jobs:
+  discord_notification:
+    name: Send Discord Notification
+    runs-on: ubuntu-latest
+    # Nur ausführen, wenn der Hauptworkflow erfolgreich ('success') abgeschlossen wurde
+    if: github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Extract Tag Name from Triggering Workflow
+        id: get_tag
+        run: |
+          # Der 'head_branch' im workflow_run Event ist der Name des Tags,
+          # wenn der auslösende Workflow durch einen Tag-Push gestartet wurde.
+          TAG_NAME="${{ github.event.workflow_run.head_branch }}"
+          echo "Triggering tag from workflow_run.head_branch: ${TAG_NAME}"
+          if [[ -z "$TAG_NAME" ]]; then
+            echo "Error: Could not determine release tag from the triggering workflow's head_branch."
+            # Als Fallback versuchen wir, den Tag aus dem Commit SHA zu bekommen,
+            # obwohl dies weniger robust ist, falls mehrere Tags auf denselben Commit zeigen.
+            COMMIT_SHA="${{ github.event.workflow_run.head_sha }}"
+            echo "Attempting to find tag for commit SHA: ${COMMIT_SHA}"
+            # Wir brauchen einen Checkout, um 'git describe' zu verwenden
+            actions/checkout@v4
+            # Holen aller Tags
+            git fetch --tags --force
+            TAG_NAME=$(git describe --tags --exact-match "${COMMIT_SHA}" 2>/dev/null)
+            if [[ -z "$TAG_NAME" ]]; then
+                echo "Error: Could not determine tag from commit SHA ${COMMIT_SHA} either."
+                exit 1
+            else
+                echo "Determined tag from commit SHA: ${TAG_NAME}"
+            fi
+          fi
+          echo "::set-output name=tag_name::${TAG_NAME}"
+
+      - name: Send GitHub Release to Discord
+        uses: SethCohen/github-releases-to-discord@v1.16.2
+        with:
+          webhook_url: ${{ secrets.WEBHOOK_URL }}
+          # Die Action sollte die Release-Informationen basierend auf dem tag_name holen.
+          # Wenn tag_name nicht explizit angegeben wird, versucht sie, die 'latest' Release zu nehmen,
+          # was in diesem Szenario (Auslösung nach Abschluss des Release-Workflows) die korrekte sein sollte.
+          # Zur Sicherheit übergeben wir den expliziten Tag-Namen.
+          tag_name: ${{ steps.get_tag.outputs.tag_name }}
+          color: "2105893"
+          username: "Randomizer-CS2"
+          avatar_url: "https://raw.githubusercontent.com/bsommerfeld/randomizer-cs2/refs/heads/master/.randomizer/design/logo/randomizer.png"
+          content: "@everyone"
+          footer_title: "Changelog"
+          footer_icon_url: "https://raw.githubusercontent.com/bsommerfeld/randomizer-cs2/refs/heads/master/.randomizer/design/logo/randomizer.png"
+          footer_timestamp: true
+          max_description: '4096'
+          reduce_headings: true
