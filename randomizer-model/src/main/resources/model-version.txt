@@ -1,8 +1,0 @@
-1.1.4
-/*
- * The first number of the version is the major version number.
- * The second number of the version is the minor version number.
- * The third number of the version is the revision number.
- *
- * The suffix of the version is the release type if there is any.
- */
