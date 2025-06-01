@@ -12,5 +12,8 @@
 
 ### Fixed
 
+- Configuration mess: The Randomizer configuration is now saved and reloaded properly again
+  which means, that set values won't reset anymore.
+
 ### Removed
 
