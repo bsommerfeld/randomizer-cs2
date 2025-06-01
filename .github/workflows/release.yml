@@ -31,20 +31,61 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
+      - name: List relevant tags and commits for changelog diagnosis
+        run: |
+          echo "Current tag (GITHUB_REF_NAME): ${{ github.ref_name }}"
+          echo "Listing all tags sorted by version (most recent first):"
+          # List tags, sort them as versions (ignoring non-semver like 'jdeploy' for PREVIOUS_TAG determination)
+          # and then get the one immediately preceding the current tag.
+          git tag -l --sort=-v:refname > all_tags.txt
+          echo "--- All Tags ---"
+          cat all_tags.txt
+          echo "--- End All Tags ---"
+
+          CURRENT_TAG="${{ github.ref_name }}"
+          # Attempt to find the previous semver tag
+          PREVIOUS_TAG=$(grep -E "^[0-9]+\.[0-9]+\.[0-9]+$" all_tags.txt | grep -B1 -A0 "$CURRENT_TAG" | head -n1)
+          
+          if [ -z "${PREVIOUS_TAG}" ] || [ "${PREVIOUS_TAG}" == "${CURRENT_TAG}" ]; then
+            echo "Could not automatically determine a distinct previous semver tag. Trying to find any immediate previous tag."
+            # Fallback: try to get the immediate previous tag regardless of semver pattern, if different from current
+            PREVIOUS_TAG_CANDIDATE=$(git describe --tags --abbrev=0 "${CURRENT_TAG}^" 2>/dev/null)
+            if [ -n "${PREVIOUS_TAG_CANDIDATE}" ] && [ "${PREVIOUS_TAG_CANDIDATE}" != "${CURRENT_TAG}" ]; then
+                PREVIOUS_TAG="${PREVIOUS_TAG_CANDIDATE}"
+            else
+                PREVIOUS_TAG="" # Explicitly set to empty if no suitable previous tag found
+                echo "No suitable previous tag found before ${CURRENT_TAG}. Changelog might be from the beginning of history."
+            fi
+          fi
+
+          if [ -n "${PREVIOUS_TAG}" ]; then
+            echo "Determined previous tag for changelog range: ${PREVIOUS_TAG}"
+            echo "Commits between ${PREVIOUS_TAG} and ${CURRENT_TAG} (inclusive of ${CURRENT_TAG}'s commit, exclusive of ${PREVIOUS_TAG}'s commit):"
+            # The range PREVIOUS_TAG..CURRENT_TAG includes commits *after* PREVIOUS_TAG up to and including CURRENT_TAG
+            git log --pretty=format:"%h %ai %s" "${PREVIOUS_TAG}".."${CURRENT_TAG}" || echo "Failed to list commits in range ${PREVIOUS_TAG}..${CURRENT_TAG}, or range is empty."
+          else
+            echo "No previous tag determined. Listing commits for current tag ${CURRENT_TAG} (might be all history if it's the first tag):"
+            # This will list commits that are part of the current tag's history, potentially up to its creation if no other tags are specified.
+            # For conventional-changelog, without a previous tag, it often goes to the first commit.
+            git log --pretty=format:"%h %ai %s" "${CURRENT_TAG}" -n 20 # List last 20 commits for the current tag for context
+          fi
+          echo "-------------------------------------------------"
+
+
       - name: Generate categorized changelog
         id: changelog_generator
         uses: TriPSs/conventional-changelog-action@v5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          output-file: "false" # Get the changelog as a step output, not written to a file
-          skip-version-file: "true" # Don't create/update a version file
-          skip-commit: "true" # Don't commit a CHANGELOG.md file
-          skip-tag: "true" # Don't create a new tag; the workflow is triggered by a tag
+          output-file: "false"
+          skip-version-file: "true"
+          skip-commit: "true"
+          skip-tag: "true"
           skip-git-pull: "true"
-          skip-bump: "true" # Crucial: Use the current tag as the version, don't bump it
-          tag-prefix: "" # Set to empty if your tags are like 1.0.0, 1.2.0 (no "v" prefix)
-          # preset: "conventionalcommits" # This is the default and usually what you want for fix:, feat:, etc.
-          # release-count: 1 # Consider setting to 1 if you only want the changelog for the current tag
+          skip-bump: "true"
+          tag-prefix: ""
+          release-count: 1 # Explicitly process only the current tag/release
+          # preset: "conventionalcommits"
 
       - name: Build App Installer Bundles and Create/Update GitHub Release (jDeploy)
         id: jdeploy_release
@@ -56,77 +97,86 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: ${{ github.ref_name }}
-          # Pass the multiline categorized changelog as an environment variable
           RAW_CATEGORIZED_CHANGELOG: ${{ steps.changelog_generator.outputs.changelog }}
         run: |
-          echo "Raw categorized changelog output: <<EOF"
+          echo "Raw categorized changelog output from step: <<EOF"
           echo "${RAW_CATEGORIZED_CHANGELOG}"
           echo "EOF"
 
           FINAL_CATEGORIZED_CHANGELOG="${RAW_CATEGORIZED_CHANGELOG}"
-          # Check if the raw changelog is empty or contains only whitespace or just the typical empty header
-          if [ -z "${FINAL_CATEGORIZED_CHANGELOG}" ] || \
-             ! echo "${FINAL_CATEGORIZED_CHANGELOG}" | grep -qE "(\*|Features|Bug Fixes|Performance Improvements|BREAKING CHANGES)"; then
+          # Check if the raw changelog is effectively empty (only whitespace or the generic header without list items)
+          # The grep looks for typical list item markers (*) or section headers.
+          if echo "${FINAL_CATEGORIZED_CHANGELOG}" | awk 'NF' | grep -qE "(\* |Features|Bug Fixes|Performance Improvements|BREAKING CHANGES)"; then
+            echo "Using generated categorized changelog as it appears to have content."
+          else
             echo "Categorized changelog is effectively empty or contains no standard sections. Using default message."
             FINAL_CATEGORIZED_CHANGELOG="### Changelog\n\nNo user-facing changes (e.g., features, fixes) noted in conventional commits for this release."
-          else
-            echo "Using generated categorized changelog."
           fi
           
           echo "Attempting to update release for tag: ${TAG_NAME}"
-          # Fetch the current release body content that jDeploy might have set.
           JDEPLOY_NOTES=$(gh release view "${TAG_NAME}" --json body --template '{{.body}}')
 
           if [ -z "${JDEPLOY_NOTES}" ]; then
             echo "jDeploy did not add any specific release notes, or the notes were empty."
             JDEPLOY_NOTES="*jDeploy artifacts and installers attached.*" 
           else
-            echo "Successfully fetched jDeploy notes."
+            echo "Successfully fetched jDeploy notes initially set by jDeploy."
           fi
 
           echo "-------------------------------------------------"
           echo "Final Categorized Changelog (for tag ${TAG_NAME}):"
-          echo "${FINAL_CATEGORIZED_CHANGELOG}"
+          echo -e "${FINAL_CATEGORIZED_CHANGELOG}" # Use -e to render \n for multiline echo
           echo "-------------------------------------------------"
-          echo "jDeploy Notes (fetched from GitHub release created/updated by jDeploy):"
-          echo "${JDEPLOY_NOTES}"
+          echo "jDeploy Notes (fetched from GitHub release):"
+          echo -e "${JDEPLOY_NOTES}" # Use -e to render \n for multiline echo
           echo "-------------------------------------------------"
           
-          # Prepare the new combined body.
-          # The categorized changelog comes first, then jDeploy's information.
           {
-            echo -e "${FINAL_CATEGORIZED_CHANGELOG}" # Use -e to interpret backslashes if any, e.g. \n
+            echo -e "${FINAL_CATEGORIZED_CHANGELOG}"
             echo "" 
             echo "---" 
             echo "" 
             echo "**jDeploy Information & Artifacts:**"
             echo "" 
-            echo -e "${JDEPLOY_NOTES}" # Use -e here as well for consistency
+            echo -e "${JDEPLOY_NOTES}" 
           } > combined_release_notes.md
 
-          echo "Combined notes to be uploaded to GitHub release:"
+          echo "Combined notes to be uploaded to GitHub release (content of combined_release_notes.md):"
           cat combined_release_notes.md
           echo "-------------------------------------------------"
 
-          # Edit the GitHub release to set the new combined notes.
           gh release edit "${TAG_NAME}" --notes-file combined_release_notes.md
           
-          echo "GitHub release notes for ${TAG_NAME} have been updated successfully."
+          echo "GitHub release notes for ${TAG_NAME} have been updated successfully (according to gh cli)."
           echo "Release URL: https://github.com/${GITHUB_REPOSITORY}/releases/tag/${TAG_NAME}"
+          echo "-------------------------------------------------"
+          echo "VERIFYING Release Body Content AFTER 'gh release edit':"
+          VERIFIED_BODY_AFTER_EDIT=$(gh release view "${TAG_NAME}" --json body --template '{{.body}}')
+          if [ -z "$(echo -e "${VERIFIED_BODY_AFTER_EDIT}" | tr -d '[:space:]')" ]; then # Check if empty after removing all whitespace
+            echo "ERROR: Release body appears EMPTY or whitespace-only after 'gh release edit'!"
+            echo "Raw verified body: <<EOF"
+            echo "${VERIFIED_BODY_AFTER_EDIT}"
+            echo "EOF"
+          else
+            echo "SUCCESS: Release body is NOT empty after 'gh release edit'. Content:"
+            echo "------------------- VERIFIED BODY START -------------------"
+            echo -e "${VERIFIED_BODY_AFTER_EDIT}"
+            echo "-------------------- VERIFIED BODY END --------------------"
+          fi
+          echo "-------------------------------------------------"
 
 
       - name: Send GitHub Release to Discord
-        # This step runs last, after the GitHub release notes have been finalized.
+        if: success() # Ensures this runs only if previous steps were successful
         uses: SethCohen/github-releases-to-discord@v1.16.2
         with:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
           color: "2105893"
           username: "Randomizer-CS2"
           avatar_url: "https://raw.githubusercontent.com/bsommerfeld/randomizer-cs2/refs/heads/master/.randomizer/design/logo/randomizer.png"
-          content: "@everyone" # Message content outside the embed
-          # The action will automatically fetch the title and the (now combined) body of the GitHub release.
-          footer_title: "Changelog" # Footer title for the Discord embed
+          content: "@everyone"
+          footer_title: "Changelog"
           footer_icon_url: "https://raw.githubusercontent.com/bsommerfeld/randomizer-cs2/refs/heads/master/.randomizer/design/logo/randomizer.png"
           footer_timestamp: true
-          max_description: '4096' # Max length of the release notes in the Discord message
-          reduce_headings: true # Reduces markdown heading levels (e.g., H1 to H2)
+          max_description: '4096'
+          reduce_headings: true
