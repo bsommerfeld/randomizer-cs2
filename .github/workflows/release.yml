@@ -33,16 +33,16 @@ jobs:
 
       - name: Generate categorized changelog
         id: changelog_generator
-        uses: TriPSs/conventional-changelog-action@v5 # Using a popular action for conventional changelogs
+        uses: TriPSs/conventional-changelog-action@v5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           output-file: "false" # Get the changelog as a step output, not written to a file
           skip-version-file: "true" # Don't create/update a version file
           skip-commit: "true" # Don't commit a CHANGELOG.md file
           skip-tag: "true" # Don't create a new tag; the workflow is triggered by a tag
-            # preset: "conventionalcommits" # This is the default and usually what you want for fix:, feat:, etc.
-          # tag-prefix: "v" # Uncomment and adjust if your tags are consistently prefixed (e.g., v1.0.0).
-          # If tags are 1.0.0, this is usually not needed or should be empty.
+          git-pull: "false" # Skip git pull as fetch-depth: 0 already fetches all history
+          tag-prefix: "" # Set to empty if your tags are like 1.0.0, 1.2.0 (no "v" prefix)
+          # preset: "conventionalcommits" # This is the default and usually what you want for fix:, feat:, etc.
 
       - name: Build App Installer Bundles and Create/Update GitHub Release (jDeploy)
         id: jdeploy_release
