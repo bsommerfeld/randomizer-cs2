@@ -1,14 +1,14 @@
 # .github/workflows/release-main.yml
-name: Release CI - Main (Manual Changelog & Integrated Discord)
+name: Release CI - Main (Manual Changelog v3)
 
 on:
   push:
     tags:
-      - '*' # Wird bei jedem Tag-Push ausgelöst
+      - '*'
 
 permissions:
-  contents: write # Notwendig für Releases, Assets und das Committen der geleerten CHANGELOG.md
-  # actions: write # Nicht mehr benötigt, da kein separater Workflow-Dispatch
+  contents: write
+  # actions: write # Nur nötig für workflow_dispatch mit Standard-Token, was oft nicht geht.
 
 jobs:
   build_release_and_notify:
@@ -21,7 +21,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # Token wird für den späteren Commit der geleerten CHANGELOG.md benötigt
+          fetch-depth: 0 # WICHTIG: Volle Historie für Git-Operationen
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up JDK 24
@@ -34,40 +34,74 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
-      - name: Prepare Changelog for jDeploy
-        id: prep_changelog_for_jdeploy
+      - name: Read CHANGELOG.md
+        id: read_manual_changelog
         run: |
-          CHANGELOG_SOURCE_FILE="CHANGELOG.md"
-          JDEPLOY_NOTES_DIR=".jdeploy"
-          JDEPLOY_NOTES_FILE="${JDEPLOY_NOTES_DIR}/release-notes.md"
-          
-          echo "Prüfe, ob ${CHANGELOG_SOURCE_FILE} existiert..."
-          if [ ! -f "${CHANGELOG_SOURCE_FILE}" ]; then
-            echo "FEHLER: ${CHANGELOG_SOURCE_FILE} nicht im Repository-Root gefunden!"
-            echo "Erstelle eine Fallback-Datei für jDeploy: ${JDEPLOY_NOTES_FILE}"
-            mkdir -p "${JDEPLOY_NOTES_DIR}"
-            echo -e "### Changelog für ${{ github.ref_name }}\n\n*Keine ${CHANGELOG_SOURCE_FILE} im Repository gefunden. Release wurde ohne benutzerdefinierte Notizen erstellt.*" > "${JDEPLOY_NOTES_FILE}"
-          else
-            echo "Verwende ${CHANGELOG_SOURCE_FILE} für Release Notes und kopiere nach ${JDEPLOY_NOTES_FILE}."
-            mkdir -p "${JDEPLOY_NOTES_DIR}"
-            cp "${CHANGELOG_SOURCE_FILE}" "${JDEPLOY_NOTES_FILE}"
-            echo "--- Inhalt von ${JDEPLOY_NOTES_FILE} (vor jDeploy) ---"
-            cat "${JDEPLOY_NOTES_FILE}"
-            echo "-------------------------------------------------------"
-          fi
+          CHANGELOG_CONTENT=$(cat CHANGELOG.md || echo "### Changelog für ${{ github.ref_name }}\n\n*CHANGELOG.md nicht gefunden oder leer.*")
+          # Mache den Inhalt sicher für multiline echo und als Input für andere Steps
+          CHANGELOG_CONTENT="${CHANGELOG_CONTENT//'%'/'%25'}"
+          CHANGELOG_CONTENT="${CHANGELOG_CONTENT//$'\n'/'%0A'}"
+          CHANGELOG_CONTENT="${CHANGELOG_CONTENT//$'\r'/'%0D'}"
+          echo "changelog_text=${CHANGELOG_CONTENT}" >> $GITHUB_OUTPUT
+          echo "--- Inhalt von CHANGELOG.md ---"
+          cat CHANGELOG.md || echo "CHANGELOG.md nicht gefunden."
+          echo "-------------------------------"
 
       - name: Build App Installer Bundles and Create/Update GitHub Release (jDeploy)
         id: jdeploy_release
         uses: shannah/jdeploy@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          # jDeploy wird ./.jdeploy/release-notes.md als Basis für den Release-Body verwenden
-          # und seine eigenen Installer-Informationen und Links darunter anfügen.
+          # jDeploy erstellt die Release mit seinen Standardnotizen und Assets.
+          # Der Body wird im nächsten Schritt von uns überschrieben/ergänzt.
 
-      - name: Wait for GitHub API to propagate release changes
+      - name: Wait for jDeploy Release to be somewhat propagated
         run: |
-          echo "Warte 20 Sekunden, damit die von jDeploy erstellte/aktualisierte Release konsistent ist..."
-          sleep 20
+          echo "Warte 15 Sekunden, damit die von jDeploy erstellte Release-Struktur via API verfügbar ist..."
+          sleep 15
+
+      - name: Update Release Body with Manual Changelog and jDeploy Info
+        id: update_release_body
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ github.ref_name }}
+          MANUAL_CHANGELOG: ${{ steps.read_manual_changelog.outputs.changelog_text }}
+        run: |
+          echo "Hole den von jDeploy gesetzten Release Body für Tag: ${TAG_NAME}"
+          # Versuche, den existierenden Body zu holen. Wenn es fehlschlägt oder leer ist, setze einen Fallback.
+          JDEPLOY_BODY_PART=$(gh release view "${TAG_NAME}" --json body -q .body || echo "")
+
+          if [ -z "$(echo -e "${JDEPLOY_BODY_PART}" | tr -d '[:space:]')" ]; then
+            echo "Warnung: jDeploy hat keinen signifikanten Body gesetzt. Verwende Standardtext für jDeploy-Teil."
+            JDEPLOY_BODY_PART="*jDeploy Artefakte und Installer wurden dieser Release hinzugefügt.*"
+          else
+            echo "Erfolgreich den von jDeploy gesetzten Release Body (oder Teile davon) geholt."
+          fi
+
+          echo "------------------- Geholter jDeploy Body-Teil -------------------"
+          echo -e "${JDEPLOY_BODY_PART}"
+          echo "------------------------------------------------------------------"
+          
+          # Stelle den manuellen Changelog voran
+          # Dekodiere den Changelog-Text zurück für die Datei
+          DECODED_MANUAL_CHANGELOG=$(echo -e "${MANUAL_CHANGELOG}")
+
+          {
+            echo -e "${DECODED_MANUAL_CHANGELOG}"
+            echo "" 
+            echo "---" 
+            echo "" 
+            echo "**App Installers & jDeploy Info:**"
+            echo "" 
+            echo -e "${JDEPLOY_BODY_PART}" 
+          } > combined_release_notes.md
+
+          echo "Kombinierte Notizen, die hochgeladen werden:"
+          cat combined_release_notes.md
+          echo "-------------------------------------------"
+
+          gh release edit "${TAG_NAME}" --notes-file combined_release_notes.md
+          echo "GitHub Release Notes für ${TAG_NAME} wurden aktualisiert."
 
       - name: Attach original CHANGELOG.md as Release Asset
         env:
@@ -82,6 +116,11 @@ jobs:
             echo "CHANGELOG.md nicht gefunden, konnte nicht als Asset angehängt werden."
           fi
 
+      - name: Wait for Release Body update to propagate
+        run: |
+          echo "Warte weitere 20 Sekunden, damit der aktualisierte Release-Body konsistent ist..."
+          sleep 20
+
       - name: Verify Final Release Body (for Discord)
         id: verify_final_release_body
         env:
@@ -92,9 +131,6 @@ jobs:
           
           if [[ "${VERIFIED_BODY}" == "VERIFIZIERUNGSFEHLER" ]] || [ -z "$(echo -e "${VERIFIED_BODY}" | tr -d '[:space:]')" ]; then
             echo "FEHLER: Finaler Release Body erscheint LEER oder nur Whitespace!"
-            echo "Raw verifizierter Body: <<EOF"
-            echo "${VERIFIED_BODY}"
-            echo "EOF"
             echo "body_is_set=false" >> $GITHUB_OUTPUT
           else
             echo "ERFOLG: Finaler Release Body ist NICHT leer."
@@ -109,7 +145,9 @@ jobs:
         uses: SethCohen/github-releases-to-discord@v1.16.2
         with:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
-          tag_name: ${{ github.ref_name }} # Die Action holt sich den Body basierend auf diesem Tag
+          # Lasse die Action die "latest" Release holen oder die Release anhand des github.ref_name
+          # Da wir den `tag_name` Input vorher als problematisch identifiziert haben (Warnung), lassen wir ihn weg.
+          # Die Action sollte den Body der Release verwenden, die dem aktuellen Tag entspricht.
           color: "2105893"
           username: "Randomizer-CS2"
           avatar_url: "https://raw.githubusercontent.com/bsommerfeld/randomizer-cs2/refs/heads/master/.randomizer/design/logo/randomizer.png"
@@ -118,24 +156,23 @@ jobs:
           footer_icon_url: "https://raw.githubusercontent.com/bsommerfeld/randomizer-cs2/refs/heads/master/.randomizer/design/logo/randomizer.png"
           footer_timestamp: true
           max_description: '4096'
-          reduce_headings: true
+          reduce_headings: true # Kann testweise auf 'false' gesetzt werden, falls es Probleme macht
 
       - name: Clear and Commit CHANGELOG.md for next release
-        # Dieser Schritt läuft auch, wenn der Discord-Schritt fehlschlägt,
-        # aber NACHDEM die Release erstellt und der Body (hoffentlich) verifiziert wurde.
         if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Bestimme den Default-Branch des Repositories, um darauf zu pushen
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          TARGET_BRANCH=$(git branch -r --contains HEAD~0 | grep 'origin/' | sed 's|origin/||' | grep -v 'HEAD' | head -n 1)
-
-          if [ -z "$TARGET_BRANCH" ]; then
-            echo "Konnte den Zielbranch nicht automatisch bestimmen. Verwende 'main' als Fallback."
-            TARGET_BRANCH="master"
-          fi
+          TARGET_BRANCH="${DEFAULT_BRANCH}"
           echo "Zielbranch für das Leeren des Changelogs: ${TARGET_BRANCH}"
           
+          # Stelle sicher, dass wir auf dem Zielbranch sind (nicht im Detached HEAD des Tags)
+          # und dass er aktuell ist.
           git checkout "${TARGET_BRANCH}"
           git pull origin "${TARGET_BRANCH}" --ff-only
           
@@ -145,8 +182,11 @@ jobs:
             echo "CHANGELOG.md wurde mit dem Template für das nächste Release überschrieben."
           
             git add "${CHANGELOG_FILE_TO_CLEAR}"
+            # Prüfen, ob es tatsächlich Änderungen gibt
             if ! git diff --staged --quiet; then
               git commit -m "chore: Reset ${CHANGELOG_FILE_TO_CLEAR} for next release [skip ci]"
+              # Authentifiziere den Push (redundant, wenn actions/checkout bereits den Token verwendet)
+              # git remote set-url origin https://x-access-token:${{ env.GITHUB_TOKEN }}@github.com/${{ github.repository }}
               git push origin "${TARGET_BRANCH}"
               echo "${CHANGELOG_FILE_TO_CLEAR} wurde geleert und die Änderung gepusht auf Branch ${TARGET_BRANCH}."
             else
