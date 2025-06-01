@@ -5,6 +5,7 @@ import de.bsommerfeld.randomizer.config.RandomizerConfig;
 import de.bsommerfeld.randomizer.ui.view.View;
 import de.bsommerfeld.randomizer.ui.view.ViewProvider;
 import de.bsommerfeld.randomizer.ui.view.controller.SettingsViewController;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.layout.HBox;
@@ -24,9 +25,14 @@ public class BuilderFillerViewController {
 
   @FXML
   private void initialize() {
-    randomizerConfig.getConfigPathProperty().addListener((observable, oldValue, newValue) -> {
-      configIndicatorHBox.setVisible(newValue == null || newValue.isEmpty());
-    });
+    configIndicatorHBox
+        .visibleProperty()
+        .bind(
+            Bindings.createBooleanBinding(
+                () ->
+                    randomizerConfig.getConfigPath() == null
+                        || randomizerConfig.getConfigPath().isEmpty(),
+                randomizerConfig.getConfigPathProperty()));
   }
 
   @FXML
