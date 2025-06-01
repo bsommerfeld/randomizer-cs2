@@ -14,7 +14,6 @@ public class SettingsViewController {
   private final ViewProvider viewProvider;
 
   @FXML private ToggleButton generalToggleButton;
-  @FXML private ToggleButton updaterToggleButton;
   @FXML private GridPane contentPane;
 
   @Inject
@@ -24,21 +23,10 @@ public class SettingsViewController {
 
   @FXML
   private void initialize() {
-    setupButton(generalToggleButton, GeneralSettingsController.class, updaterToggleButton);
     generalToggleButton.setSelected(true);
-  }
-
-  private void setupButton(ToggleButton thisButton, Class<?> viewClass, ToggleButton otherButton) {
-    thisButton
-        .selectedProperty()
-        .addListener(
-            (_, _, newValue) -> {
-              if (newValue) {
-                otherButton.setSelected(false);
-                contentPane.getChildren().setAll(viewProvider.requestView(viewClass).parent());
-              } else if (!otherButton.isSelected()) {
-                thisButton.setSelected(true);
-              }
-            });
+    generalToggleButton.setDisable(true);
+    contentPane
+        .getChildren()
+        .setAll(viewProvider.requestView(GeneralSettingsController.class).parent());
   }
 }
