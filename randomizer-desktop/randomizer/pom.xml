@@ -58,6 +58,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>de.bsommerfeld</groupId>
+            <artifactId>hector</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
             <groupId>com.github.bsommerfeld</groupId>
             <artifactId>jshepherd</artifactId>
             <version>3.0.0</version>
