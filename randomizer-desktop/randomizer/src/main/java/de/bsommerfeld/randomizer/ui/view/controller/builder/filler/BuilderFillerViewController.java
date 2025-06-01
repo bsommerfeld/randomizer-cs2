@@ -14,6 +14,7 @@ public class BuilderFillerViewController {
 
   private final ViewProvider viewProvider;
   private final RandomizerConfig randomizerConfig;
+  @FXML private HBox configIndicatorHBox;
 
   @Inject
   public BuilderFillerViewController(ViewProvider viewProvider, RandomizerConfig randomizerConfig) {
@@ -21,12 +22,11 @@ public class BuilderFillerViewController {
     this.randomizerConfig = randomizerConfig;
   }
 
-  @FXML private HBox configIndicatorHBox;
-
   @FXML
   private void initialize() {
-    configIndicatorHBox.setVisible(
-        randomizerConfig.getConfigPath() == null || randomizerConfig.getConfigPath().isEmpty());
+    randomizerConfig.getConfigPathProperty().addListener((observable, oldValue, newValue) -> {
+      configIndicatorHBox.setVisible(newValue == null || newValue.isEmpty());
+    });
   }
 
   @FXML
