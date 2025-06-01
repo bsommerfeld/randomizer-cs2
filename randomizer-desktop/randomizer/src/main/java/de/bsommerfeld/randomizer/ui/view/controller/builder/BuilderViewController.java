@@ -2,6 +2,7 @@ package de.bsommerfeld.randomizer.ui.view.controller.builder;
 
 import com.google.inject.Inject;
 import de.bsommerfeld.model.action.sequence.ActionSequence;
+import de.bsommerfeld.randomizer.config.RandomizerConfig;
 import de.bsommerfeld.randomizer.ui.view.View;
 import de.bsommerfeld.randomizer.ui.view.ViewProvider;
 import de.bsommerfeld.randomizer.ui.view.controller.builder.filler.BuilderFillerViewController;
@@ -9,6 +10,7 @@ import de.bsommerfeld.randomizer.ui.view.viewmodel.builder.BuilderViewModel;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
+import javafx.beans.binding.BooleanBinding;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -31,14 +33,21 @@ public class BuilderViewController {
   private static final double BUTTON_HBOX_SPACING = 10;
 
   private final ViewProvider viewProvider;
+  private final RandomizerConfig randomizerConfig;
   private final BuilderViewModel builderViewModel;
 
+  @FXML private HBox rootHBox;
+  @FXML private VBox actionSequencesSection;
   @FXML private VBox actionSequencesVBox;
   @FXML private GridPane contentPane;
 
   @Inject
-  public BuilderViewController(ViewProvider viewProvider, BuilderViewModel builderViewModel) {
+  public BuilderViewController(
+      ViewProvider viewProvider,
+      RandomizerConfig randomizerConfig,
+      BuilderViewModel builderViewModel) {
     this.viewProvider = viewProvider;
+    this.randomizerConfig = randomizerConfig;
     this.builderViewModel = builderViewModel;
   }
 
@@ -61,8 +70,41 @@ public class BuilderViewController {
 
   @FXML
   private void initialize() {
+    setupBindToNotShowSequencesSection();
+
     showFiller();
     fillActionSequences();
+  }
+
+  /**
+   * Configures the binding and visibility settings for the `actionSequencesSection` UI component.
+   *
+   * <p>This method ensures that the `actionSequencesSection` is added to the beginning of the
+   * `rootHBox` if it is not already present, or repositions it if it is not the first element.
+   *
+   * <p>The visibility and managed properties of the `actionSequencesSection` are bound to a
+   * condition based on the presence of a valid configuration path in the `randomizerConfig` object.
+   * Specifically: - The `visibleProperty` of the `actionSequencesSection` is bound to a boolean
+   * expression that evaluates to true if the configuration path is not null and not empty. - The
+   * `managedProperty` of the `actionSequencesSection` is bound to its `visibleProperty`, ensuring
+   * that it is only managed in the UI layout when visible.
+   */
+  private void setupBindToNotShowSequencesSection() {
+    if (!rootHBox.getChildren().contains(actionSequencesSection)) {
+      rootHBox.getChildren().addFirst(actionSequencesSection);
+    } else if (rootHBox.getChildren().getFirst() != actionSequencesSection) {
+      rootHBox.getChildren().remove(actionSequencesSection);
+      rootHBox.getChildren().addFirst(actionSequencesSection);
+    }
+
+    BooleanBinding configPathIsPresent =
+        randomizerConfig
+            .getConfigPathProperty()
+            .isNotNull()
+            .and(randomizerConfig.getConfigPathProperty().isNotEmpty());
+
+    actionSequencesSection.visibleProperty().bind(configPathIsPresent);
+    actionSequencesSection.managedProperty().bind(actionSequencesSection.visibleProperty());
   }
 
   private void showFiller() {
