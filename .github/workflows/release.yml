@@ -40,7 +40,7 @@ jobs:
           skip-version-file: "true" # Don't create/update a version file
           skip-commit: "true" # Don't commit a CHANGELOG.md file
           skip-tag: "true" # Don't create a new tag; the workflow is triggered by a tag
-          git-pull: "false" # Skip git pull as fetch-depth: 0 already fetches all history
+          skip-git-pull: "true" # Corrected: Skip git pull as fetch-depth: 0 already fetches all history
           tag-prefix: "" # Set to empty if your tags are like 1.0.0, 1.2.0 (no "v" prefix)
           # preset: "conventionalcommits" # This is the default and usually what you want for fix:, feat:, etc.
 
