@@ -9,7 +9,6 @@ import de.bsommerfeld.model.tracker.TimeTracker;
 import de.bsommerfeld.randomizer.config.RandomizerConfig;
 import de.bsommerfeld.randomizer.ui.view.ViewProvider;
 import de.bsommerfeld.randomizer.ui.view.viewmodel.HomeViewModel;
-import de.bsommerfeld.randomizer.ui.view.viewmodel.NavigationBarViewModel;
 import de.bsommerfeld.randomizer.ui.view.viewmodel.RandomizerViewModel;
 import de.bsommerfeld.randomizer.ui.view.viewmodel.builder.BuilderActionsViewModel;
 import de.bsommerfeld.randomizer.ui.view.viewmodel.builder.BuilderEditorViewModel;
@@ -25,7 +24,6 @@ public class RandomizerModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(NavigationBarViewModel.class).asEagerSingleton();
     bind(BuilderViewModel.class).asEagerSingleton();
     bind(BuilderEditorViewModel.class).asEagerSingleton();
     bind(BuilderActionsViewModel.class).asEagerSingleton();
