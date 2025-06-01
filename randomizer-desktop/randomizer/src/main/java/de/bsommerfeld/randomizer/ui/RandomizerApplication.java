@@ -8,8 +8,6 @@ import de.bsommerfeld.randomizer.Main;
 import de.bsommerfeld.randomizer.config.RandomizerConfig;
 import de.bsommerfeld.randomizer.ui.view.ViewProvider;
 import de.bsommerfeld.randomizer.ui.view.controller.RandomizerWindowController;
-import de.bsommerfeld.updater.Updater;
-import de.bsommerfeld.updater.util.JarFileUtil;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Parent;
@@ -55,7 +53,6 @@ public class RandomizerApplication extends Application {
               randomizerConfig.getTimeTracked() + timeTracker.getElapsedTime());
           randomizerConfig.save();
           ActionSequenceDispatcher.discardAllRunningActions();
-          Updater.close();
           Platform.exit();
         });
     stage.show();
@@ -67,8 +64,6 @@ public class RandomizerApplication extends Application {
         stage.setTitle("Randomizer-CS2 - DEVELOPMENT");
       } else {
         stage.setTitle("Randomizer-CS2");
-        Updater.getVersion(JarFileUtil.getJarFile(), Updater.FileType.RANDOMIZER)
-            .thenAccept(version -> stage.setTitle("Randomizer-CS2 - " + version));
       }
     } catch (Exception e) {
       log.error("Fehler beim Laden der Version für Titel", e);

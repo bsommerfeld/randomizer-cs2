@@ -60,7 +60,6 @@
     <modules>
         <module>randomizer-desktop</module>
         <module>randomizer-model</module>
-        <module>updater</module>
     </modules>
 
     <build>

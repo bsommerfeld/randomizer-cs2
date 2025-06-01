@@ -44,7 +44,6 @@ public class NavigationBarController {
     setupToggleButtonLogic();
     addTooltips();
     toggle(homeButton);
-    if (randomizerConfig.isUpdateNotifier()) setupUpdateIndicator();
   }
 
   private void setupBindings() {
@@ -93,25 +92,6 @@ public class NavigationBarController {
         builderButton, BuilderViewController.class, homeButton, randomizerButton, settingsButton);
     addToggleButtonListener(
         settingsButton, SettingsViewController.class, homeButton, randomizerButton, builderButton);
-  }
-
-  private void setupUpdateIndicator() {
-    Tooltip tooltip = new Tooltip("Click to update to the latest version");
-    tooltip.getStyleClass().add("tooltip-user-options");
-    Tooltip.install(updateIndicatorButton, tooltip);
-    triggerUpdateCheck();
-    updateIndicatorButton.setOnAction(_ -> navigationBarViewModel.runUpdater());
-  }
-
-  public void triggerUpdateCheck() {
-    navigationBarViewModel
-        .isUpdateAvailable()
-        .thenAccept(b -> Platform.runLater(() -> updateIndicatorButton.setVisible(b)))
-        .exceptionally(
-            throwable -> {
-              log.error("Error checking for updates", throwable);
-              return null;
-            });
   }
 
   private void addToggleButtonListener(

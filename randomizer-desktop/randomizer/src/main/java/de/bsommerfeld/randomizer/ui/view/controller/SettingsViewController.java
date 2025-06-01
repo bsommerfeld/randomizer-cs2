@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import de.bsommerfeld.randomizer.ui.view.View;
 import de.bsommerfeld.randomizer.ui.view.ViewProvider;
 import de.bsommerfeld.randomizer.ui.view.controller.settings.GeneralSettingsController;
-import de.bsommerfeld.randomizer.ui.view.controller.settings.UpdaterSettingsViewController;
 import javafx.fxml.FXML;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.GridPane;
@@ -26,7 +25,6 @@ public class SettingsViewController {
   @FXML
   private void initialize() {
     setupButton(generalToggleButton, GeneralSettingsController.class, updaterToggleButton);
-    setupButton(updaterToggleButton, UpdaterSettingsViewController.class, generalToggleButton);
     generalToggleButton.setSelected(true);
   }
 

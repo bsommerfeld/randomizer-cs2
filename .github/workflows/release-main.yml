@@ -128,7 +128,7 @@ jobs:
           
           CHANGELOG_FILE_TO_CLEAR="CHANGELOG.md"
           if [ -f "${CHANGELOG_FILE_TO_CLEAR}" ]; then
-            echo -e "## [Changelogs]\n\n### Added\n\n### Changed\n\n### Fixed\n\n### Removed\n" > "${CHANGELOG_FILE_TO_CLEAR}"
+            echo -e "## --- Changelog ---\n\n### -- Added --\n\n### -- Changed --\n\n### -- Fixed --\n\n### -- Removed --\n" > "${CHANGELOG_FILE_TO_CLEAR}"
             echo "CHANGELOG.md wurde mit dem Template für das nächste Release überschrieben."
           
             git add "${CHANGELOG_FILE_TO_CLEAR}"

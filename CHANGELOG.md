@@ -1,10 +1,16 @@
-## [Unreleased]
+## --- Changelogs ---
 
-### Added
+### -- Added --
 
-### Changed
+- Added JDeploy as updater
 
-### Fixed
+### -- Changed --
 
-### Removed
+- Overworked workflows to work with JDeploy and provide a dynamic changelog
+
+### -- Fixed --
+
+### -- Removed --
+
+- Removed custom updater
 

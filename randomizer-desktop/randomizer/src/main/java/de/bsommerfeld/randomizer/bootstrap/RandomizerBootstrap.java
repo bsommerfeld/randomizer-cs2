@@ -15,7 +15,6 @@ import de.bsommerfeld.model.config.keybind.KeyBindRepository;
 import de.bsommerfeld.model.exception.UncaughtExceptionLogger;
 import de.bsommerfeld.model.messages.Messages;
 import de.bsommerfeld.model.watcher.FileSystemWatcher;
-import de.bsommerfeld.randomizer.Main;
 import de.bsommerfeld.randomizer.config.RandomizerConfig;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +32,6 @@ public class RandomizerBootstrap {
   private final KeyBindRepository keyBindRepository;
   private final ActionSequenceExecutorRunnable actionSequenceExecutorRunnable;
   private final RandomizerConfig randomizerConfig;
-  private final RandomizerUpdater randomizerUpdater;
   private final CS2ConfigLoader CS2ConfigLoader;
 
   @Inject
@@ -43,14 +41,12 @@ public class RandomizerBootstrap {
       KeyBindRepository keyBindRepository,
       ActionSequenceExecutorRunnable actionSequenceExecutorRunnable,
       RandomizerConfig randomizerConfig,
-      RandomizerUpdater randomizerUpdater,
       CS2ConfigLoader CS2ConfigLoader) {
     this.actionSequenceRepository = actionSequenceRepository;
     this.actionRepository = actionRepository;
     this.keyBindRepository = keyBindRepository;
     this.actionSequenceExecutorRunnable = actionSequenceExecutorRunnable;
     this.randomizerConfig = randomizerConfig;
-    this.randomizerUpdater = randomizerUpdater;
     this.CS2ConfigLoader = CS2ConfigLoader;
   }
 
@@ -58,9 +54,6 @@ public class RandomizerBootstrap {
     log.info("Initialisiere Applikation...");
     loadConfiguration();
     loadUserKeyBindsByConfig();
-    randomizerUpdater.installUpdater();
-    if (!Main.isTestMode() && randomizerConfig.isAutoupdateEnabled())
-      randomizerUpdater.runUpdaterIfNeeded();
     registerActions();
     setupFileWatcher();
     Messages.cache();
