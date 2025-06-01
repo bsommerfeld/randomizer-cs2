@@ -50,7 +50,6 @@ Save time by downloading our [pre-made and playtested sequences](https://github.
 
 ### System Requirements
 
-* **Java**: Version 22 or higher
 * **OS**: Windows 10/11, macOS 10.10+, or Linux
 * **Memory**: 100MB minimum
 * **Disk Space**: 50MB minimum
