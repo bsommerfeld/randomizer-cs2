@@ -1014,19 +1014,23 @@
 
 .settings-options {
     -fx-min-width: 112;
-    -fx-pref-height: 14;
+    -fx-pref-height: 18;
     -fx-padding: 0 6;
     -fx-alignment: center;
     -fx-font-family: SansSerif;
     -fx-font-size: 14;
     -fx-text-fill: #040316;
     -fx-background-radius: 4;
-    -fx-background-color: transparent;
+    -fx-background-color: #E6E5FF;
     -fx-cursor: hand;
 }
 
 .settings-options:hover, .settings-options:selected {
-    -fx-background-color: #E6E5FF;
+    -fx-background-color: #D4D2F9;
+}
+
+.settings-options:pressed {
+    -fx-background-color: #ADA9EF;
 }
 
 .settings-selection-separator, .settings-selection-separator .line {
