@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -31,10 +32,12 @@ public class UIUncaughtExceptionHandler implements Thread.UncaughtExceptionHandl
       lastDialogShownTime = currentTime;
 
       try {
-        Alert alert = createStyledAlert();
-        VBox content = createContent();
-        alert.getDialogPane().setContent(content);
-        alert.showAndWait();
+        Platform.runLater(() -> {
+          Alert alert = createStyledAlert();
+          VBox content = createContent();
+          alert.getDialogPane().setContent(content);
+          alert.showAndWait();
+        });
       } catch (Exception ex) {
         log.error(
             "An unexpected error occurred, and the error dialog could not be displayed. Secondary exception: ",
