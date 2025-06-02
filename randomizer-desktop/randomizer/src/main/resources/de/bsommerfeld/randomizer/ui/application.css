@@ -996,8 +996,6 @@
 .settings-container {
     -fx-max-width: 632;
     -fx-pref-height: 360;
-    -fx-spacing: 12;
-    -fx-padding: 8;
     -fx-background-radius: 8;
     -fx-background-color: #EBEBFA;
 }
@@ -1005,7 +1003,9 @@
 .settings-selection {
     -fx-pref-width: 412;
     -fx-min-height: 344;
-    -fx-spacing: 8;
+    -fx-padding: 0 6 0 0;
+    -fx-background-color: #9C99FF;
+    -fx-background-radius: 8 0 0 8;
     -fx-alignment: center-right;
 }
 
@@ -1023,7 +1023,7 @@
 }
 
 .settings-options:hover, .settings-options:selected {
-    -fx-background-color: #9E99FF;
+    -fx-background-color: #E6E5FF;
 }
 
 .settings-selection-separator, .settings-selection-separator .line {
@@ -1036,7 +1036,6 @@
 .updater-settings {
     -fx-pref-width: 480;
     -fx-pref-height: 344;
-    -fx-padding: 4 0 0 0;
     -fx-spacing: 12;
     -fx-alignment: center-left;
 }
