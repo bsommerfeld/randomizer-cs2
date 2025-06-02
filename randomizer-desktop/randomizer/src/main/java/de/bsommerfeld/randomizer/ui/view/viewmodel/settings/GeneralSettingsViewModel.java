@@ -11,10 +11,8 @@ import java.util.function.Supplier;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import lombok.Getter;
@@ -23,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GeneralSettingsViewModel {
 
-  @Getter private final LongProperty spentTimeProperty = new SimpleLongProperty();
   @Getter private final StringProperty configPathProperty = new SimpleStringProperty();
   @Getter private final BooleanProperty showIntroProperty = new SimpleBooleanProperty(true);
   @Getter private final IntegerProperty minIntervalProperty = new SimpleIntegerProperty();
@@ -86,7 +83,6 @@ public class GeneralSettingsViewModel {
 
   public void setupViewModel() {
     loadIntervalFromConfig();
-    spentTimeProperty.set(randomizerConfig.getTimeTracked());
     showIntroProperty.set(randomizerConfig.isShowIntro());
     showIntroProperty.addListener((_, _, _) -> saveRegularSettings());
     minIntervalProperty.addListener((_, _, _) -> updateInterval());

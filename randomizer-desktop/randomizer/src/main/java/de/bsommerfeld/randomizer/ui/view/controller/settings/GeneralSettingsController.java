@@ -29,7 +29,6 @@ public class GeneralSettingsController {
   @FXML private TextField configPathTextField;
   @FXML private MinMaxSlider minMaxSlider;
   @FXML private Label syncFailedIndicator;
-  @FXML private Label spentTimeLabel;
 
   @Inject
   public GeneralSettingsController(GeneralSettingsViewModel generalSettingsViewModel) {
@@ -38,18 +37,10 @@ public class GeneralSettingsController {
 
   @FXML
   private void initialize() {
-    initializeSpentTimeLabel();
     generalSettingsViewModel.setupViewModel();
     setupSettingsOptions();
     setupIntervalSlider();
     syncStatus();
-  }
-
-  private void initializeSpentTimeLabel() {
-    generalSettingsViewModel
-        .getSpentTimeProperty()
-        .addListener(
-            (_, _, newValue) -> spentTimeLabel.setText(longInHours(newValue.longValue()) + "h"));
   }
 
   private int longInHours(long timestamp) {

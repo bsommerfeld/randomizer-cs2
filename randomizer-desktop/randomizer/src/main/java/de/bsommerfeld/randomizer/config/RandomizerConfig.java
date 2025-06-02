@@ -45,13 +45,6 @@ public class RandomizerConfig extends ConfigurablePojo<RandomizerConfig> {
   @Key("builder.filters.activated")
   private List<String> builderFiltersActivated = new ArrayList<>(KeyBindType.values().length);
 
-  @Key("time.tracked")
-  @Comment({
-    "Basically this is just to see, how many hours you've spent with the Randomizer on.",
-    "Please do not change this specific value, it would just be self-sabotage"
-  })
-  private long timeTracked = 0L;
-
   public void setConfigPath(String configPath) {
     this.configPath = configPath;
     configPathProperty.set(configPath);
