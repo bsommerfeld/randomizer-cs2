@@ -80,15 +80,22 @@ public class RandomizerViewController {
     centerBox.getStyleClass().add("logbook-history-entry-rightbox");
     Label actionSequenceActionCount = new Label(actionSequence.getActions().size() + " Actions");
     actionSequenceActionCount.getStyleClass().add("logbook-history-entry-action-count");
+
+    HBox rigfhtFiller = new HBox();
+    HBox.setHgrow(rigfhtFiller, Priority.ALWAYS);
+
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
     Label actionSequenceActionExecutedAt = new Label(LocalTime.now().format(formatter));
     actionSequenceActionExecutedAt.getStyleClass().add("logbook-history-entry-executed-at");
-    centerBox.getChildren().addAll(actionSequenceActionCount, actionSequenceActionExecutedAt);
+    centerBox.getChildren().addAll(actionSequenceActionCount, rigfhtFiller, actionSequenceActionExecutedAt);
+
+    HBox leftFiller = new HBox();
+    HBox.setHgrow(leftFiller, Priority.ALWAYS);
 
 
     container
         .getChildren()
-        .addAll(actionSequenceNameLabel, centerBox);
+        .addAll(actionSequenceNameLabel, leftFiller, centerBox);
     historyVBox.getChildren().addFirst(container);
   }
 

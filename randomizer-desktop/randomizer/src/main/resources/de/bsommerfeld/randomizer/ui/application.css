@@ -357,7 +357,7 @@
 }
 
 .logbook-history-entry-name {
-    -fx-pref-width: 160;
+    -fx-pref-width: 128;
     -fx-font-family: SansSerif;
     -fx-font-size: 13;
     -fx-text-fill: #7E78ED;
@@ -365,7 +365,7 @@
 }
 
 .logbook-history-entry-rightbox {
-    -fx-min-width: 114;
+    -fx-pref-width: 114;
     -fx-spacing: 4;
     -fx-alignment: center-right;
 }
