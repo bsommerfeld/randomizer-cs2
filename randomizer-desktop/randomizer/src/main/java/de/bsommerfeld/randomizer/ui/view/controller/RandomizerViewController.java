@@ -71,19 +71,32 @@ public class RandomizerViewController {
   private void createActionSequenceContainer(ActionSequence actionSequence) {
     HBox container = new HBox();
     container.getStyleClass().add("logbook-history-entry-container");
+
     Label actionSequenceNameLabel = new Label(actionSequence.getName());
     actionSequenceNameLabel.getStyleClass().add("logbook-history-entry-name");
-    VBox rightbox = new VBox();
-    rightbox.getStyleClass().add("logbook-history-entry-rightbox");
-    Label actionSequenceActionCount = new Label(String.valueOf(actionSequence.getActions().size()));
+
+    HBox centerBox = new HBox();
+    centerBox.setAlignment(javafx.geometry.Pos.CENTER);
+    Label actionSequenceActionCount = new Label(actionSequence.getActions().size() + " Actions");
     actionSequenceActionCount.getStyleClass().add("logbook-history-entry-action-count");
+    centerBox.getChildren().add(actionSequenceActionCount);
+
+    VBox rightBox = new VBox();
+    rightBox.getStyleClass().add("logbook-history-entry-rightbox");
+    rightBox.setAlignment(javafx.geometry.Pos.CENTER);
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
     Label actionSequenceActionExecutedAt = new Label(LocalTime.now().format(formatter));
     actionSequenceActionExecutedAt.getStyleClass().add("logbook-history-entry-executed-at");
-    rightbox.getChildren().addAll(actionSequenceActionCount, actionSequenceActionExecutedAt);
-    HBox filler = new HBox();
-    HBox.setHgrow(filler, Priority.ALWAYS);
-    container.getChildren().addAll(actionSequenceNameLabel, filler, rightbox);
+    rightBox.getChildren().add(actionSequenceActionExecutedAt);
+
+    HBox leftFiller = new HBox();
+    HBox rightFiller = new HBox();
+    HBox.setHgrow(leftFiller, Priority.ALWAYS);
+    HBox.setHgrow(rightFiller, Priority.ALWAYS);
+
+    container
+        .getChildren()
+        .addAll(actionSequenceNameLabel, leftFiller, centerBox, rightFiller, rightBox);
     historyVBox.getChildren().addFirst(container);
   }
 

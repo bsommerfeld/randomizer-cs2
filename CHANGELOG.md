@@ -5,6 +5,7 @@
 ### Changed
 
 - Refined SettingsView layout and styling
+- Refined history container contents
 
 ### Fixed
 
