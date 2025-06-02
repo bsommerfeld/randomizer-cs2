@@ -1148,10 +1148,10 @@
 }
 
 .sync-config-path, .sync-config-path-failed {
-    -fx-min-width: 14;
-    -fx-max-width: 14;
-    -fx-min-height: 14;
-    -fx-max-height: 14;
+    -fx-min-width: 16;
+    -fx-max-width: 16;
+    -fx-min-height: 16;
+    -fx-max-height: 16;
     -fx-background-color: transparent;
     -fx-cursor: hand;
 }
@@ -1192,7 +1192,7 @@
 }
 
 .config-path-textfield {
-    -fx-pref-width: 430;
+    -fx-pref-width: 426;
     -fx-pref-height: 16;
     -fx-padding: 2 6;
     -fx-background-radius: 4;
@@ -1203,10 +1203,10 @@
 }
 
 .config-folder-path {
-    -fx-min-width: 16;
-    -fx-max-width: 16;
-    -fx-min-height: 16;
-    -fx-max-height: 16;
+    -fx-min-width: 18;
+    -fx-max-width: 18;
+    -fx-min-height: 18;
+    -fx-max-height: 18;
     -fx-background-color: transparent;
     -fx-cursor: hand;
     -fx-graphic: url("../images/settingsView/configFolderIcon.png");

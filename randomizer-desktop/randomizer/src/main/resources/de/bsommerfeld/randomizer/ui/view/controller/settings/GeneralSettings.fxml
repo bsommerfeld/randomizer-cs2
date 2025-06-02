@@ -35,7 +35,7 @@
             </children>
         </HBox>
         <Separator styleClass="settings-separator" />
-        <VBox styleClass="settings-auto-update">
+        <VBox styleClass="settings-auto-update-container">
             <children>
                 <Label styleClass="settings-title" text="Config Path" />
                 <Label styleClass="settings-description" text="The path of the CS2 config used to load the keybinds" />
