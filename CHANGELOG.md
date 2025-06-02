@@ -12,3 +12,5 @@
 
 ### Removed
 
+- Removed time tracking
+
