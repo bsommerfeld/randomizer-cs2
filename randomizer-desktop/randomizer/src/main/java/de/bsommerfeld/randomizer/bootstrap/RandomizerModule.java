@@ -53,6 +53,6 @@ public class RandomizerModule extends AbstractModule {
       throw new RuntimeException("Failed to create config directory", e);
     }
 
-    return ConfigurationLoader.load(configFile, RandomizerConfig.class, RandomizerConfig::new);
+    return ConfigurationLoader.load(configFile, RandomizerConfig::new);
   }
 }
