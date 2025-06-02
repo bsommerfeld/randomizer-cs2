@@ -65,9 +65,10 @@ public class RandomizerBootstrap {
 
   private void loadUserKeyBindsByConfig() {
     try {
-      CS2ConfigLoader.ladeDefaultKeyBinds();
-      if (randomizerConfig.getConfigPath() != null && !randomizerConfig.getConfigPath().isEmpty())
+      if (randomizerConfig.getConfigPath() != null && !randomizerConfig.getConfigPath().isEmpty()) {
+        CS2ConfigLoader.ladeDefaultKeyBinds();
         CS2ConfigLoader.ladeUserKeyBinds();
+      }
     } catch (Exception e) {
       log.error("Fehler beim Laden der User KeyBinds", e);
     }
@@ -75,8 +76,6 @@ public class RandomizerBootstrap {
 
   private void loadConfiguration() {
     log.info("Lade Konfiguration...");
-
-    randomizerConfig.reload();
 
     ActionSequenceExecutorRunnable.setMinWaitTime(randomizerConfig.getMinInterval());
     ActionSequenceExecutorRunnable.setMaxWaitTime(randomizerConfig.getMaxInterval());

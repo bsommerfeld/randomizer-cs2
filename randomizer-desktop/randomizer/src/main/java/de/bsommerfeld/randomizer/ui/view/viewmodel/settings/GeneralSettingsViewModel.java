@@ -35,7 +35,9 @@ public class GeneralSettingsViewModel {
 
   @Inject
   public GeneralSettingsViewModel(
-      RandomizerConfig randomizerConfig, KeyBindRepository keyBindRepository, CS2ConfigLoader CS2ConfigLoader) {
+      RandomizerConfig randomizerConfig,
+      KeyBindRepository keyBindRepository,
+      CS2ConfigLoader CS2ConfigLoader) {
     this.randomizerConfig = randomizerConfig;
     this.keyBindRepository = keyBindRepository;
     this.CS2ConfigLoader = CS2ConfigLoader;
@@ -44,21 +46,13 @@ public class GeneralSettingsViewModel {
   public CompletionStage<Void> loadConfigs() {
     return CompletableFuture.runAsync(
             () -> {
-              String userConfigPath = randomizerConfig.getConfigPath();
-              if (randomizerConfig.getConfigPath() == null
-                  || randomizerConfig.getConfigPath().isEmpty()) {
+              try {
                 randomizerConfig.setConfigPath(
                     CS2ConfigLoader.ladeUserConfigPath().replace("\\", "/"));
-              } else {
-                String loadedConfigPath =
-                    noThrow(() -> CS2ConfigLoader.ladeUserConfigPath().replace("\\", "/"));
-                if(loadedConfigPath != null && !loadedConfigPath.equals(userConfigPath)) {
-                  randomizerConfig.setConfigPath(loadedConfigPath); // TODO: what if it always finds the wrong config?
-                }
+                randomizerConfig.save();
+              } catch (Exception e) {
+                throw new RuntimeException(e);
               }
-              randomizerConfig.save();
-              CS2ConfigLoader.ladeDefaultKeyBinds();
-              CS2ConfigLoader.ladeUserKeyBinds();
             })
         .thenRunAsync(
             () -> configPathProperty.set(randomizerConfig.getConfigPath()), Platform::runLater);
