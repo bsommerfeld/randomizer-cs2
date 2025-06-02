@@ -3,6 +3,7 @@ package de.bsommerfeld.randomizer.config;
 import de.bsommerfeld.jshepherd.annotation.Comment;
 import de.bsommerfeld.jshepherd.annotation.CommentSection;
 import de.bsommerfeld.jshepherd.annotation.Key;
+import de.bsommerfeld.jshepherd.annotation.PostInject;
 import de.bsommerfeld.jshepherd.core.ConfigurablePojo;
 import de.bsommerfeld.model.config.keybind.KeyBindType;
 import java.util.ArrayList;
@@ -47,6 +48,11 @@ public class RandomizerConfig extends ConfigurablePojo<RandomizerConfig> {
 
   public void setConfigPath(String configPath) {
     this.configPath = configPath;
+    configPathProperty.set(configPath);
+  }
+
+  @PostInject
+  private void updateConfigPathProperty() {
     configPathProperty.set(configPath);
   }
 }

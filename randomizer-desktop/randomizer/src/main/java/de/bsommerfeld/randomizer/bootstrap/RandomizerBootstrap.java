@@ -77,10 +77,6 @@ public class RandomizerBootstrap {
   private void loadConfiguration() {
     log.info("Lade Konfiguration...");
 
-    // This has to be here for now, so that the internal property updates after the
-    // annotated fields gets injected.
-    randomizerConfig.setConfigPath(randomizerConfig.getConfigPath());
-
     ActionSequenceExecutorRunnable.setMinWaitTime(randomizerConfig.getMinInterval());
     ActionSequenceExecutorRunnable.setMaxWaitTime(randomizerConfig.getMaxInterval());
   }
