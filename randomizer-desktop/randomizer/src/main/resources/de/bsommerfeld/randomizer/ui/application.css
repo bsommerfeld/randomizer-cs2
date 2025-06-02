@@ -326,7 +326,7 @@
 }
 
 .range-slider {
-    -fx-pref-width: 450;
+    -fx-pref-width: 346;
     -fx-pref-height: 12;
     -fx-padding: 8 2;
 }
@@ -995,8 +995,8 @@
 .settings-container {
     -fx-max-width: 632;
     -fx-pref-height: 360;
-    -fx-spacing: 8;
-    -fx-padding: 8 12;
+    -fx-spacing: 12;
+    -fx-padding: 8;
     -fx-background-radius: 8;
     -fx-background-color: #EBEBFA;
 }
@@ -1005,16 +1005,16 @@
     -fx-pref-width: 112;
     -fx-pref-height: 344;
     -fx-spacing: 8;
-    -fx-alignment: top-center;
+    -fx-alignment: center;
 }
 
 .settings-options {
     -fx-min-width: 112;
     -fx-pref-height: 14;
-    -fx-padding: 0 0 0 6;
-    -fx-alignment: center-left;
+    -fx-padding: 0 6;
+    -fx-alignment: center;
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #040316;
     -fx-background-radius: 4;
     -fx-background-color: transparent;
@@ -1035,11 +1035,12 @@
 .updater-settings {
     -fx-pref-width: 480;
     -fx-pref-height: 344;
-    -fx-spacing: 8;
+    -fx-padding: 4 0 0 0;
+    -fx-spacing: 12;
 }
 
 .settings-auto-update {
-    -fx-pref-width: 480;
+    -fx-max-width: 463;
 }
 
 .settings-auto-update-container {
@@ -1049,13 +1050,13 @@
 
 .settings-title {
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #040316;
 }
 
 .settings-description {
     -fx-font-family: SansSerif;
-    -fx-font-size: 11;
+    -fx-font-size: 12;
     -fx-text-fill: #7E78ED;
 }
 
@@ -1189,7 +1190,7 @@
 }
 
 .config-path-textfield {
-    -fx-pref-width: 426;
+    -fx-pref-width: 421;
     -fx-pref-height: 16;
     -fx-padding: 2 6;
     -fx-background-radius: 4;
@@ -1236,6 +1237,7 @@
 /* Rangeslider Labels */
 .rangeslider-min-label, .rangeslider-max-label {
     -fx-min-width: 42;
+    -fx-max-width: 42;
     -fx-min-height: 12;
     -fx-background-radius: 4;
     -fx-background-color: #D6D6F5;
@@ -1247,6 +1249,7 @@
 
 .rangeslider-up-button, .rangeslider-down-button {
     -fx-min-width: 8;
+    -fx-max-width: 8;
     -fx-min-height: 8;
     -fx-background-color: transparent;
     -fx-background-repeat: no-repeat;
