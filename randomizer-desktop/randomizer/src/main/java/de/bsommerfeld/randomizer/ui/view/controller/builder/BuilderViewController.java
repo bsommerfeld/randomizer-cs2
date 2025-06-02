@@ -27,7 +27,7 @@ public class BuilderViewController {
 
   private static final String HBOX_STYLE_CLASS = "builder-sequences-hbox";
   private static final String LABEL_STYLE_CLASS = "builder-sequences-title";
-  private static final String ACTION_COUNT_STYLE_CLASS = "logbook-history-entry-action-count";
+  private static final String ACTION_COUNT_STYLE_CLASS = "builder-sequence-entry-action-count";
   private static final String HBOX_SELECTED_STYLE_CLASS = "builder-sequences-hbox-selected";
 
   private static final double BUTTON_HBOX_SPACING = 10;
