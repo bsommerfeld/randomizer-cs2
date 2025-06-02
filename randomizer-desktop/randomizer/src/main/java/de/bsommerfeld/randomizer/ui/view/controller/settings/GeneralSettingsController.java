@@ -92,9 +92,11 @@ public class GeneralSettingsController {
         .addListener(
             (observableValue, s, t1) -> {
               if (t1 == null || t1.isEmpty()) {
+                syncConfigButton.getStyleClass().remove("sync-config-path-success");
                 syncConfigButton.getStyleClass().add("sync-config-path-failed");
                 syncFailedIndicator.setVisible(true);
               } else {
+                syncConfigButton.getStyleClass().remove("sync-config-path-failed");
                 syncConfigButton.getStyleClass().add("sync-config-path-success");
                 syncFailedIndicator.setVisible(false);
               }
@@ -102,6 +104,7 @@ public class GeneralSettingsController {
               // Important for now, since there is no check if a sequence is used the user don't
               // have keybinds for
               if (!generalSettingsViewModel.isThereAnyKeyBinds()) {
+                syncConfigButton.getStyleClass().remove("sync-config-path-success");
                 syncConfigButton.getStyleClass().add("sync-config-path-failed");
                 syncFailedIndicator.setVisible(true);
               }
