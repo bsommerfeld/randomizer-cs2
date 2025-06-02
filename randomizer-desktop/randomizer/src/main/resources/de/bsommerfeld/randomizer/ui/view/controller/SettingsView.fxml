@@ -25,7 +25,7 @@
                         </HBox>
                     </children>
                 </VBox>
-                <HBox prefHeight="344.0" prefWidth="752.0" spacing="12" HBox.hgrow="ALWAYS">
+                <HBox prefHeight="344.0" prefWidth="752.0" spacing="6" HBox.hgrow="ALWAYS">
                     <children>
                         <Separator orientation="VERTICAL" prefHeight="360.0" styleClass="settings-selection-separator"/>
                         <GridPane fx:id="contentPane" prefHeight="344.0" prefWidth="728.0" HBox.hgrow="ALWAYS">

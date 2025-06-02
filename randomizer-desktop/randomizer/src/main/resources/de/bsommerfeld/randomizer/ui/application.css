@@ -1048,6 +1048,7 @@
 }
 
 .settings-auto-update-container {
+    -fx-max-width: 463;
     -fx-spacing: 4;
     -fx-alignment: center-left;
 }
