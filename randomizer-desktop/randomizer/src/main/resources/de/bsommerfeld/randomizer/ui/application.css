@@ -55,25 +55,6 @@
     -fx-background-image: url("../images/navigationbar/settingsIconSelected.png");
 }
 
-.navigation-bar-update-indicator {
-    -fx-pref-width: 34;
-    -fx-pref-height: 20;
-    -fx-background-color: transparent;
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: right;
-    -fx-background-image: url("../images/navigationbar/updateIndicatorIcon.png");
-    -fx-cursor: hand;
-}
-
-.navigation-bar-update-indicator:hover {
-    -fx-background-image: url("../images/navigationbar/updateIndicatorIconSelected.png");
-}
-
-.navigation-bar-update-indicator:pressed {
-    -fx-scale-x: 0.95;
-    -fx-scale-y: 0.95;
-}
-
 .navigation-bar-separator, .navigation-bar-separator .line {
     -fx-max-width: 27;
     -fx-pref-height: 2;
@@ -314,16 +295,101 @@
 
 .logbook-history-label {
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #040316;
 }
 
 .logbook-descriptions {
     -fx-pref-height: 12;
     -fx-font-family: SansSerif;
-    -fx-font-size: 11;
+    -fx-font-size: 12;
     -fx-text-fill: #A9A5F3;
 }
+
+.logbook-sequence-history {
+    -fx-pref-height: 320;
+    -fx-background-radius: 8;
+    -fx-background-color: #E6E5FF;
+    -fx-spacing: 4;
+    -fx-padding: 8;
+}
+
+.logbook-history-scrollpane {
+    -fx-background-color: #E6E5FF;
+}
+
+.logbook-history-content {
+    -fx-pref-width: 260;
+    -fx-pref-height: 268;
+    -fx-spacing: 6;
+    -fx-background-color: #E6E5FF;
+}
+
+.logbook-history-scrollpane .scroll-bar:vertical {
+    -fx-pref-width: 4;
+    -fx-background-color: transparent;
+}
+
+.logbook-history-scrollpane .scroll-bar:vertical .track {
+    -fx-background-radius: 2;
+    -fx-background-color: #847EE7;
+}
+
+.logbook-history-scrollpane .scroll-bar:vertical .thumb {
+    -fx-background-radius: 2;
+    -fx-background-insets: 0;
+    -fx-background-color: #2F27CE;
+}
+
+.logbook-history-scrollpane .scroll-bar:vertical .increment-button,
+.logbook-history-scrollpane .scroll-bar:vertical .decrement-button {
+    -fx-padding: -4 0 0 0 0;
+    -fx-background-color: transparent;
+    -fx-shape: null;
+    -fx-opacity: 0;
+}
+
+.logbook-history-entry-container {
+    -fx-pref-width: 252;
+    -fx-max-height: 22;
+    -fx-padding: 4;
+    -fx-background-color: #D6D6F5;
+}
+
+.logbook-history-entry-name {
+    -fx-pref-width: 220;
+    -fx-font-family: SansSerif;
+    -fx-font-size: 13;
+    -fx-text-fill: #7E78ED;
+    -fx-padding: 4;
+}
+
+.logbook-history-entry-rightbox {
+    -fx-min-width: 32;
+    -fx-spacing: 4;
+    -fx-alignment: center-right;
+}
+
+.logbook-history-entry-action-count {
+    -fx-alignment: center;
+    -fx-font-family: SansSerif;
+    -fx-font-size: 11;
+    -fx-font-weight: bold;
+    -fx-text-fill: #443DFF;
+    -fx-background-color: rgba(68, 61, 255, 0.1);
+    -fx-background-radius: 8;
+    -fx-padding: 2 6;
+}
+
+.logbook-history-entry-executed-at {
+    -fx-alignment: center;
+    -fx-font-family: SansSerif;
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+    -fx-text-fill: #281FE0;
+    -fx-padding: 2 4;
+}
+
 
 .range-slider {
     -fx-pref-width: 346;
@@ -385,90 +451,6 @@
     -fx-scale-x: 0.95;
     -fx-scale-y: 0.95;
     -fx-cursor: hand;
-}
-
-.logbook-sequence-history {
-    -fx-pref-height: 320;
-    -fx-background-radius: 8;
-    -fx-background-color: #E6E5FF;
-    -fx-spacing: 4;
-    -fx-padding: 8 6;
-}
-
-.logbook-history-scrollpane {
-    -fx-background-color: #E6E5FF;
-}
-
-.logbook-history-content {
-    -fx-pref-width: 260;
-    -fx-pref-height: 268;
-    -fx-spacing: 6;
-    -fx-background-color: #E6E5FF;
-}
-
-.logbook-history-scrollpane .scroll-bar:vertical {
-    -fx-pref-width: 4;
-    -fx-padding: -4 0;
-    -fx-background-color: transparent;
-}
-
-.logbook-history-scrollpane .scroll-bar:vertical .track {
-    -fx-background-radius: 2;
-    -fx-background-color: #847EE7;
-}
-
-.logbook-history-scrollpane .scroll-bar:vertical .thumb {
-    -fx-background-radius: 2;
-    -fx-background-insets: 0;
-    -fx-background-color: #2F27CE;
-}
-
-.logbook-history-scrollpane .scroll-bar:vertical .increment-button,
-.logbook-history-scrollpane .scroll-bar:vertical .decrement-button {
-    -fx-background-color: transparent;
-    -fx-shape: null;
-    -fx-opacity: 0;
-}
-
-.logbook-history-entry-container {
-    -fx-pref-width: 252;
-    -fx-max-height: 22;
-    -fx-padding: 4;
-    -fx-background-color: #D6D6F5;
-}
-
-.logbook-history-entry-name {
-    -fx-pref-width: 220;
-    -fx-font-family: SansSerif;
-    -fx-font-size: 12;
-    -fx-text-fill: #7E78ED;
-    -fx-padding: 4;
-}
-
-.logbook-history-entry-rightbox {
-    -fx-min-width: 32;
-    -fx-spacing: 4;
-    -fx-alignment: center-right;
-}
-
-.logbook-history-entry-action-count {
-    -fx-alignment: center;
-    -fx-font-family: SansSerif;
-    -fx-font-size: 11;
-    -fx-font-weight: bold;
-    -fx-text-fill: #443DFF;
-    -fx-background-color: rgba(68, 61, 255, 0.1);
-    -fx-background-radius: 8;
-    -fx-padding: 2 6;
-}
-
-.logbook-history-entry-executed-at {
-    -fx-alignment: center;
-    -fx-font-family: SansSerif;
-    -fx-font-size: 12;
-    -fx-font-weight: bold;
-    -fx-text-fill: #281FE0;
-    -fx-padding: 2 4;
 }
 
 /* Builder View */

@@ -14,7 +14,6 @@
             <Insets />
          </VBox.margin></ToggleButton>
       <VBox VBox.vgrow="ALWAYS" />
-      <Button fx:id="updateIndicatorButton" visible="false" styleClass="navigation-bar-update-indicator" mnemonicParsing="false" />
       <ToggleButton fx:id="settingsButton" mnemonicParsing="false" prefHeight="28" prefWidth="38" styleClass="navigation-bar-settings" />
    </children>
 </VBox>

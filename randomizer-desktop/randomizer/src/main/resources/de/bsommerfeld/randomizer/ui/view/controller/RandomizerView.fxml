@@ -39,11 +39,9 @@
                                 </HBox>
                             </children>
                         </VBox>
-
-                        <!-- Rechte Spalte -->
-                        <VBox spacing="12" HBox.hgrow="ALWAYS">
-                            <children>
-
+                  <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                     <children>
+      
                                 <!-- History-Bereich, der vertikal mitwachsen soll -->
                                 <VBox styleClass="logbook-sequence-history" VBox.vgrow="ALWAYS">
                                     <children>
@@ -56,8 +54,8 @@
                                         </ScrollPane>
                                     </children>
                                 </VBox>
-                            </children>
-                        </VBox>
+                     </children>
+                  </VBox>
                     </children>
                     <padding>
                         <Insets left="12.0" right="12.0" />
