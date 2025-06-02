@@ -4,7 +4,7 @@
 
 ### Changed
 
-- Refined SettingsView layout
+- Refined SettingsView layout and styling
 
 ### Fixed
 
