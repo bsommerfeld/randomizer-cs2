@@ -7,8 +7,6 @@ import de.bsommerfeld.randomizer.bootstrap.CS2ConfigLoader;
 import de.bsommerfeld.randomizer.config.RandomizerConfig;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.function.Supplier;
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -42,17 +40,15 @@ public class GeneralSettingsViewModel {
 
   public CompletionStage<Void> loadConfigs() {
     return CompletableFuture.runAsync(
-            () -> {
-              try {
-                randomizerConfig.setConfigPath(
-                    CS2ConfigLoader.ladeUserConfigPath().replace("\\", "/"));
-                randomizerConfig.save();
-              } catch (Exception e) {
-                throw new RuntimeException(e);
-              }
-            })
-        .thenRunAsync(
-            () -> configPathProperty.set(randomizerConfig.getConfigPath()), Platform::runLater);
+        () -> {
+          try {
+            configPathProperty.set(randomizerConfig.getConfigPath());
+            randomizerConfig.setConfigPath(CS2ConfigLoader.ladeUserConfigPath().replace("\\", "/"));
+            randomizerConfig.save();
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
   }
 
   public boolean isThereAnyKeyBinds() {
@@ -63,18 +59,10 @@ public class GeneralSettingsViewModel {
     CS2ConfigLoader.ladeUserKeyBinds();
   }
 
-  private <T> T noThrow(Supplier<T> tSupplier) {
-    try {
-      return tSupplier.get();
-    } catch (Exception e) {
-      return null;
-    }
-  }
-
   public void setConfigPath(String configPath) {
+    configPathProperty.set(configPath);
     randomizerConfig.setConfigPath(configPath);
     randomizerConfig.save();
-    configPathProperty.set(configPath);
   }
 
   public String getCurrentConfigPath() {
@@ -83,6 +71,7 @@ public class GeneralSettingsViewModel {
 
   public void setupViewModel() {
     loadIntervalFromConfig();
+    configPathProperty.set(randomizerConfig.getConfigPath());
     showIntroProperty.set(randomizerConfig.isShowIntro());
     showIntroProperty.addListener((_, _, _) -> saveRegularSettings());
     minIntervalProperty.addListener((_, _, _) -> updateInterval());

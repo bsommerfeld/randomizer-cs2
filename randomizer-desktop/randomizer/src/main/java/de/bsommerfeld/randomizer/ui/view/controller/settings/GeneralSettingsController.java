@@ -8,6 +8,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import javafx.application.Platform;
+import javafx.beans.binding.BooleanBinding;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -41,10 +42,6 @@ public class GeneralSettingsController {
     setupSettingsOptions();
     setupIntervalSlider();
     syncStatus();
-  }
-
-  private int longInHours(long timestamp) {
-    return (int) (timestamp / 3600000);
   }
 
   private void setupSettingsOptions() {
@@ -87,28 +84,22 @@ public class GeneralSettingsController {
   }
 
   private void syncStatus() {
-    generalSettingsViewModel
-        .getConfigPathProperty()
-        .addListener(
-            (observableValue, s, t1) -> {
-              if (t1 == null || t1.isEmpty()) {
-                syncConfigButton.getStyleClass().remove("sync-config-path-success");
-                syncConfigButton.getStyleClass().add("sync-config-path-failed");
-                syncFailedIndicator.setVisible(true);
-              } else {
-                syncConfigButton.getStyleClass().remove("sync-config-path-failed");
-                syncConfigButton.getStyleClass().add("sync-config-path-success");
-                syncFailedIndicator.setVisible(false);
-              }
+    BooleanBinding configPathExists = generalSettingsViewModel.getConfigPathProperty()
+            .isNotNull()
+            .and(generalSettingsViewModel.getConfigPathProperty().isNotEmpty());
 
-              // Important for now, since there is no check if a sequence is used the user don't
-              // have keybinds for
-              if (!generalSettingsViewModel.isThereAnyKeyBinds()) {
-                syncConfigButton.getStyleClass().remove("sync-config-path-success");
-                syncConfigButton.getStyleClass().add("sync-config-path-failed");
-                syncFailedIndicator.setVisible(true);
-              }
-            });
+    configPathExists.addListener((obs, oldVal, newVal) -> {
+      syncConfigButton.getStyleClass().removeAll("sync-config-path-success", "sync-config-path-failed");
+      syncConfigButton.getStyleClass().add(newVal ? "sync-config-path-success" : "sync-config-path-failed");
+    });
+
+    syncFailedIndicator.visibleProperty().bind(configPathExists.not());
+
+    Platform.runLater(() -> {
+      boolean isSuccess = configPathExists.get();
+      syncConfigButton.getStyleClass().removeAll("sync-config-path-success", "sync-config-path-failed");
+      syncConfigButton.getStyleClass().add(isSuccess ? "sync-config-path-success" : "sync-config-path-failed");
+    });
   }
 
   @FXML
