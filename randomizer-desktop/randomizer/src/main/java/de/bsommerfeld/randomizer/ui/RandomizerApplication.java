@@ -21,6 +21,8 @@ public class RandomizerApplication extends Application {
 
   private static final int MIN_WIDTH = 704;
   private static final int MIN_HEIGHT = 536;
+  private static final int MAX_WIDTH = 1280;
+  private static final int MAX_HEIGHT = 720;
 
   @Override
   public void start(Stage stage) {
@@ -66,6 +68,8 @@ public class RandomizerApplication extends Application {
     stage.setMinHeight(MIN_HEIGHT);
     stage.setWidth(MIN_WIDTH);
     stage.setHeight(MIN_HEIGHT);
+    stage.setMaxWidth(MAX_WIDTH);
+    stage.setMaxHeight(MAX_HEIGHT);
     stage.setScene(scene);
   }
 }
