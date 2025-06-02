@@ -13,4 +13,3 @@
 ### Removed
 
 - Removed time tracking
-
