@@ -1302,3 +1302,26 @@
     -fx-font-size: 13;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0, 0, 2);
 }
+
+.release-bottom-bar {
+    -fx-pref-width: 480;
+    -fx-pref-height: 16;
+    -fx-margin: 0 0 4 0;
+    -fx-padding: 0 0 0 8;
+    -fx-spacing: 4;
+    -fx-alignment: center-left;
+    -fx-background-insets: 8 0 0 0;
+}
+
+.releases-label {
+    -fx-font-family: SansSerif;
+    -fx-font-size: 14;
+    -fx-text-fill: #040316;
+    -fx-graphic: url("../images/randomizerView/arrowDownIcon.png");
+    -fx-content-display: left;
+    -fx-graphic-text-gap: 8;
+}
+
+.releases-label:hover {
+    -fx-text-fill: #2F27CE;
+}
