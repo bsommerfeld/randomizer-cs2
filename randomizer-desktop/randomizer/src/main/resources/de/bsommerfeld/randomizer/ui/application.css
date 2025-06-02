@@ -709,6 +709,7 @@
 .builder-sequence-settings-container, .builder-settings-sequence-title-vbox, .action-time-frame-vbox {
     -fx-pref-width: 176;
     -fx-spacing: 6;
+    -fx-alignment: center;
 }
 
 .sequence-in-focus-label {
@@ -1002,10 +1003,10 @@
 }
 
 .settings-selection {
-    -fx-pref-width: 112;
-    -fx-pref-height: 344;
+    -fx-pref-width: 412;
+    -fx-min-height: 344;
     -fx-spacing: 8;
-    -fx-alignment: center;
+    -fx-alignment: center-right;
 }
 
 .settings-options {
@@ -1037,6 +1038,7 @@
     -fx-pref-height: 344;
     -fx-padding: 4 0 0 0;
     -fx-spacing: 12;
+    -fx-alignment: center-left;
 }
 
 .settings-auto-update {
@@ -1088,7 +1090,7 @@
 }
 
 .settings-separator, .settings-separator .line {
-    -fx-pref-width: 480;
+    -fx-max-width: 463;
     -fx-pref-height: 1;
     -fx-background-color: #CECCFF;
     -fx-border-color: null;
@@ -1190,7 +1192,7 @@
 }
 
 .config-path-textfield {
-    -fx-pref-width: 421;
+    -fx-pref-width: 430;
     -fx-pref-height: 16;
     -fx-padding: 2 6;
     -fx-background-radius: 4;
