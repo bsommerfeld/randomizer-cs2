@@ -51,26 +51,31 @@ public class UIUncaughtExceptionHandler implements Thread.UncaughtExceptionHandl
         .getDialogPane()
         .getStylesheets()
         .add(getClass().getResource("alert-style.css").toExternalForm());
-    alert.setTitle("User Error Dialog");
-    alert.setHeaderText("Something happened");
+    alert.getDialogPane().getStyleClass().add("error");
+    alert.setTitle("Unexpected Error");
+    alert.setHeaderText("An error occurred");
+
+    alert.getDialogPane().getStyleClass().add("fade-in");
+
     return alert;
   }
 
   private VBox createContent() {
     Hyperlink githubLink =
-        createHyperlink(
-            "Click here to get to the Issue section on GitHub.", () -> openUrl(GITHUB_ISSUES_URL));
-    Hyperlink logsLink =
-        createHyperlink("Click here to direct to your logs folder.", this::openLogsFolder);
+        createHyperlink("📋 GitHub Issues - Report Bug", () -> openUrl(GITHUB_ISSUES_URL));
 
-    VBox content = new VBox(10);
+    Hyperlink logsLink = createHyperlink("📁 Open Log Folder", this::openLogsFolder);
+
+    VBox content = new VBox();
+    content.getStyleClass().add("vbox");
     content
         .getChildren()
         .addAll(
-            new Label("Please report this error to us on GitHub."),
-            new Label("The following information will be helpful in debugging this issue"),
+            new Label("Please report this error to GitHub."),
+            new Label("The following information can help to debug the issue:"),
             githubLink,
             logsLink);
+
     return content;
   }
 

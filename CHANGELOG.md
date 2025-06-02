@@ -6,6 +6,7 @@
 
 - Refined SettingsView layout and styling
 - Refined history container contents
+- Refined alerts on errors
 
 ### Fixed
 
