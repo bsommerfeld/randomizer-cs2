@@ -51,9 +51,6 @@ public class RandomizerApplication extends Application {
           } catch (NativeHookException e) {
             throw new RuntimeException(e);
           }
-          randomizerConfig.setTimeTracked(
-              randomizerConfig.getTimeTracked() + timeTracker.getElapsedTime());
-          randomizerConfig.save();
           ActionSequenceDispatcher.discardAllRunningActions();
           Platform.exit();
         });
