@@ -1323,9 +1323,10 @@
 .releases-label {
     -fx-font-family: SansSerif;
     -fx-font-size: 16;
-    -fx-text-fill: #A9A5F3;
+    -fx-text-fill: #7E78ED;
     -fx-graphic: url("../images/randomizerView/arrowDownIcon.png");
     -fx-content-display: left;
+    -fx-opacity: 55%;
     -fx-graphic-text-gap: 8;
 }
 
