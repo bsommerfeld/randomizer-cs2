@@ -2,6 +2,8 @@
 
 ### Added
 
+- Added Release View below the HomeView
+
 ### Changed
 
 - Refined SettingsView layout and styling
