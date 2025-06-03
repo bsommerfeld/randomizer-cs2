@@ -1334,6 +1334,7 @@
     -fx-text-fill: #2F27CE;
     -fx-graphic: url("../images/randomizerView/arrowDownIconSelected.png");
     -fx-cursor: hand;
+    -fx-underline: true;
 }
 
 /* Releases View Styling */
