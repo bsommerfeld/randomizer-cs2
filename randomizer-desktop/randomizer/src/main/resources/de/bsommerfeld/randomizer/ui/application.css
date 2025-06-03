@@ -15,8 +15,9 @@
 
 .logbook {
     -fx-min-width: 320;
-    -fx-min-height: 276;
+    -fx-pref-height: 276;
     -fx-padding: 8 12;
+    -fx-spacing: 6;
     -fx-background-radius: 8;
     -fx-alignment: top-center;
     -fx-background-color: #E6E5FF;
@@ -24,13 +25,12 @@
 
 .logbook-active-sequence {
     -fx-pref-width: 296;
-    -fx-pref-height: 16;
     -fx-alignment: center-left;
 }
 
 .logbook-sequence-name {
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #281FE0;
     -fx-graphic: url("../images/randomizerView/sequenceIcon.png");
 }
@@ -80,12 +80,12 @@
     -fx-pref-width: 296;
     -fx-pref-height: 244;
     -fx-spacing: 6;
-    -fx-padding: 8 0;
     -fx-background-color: #E6E5FF;
 }
 
 .logbook-active-actions-vbox {
     -fx-alignment: top-center;
+    -fx-padding: 0 4 0 0;
 }
 
 
@@ -111,8 +111,6 @@
     -fx-background-radius: 4;
 }
 
-
-
 .logbook-sequence-actions-name {
     -fx-font-family: SansSerif;
     -fx-font-size: 12px;
@@ -120,7 +118,6 @@
     -fx-padding: 0 3;
     -fx-background-radius: 4;
 }
-
 
 .logbook-sequence-actions-name-start {
     -fx-background-image: url("../images/randomizerView/startingActionIcon.png");
@@ -181,6 +178,7 @@
     -fx-pref-width: 260;
     -fx-pref-height: 268;
     -fx-spacing: 6;
+    -fx-padding: 0 4 0 0;
     -fx-background-color: #E6E5FF;
 }
 
@@ -202,7 +200,7 @@
 
 .logbook-history-scrollpane .scroll-bar:vertical .increment-button,
 .logbook-history-scrollpane .scroll-bar:vertical .decrement-button {
-    -fx-padding: -4 0 0 0 0;
+    -fx-padding: -4 0 0 0 4;
     -fx-background-color: transparent;
     -fx-shape: null;
     -fx-opacity: 0;
