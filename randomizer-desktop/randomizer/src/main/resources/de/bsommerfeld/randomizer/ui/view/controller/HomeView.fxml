@@ -42,10 +42,14 @@
         </VBox>
 
         <!-- Releases Button -->
-        <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0"
+        <HBox fx:id="releasesButton" alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0"
               AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
               styleClass="release-bottom-bar" onMouseClicked="#onReleasesClick">
-            <Label text="Releases" styleClass="releases-label"/>
+            <Label text="Releases" styleClass="releases-label">
+                <cursor>
+                    <Cursor fx:constant="HAND"/>
+                </cursor>
+            </Label>
         </HBox>
 
         <!-- Releases View (initially positioned below visible area) -->
@@ -64,48 +68,6 @@
                         <Label text="Releases" styleClass="releases-title"/>
                     </children>
                 </HBox>
-
-                <!-- Content Area - Template for now -->
-                <VBox styleClass="releases-content">
-                    <children>
-                        <Label text="Releases Content" styleClass="releases-placeholder"/>
-                        <Label text="Hier wird später die Releases-Tabelle implementiert"
-                               styleClass="releases-placeholder-sub"/>
-
-                        <!-- Placeholder for future table -->
-                        <VBox styleClass="releases-table-placeholder">
-                            <children>
-                                <HBox styleClass="releases-table-header">
-                                    <children>
-                                        <Label text="Version" styleClass="releases-table-header-cell"/>
-                                        <Label text="Datum" styleClass="releases-table-header-cell"/>
-                                        <Label text="Download" styleClass="releases-table-header-cell"/>
-                                    </children>
-                                </HBox>
-                                <VBox styleClass="releases-table-rows">
-                                    <children>
-                                        <HBox styleClass="releases-table-row">
-                                            <children>
-                                                <Label text="v1.0.0" styleClass="releases-table-cell"/>
-                                                <Label text="01.06.2025" styleClass="releases-table-cell"/>
-                                                <Button text="Download" styleClass="releases-download-button"
-                                                        disable="true"/>
-                                            </children>
-                                        </HBox>
-                                        <HBox styleClass="releases-table-row">
-                                            <children>
-                                                <Label text="v0.9.0" styleClass="releases-table-cell"/>
-                                                <Label text="15.05.2025" styleClass="releases-table-cell"/>
-                                                <Button text="Download" styleClass="releases-download-button"
-                                                        disable="true"/>
-                                            </children>
-                                        </HBox>
-                                    </children>
-                                </VBox>
-                            </children>
-                        </VBox>
-                    </children>
-                </VBox>
             </children>
         </VBox>
     </children>
