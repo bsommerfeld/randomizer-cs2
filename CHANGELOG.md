@@ -9,6 +9,7 @@
 - Refined SettingsView layout and styling
 - Refined history container contents
 - Refined alerts on errors
+- General Alert stylings have been improved
 
 ### Fixed
 

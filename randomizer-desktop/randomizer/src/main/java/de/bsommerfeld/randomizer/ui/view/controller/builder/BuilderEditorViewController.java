@@ -86,27 +86,70 @@ public class BuilderEditorViewController {
   @FXML
   void onSaveSequence(ActionEvent event) {
     BuilderViewController controller =
-        viewProvider.requestView(BuilderViewController.class).controller(); // ew
-    if (doesAnotherActionSequenceWithThisNameExist()) {
-      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-      alert.setTitle("NOTICE");
-      alert
-          .getDialogPane()
-          .getStylesheets()
-          .add(RandomizerApplication.class.getResource("alert-style.css").toExternalForm());
-      alert.setContentText("A sequence with this name already exist. Do you want to overwrite?");
-      alert
-          .showAndWait()
-          .filter(response -> response == ButtonType.OK)
-          .ifPresent(
-              response -> {
-                builderViewModel.saveActionSequence();
-                controller.fillActionSequences();
-              });
+        viewProvider.requestView(BuilderViewController.class).controller();
+
+    if (!isWindowsConformFileName(builderViewModel.getSequenceNameProperty().get())) {
+      showInvalidSequenceNameAlert();
       return;
     }
+
+    if (doesAnotherActionSequenceWithThisNameExist()) {
+      showSequenceWithNameAlreadyExistsAlert(controller);
+      return;
+    }
+
     builderViewModel.saveActionSequence();
     controller.fillActionSequences();
+  }
+
+  private void showSequenceWithNameAlreadyExistsAlert(BuilderViewController controller) {
+    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.setTitle("Sequence Already Exists");
+    alert.setHeaderText("Duplicate Sequence Name");
+    alert.setContentText("A sequence with this name already exists. Do you want to overwrite it?");
+
+    alert
+        .getDialogPane()
+        .getStylesheets()
+        .add(RandomizerApplication.class.getResource("alert-style.css").toExternalForm());
+
+    alert.getDialogPane().getStyleClass().addAll("modern-alert", "warning");
+
+    ((Button) alert.getDialogPane().lookupButton(ButtonType.OK)).setText("Overwrite");
+    ((Button) alert.getDialogPane().lookupButton(ButtonType.CANCEL)).setText("Cancel");
+    alert.getDialogPane().lookupButton(ButtonType.CANCEL).getStyleClass().add("cancel-button");
+
+    alert
+        .showAndWait()
+        .filter(response -> response == ButtonType.OK)
+        .ifPresent(
+            response -> {
+              builderViewModel.saveActionSequence();
+              controller.fillActionSequences();
+            });
+  }
+
+  private void showInvalidSequenceNameAlert() {
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setTitle("Invalid Sequence Name");
+    alert.setHeaderText("Name Contains Invalid Characters");
+    alert.setContentText(
+        "Please use only letters, numbers, spaces, hyphens, and periods in the sequence name.");
+
+    alert
+        .getDialogPane()
+        .getStylesheets()
+        .add(RandomizerApplication.class.getResource("alert-style.css").toExternalForm());
+
+    alert.getDialogPane().getStyleClass().addAll("modern-alert", "error");
+
+    ((Button) alert.getDialogPane().lookupButton(ButtonType.OK)).setText("Got it");
+
+    alert.showAndWait();
+  }
+
+  private boolean isWindowsConformFileName(String name) {
+    return name.matches("[a-zA-Z0-9_\\-\\. ]+");
   }
 
   private void setupBindings() {
