@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -126,16 +127,35 @@ public class RandomizerViewController {
                         .forEach(
                             action -> {
                               if (action == null) return;
+
+                              HBox sequenceAction = new HBox();
+                              sequenceAction.getStyleClass().add("logbook-sequence-actions-container");
+
+                              ImageView positionalIcon = new ImageView();
+                              positionalIcon.getStyleClass().add("logbook-sequence-actions-icon");
+
                               Label actionLabel = new Label(action.getName());
                               actionLabel.getStyleClass().add("logbook-sequence-actions-name");
-                              actionsVBox.getChildren().add(actionLabel);
+
+                              HBox filler = new HBox();
+                              HBox.setHgrow(filler, Priority.ALWAYS);
+
+                              DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+                              Label timeElapsed = new Label(LocalTime.now().format(formatter));
+                              timeElapsed.getStyleClass().add("logbook-sequence-actions-time-elapsed");
+
+
+                              sequenceAction.getChildren().addAll(positionalIcon, actionLabel, filler, timeElapsed);
+
+                              actionsVBox.getChildren().add(sequenceAction);
+
                             });
-                    Platform.runLater(
-                        () -> {
-                          actionsVBox
-                              .getChildren()
-                              .forEach(label -> setPositionalStyling((Label) label, false));
-                        });
+//                    Platform.runLater(
+//                        () -> {
+//                          actionsVBox
+//                              .getChildren()
+//                              .forEach(label -> setPositionalStyling((Label) label, false));
+//                        });
                   });
             });
 
