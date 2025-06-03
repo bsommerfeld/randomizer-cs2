@@ -1322,8 +1322,8 @@
 
 .releases-label {
     -fx-font-family: SansSerif;
-    -fx-font-size: 14;
-    -fx-text-fill: #040316;
+    -fx-font-size: 16;
+    -fx-text-fill: #A9A5F3;
     -fx-graphic: url("../images/randomizerView/arrowDownIcon.png");
     -fx-content-display: left;
     -fx-graphic-text-gap: 8;
@@ -1331,6 +1331,7 @@
 
 .releases-label:hover {
     -fx-text-fill: #2F27CE;
+    -fx-graphic: url("../images/randomizerView/arrowDownIconSelected.png");
     -fx-cursor: hand;
 }
 
