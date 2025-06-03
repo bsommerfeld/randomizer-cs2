@@ -1383,3 +1383,173 @@
     -fx-font-weight: bold;
     -fx-text-fill: #040316;
 }
+
+/* Releases View - fills entire window */
+.releases-view {
+    -fx-background-color: #D6D6F5;
+    -fx-spacing: 16;
+    -fx-padding: 16;
+}
+
+/* Header - fixed height */
+.releases-header {
+    -fx-pref-height: 50;
+    -fx-min-height: 50;
+    -fx-max-height: 50;
+    -fx-alignment: center-left;
+    -fx-spacing: 16;
+    -fx-padding: 8 16;
+    -fx-background-color: #FBFBFE;
+    -fx-background-radius: 8;
+}
+
+/* Table Container - fills remaining space after header */
+.releases-table-container {
+    -fx-spacing: 16;
+    -fx-padding: 16;
+    -fx-background-color: #F8F8FF;
+    -fx-background-radius: 8;
+}
+
+/* Left Column - fixed width, full height */
+.releases-list-container {
+    -fx-background-color: #FBFBFE;
+    -fx-background-radius: 8;
+    -fx-padding: 8;
+}
+
+.releases-list-scroll {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.releases-list-content {
+    -fx-spacing: 4;
+    -fx-padding: 8;
+}
+
+/* Release Entry Styling */
+.release-entry {
+    -fx-spacing: 8;
+    -fx-padding: 12;
+    -fx-background-color: #F5F5F5;
+    -fx-background-radius: 6;
+    -fx-border-color: transparent;
+    -fx-border-width: 2;
+    -fx-border-radius: 6;
+    -fx-min-height: 40;
+    -fx-pref-height: 40;
+}
+
+.release-entry:hover {
+    -fx-background-color: #E8E8FF;
+    -fx-border-color: #C8C7FF;
+}
+
+.release-entry-selected {
+    -fx-spacing: 8;
+    -fx-padding: 12;
+    -fx-background-color: #E6E5FF;
+    -fx-background-radius: 6;
+    -fx-border-color: #443DFF;
+    -fx-border-width: 2;
+    -fx-border-radius: 6;
+    -fx-min-height: 40;
+    -fx-pref-height: 40;
+}
+
+.release-version-label {
+    -fx-font-family: SansSerif;
+    -fx-font-size: 14;
+    -fx-font-weight: bold;
+    -fx-text-fill: #040316;
+    -fx-min-width: 80;
+    -fx-pref-width: 80;
+}
+
+.release-date-label {
+    -fx-font-family: SansSerif;
+    -fx-font-size: 12;
+    -fx-text-fill: #7E78ED;
+    -fx-min-width: 90;
+    -fx-pref-width: 90;
+}
+
+.release-status-indicator {
+    -fx-font-family: SansSerif;
+    -fx-font-size: 16;
+    -fx-text-fill: #443DFF;
+    -fx-alignment: center;
+    -fx-min-width: 20;
+    -fx-pref-width: 20;
+}
+
+/* Right Column - fills remaining horizontal space */
+.changelog-container {
+    -fx-spacing: 12;
+    -fx-padding: 16;
+    -fx-background-color: #FBFBFE;
+    -fx-background-radius: 8;
+}
+
+.changelog-title {
+    -fx-font-family: SansSerif;
+    -fx-font-size: 18;
+    -fx-font-weight: bold;
+    -fx-text-fill: #040316;
+    -fx-padding: 0 0 8 0;
+    -fx-min-height: 30;
+    -fx-pref-height: 30;
+}
+
+.changelog-scroll {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.changelog-content {
+    -fx-padding: 16;
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 6;
+    -fx-border-color: #E6E5FF;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-min-height: 200;
+}
+
+.changelog-placeholder {
+    -fx-font-family: SansSerif;
+    -fx-font-size: 14;
+    -fx-text-fill: #7E78ED;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+    -fx-wrap-text: true;
+}
+
+/* Scroll Bar Styling */
+.releases-list-scroll .scroll-bar:vertical,
+.changelog-scroll .scroll-bar:vertical {
+    -fx-background-color: #E6E5FF;
+    -fx-background-radius: 4;
+    -fx-pref-width: 8;
+}
+
+.releases-list-scroll .scroll-bar:vertical .thumb,
+.changelog-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: #443DFF;
+    -fx-background-radius: 4;
+}
+
+.releases-list-scroll .scroll-bar:vertical .track,
+.changelog-scroll .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+
+/* Ensure proper spacing and alignment */
+.release-entry {
+    -fx-alignment: center-left;
+}
+
+.changelog-content {
+    -fx-alignment: top-left;
+}

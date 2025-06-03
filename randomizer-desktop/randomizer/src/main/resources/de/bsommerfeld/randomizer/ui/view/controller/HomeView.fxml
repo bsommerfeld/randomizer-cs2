@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -50,13 +51,54 @@
 
         <!-- Releases View (initially positioned below visible area) -->
         <VBox fx:id="releasesView" styleClass="releases-view"
-              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+              AnchorPane.bottomAnchor="0.0">
             <children>
                 <!-- Header with back button -->
                 <HBox styleClass="releases-header" onMouseClicked="#onBackClick">
                     <children>
-                        <Label text="Back" styleClass="releases-back-label"/>
+                        <Label text="Back" styleClass="releases-back-label">
+                            <cursor>
+                                <Cursor fx:constant="HAND"/>
+                            </cursor>
+                        </Label>
                         <Label text="Releases" styleClass="releases-title"/>
+                    </children>
+                </HBox>
+
+                <!-- Releases Table Container - fills remaining space -->
+                <HBox fx:id="releasesTableContainer" styleClass="releases-table-container" VBox.vgrow="ALWAYS">
+                    <children>
+                        <!-- Left Column: Release List - fixed width -->
+                        <VBox fx:id="releasesListContainer" styleClass="releases-list-container" prefWidth="280.0"
+                              minWidth="280.0" maxWidth="280.0">
+                            <children>
+                                <ScrollPane styleClass="releases-list-scroll" fitToWidth="true" hbarPolicy="NEVER"
+                                            vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
+                                    <VBox fx:id="releasesListContent" styleClass="releases-list-content">
+                                        <!-- Release entries will be added dynamically here -->
+                                    </VBox>
+                                </ScrollPane>
+                            </children>
+                        </VBox>
+
+                        <!-- Right Column: Changelog Display - takes remaining space -->
+                        <VBox fx:id="changelogContainer" styleClass="changelog-container" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label fx:id="changelogTitle" text="Wählen Sie ein Release aus"
+                                       styleClass="changelog-title"/>
+                                <ScrollPane fx:id="changelogScrollPane" styleClass="changelog-scroll" fitToWidth="true"
+                                            hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
+                                    <VBox fx:id="changelogContent" styleClass="changelog-content">
+                                        <children>
+                                            <Label fx:id="changelogText"
+                                                   text="Klicken Sie auf ein Release links, um die Changelog-Details zu sehen."
+                                                   styleClass="changelog-placeholder" wrapText="true"/>
+                                        </children>
+                                    </VBox>
+                                </ScrollPane>
+                            </children>
+                        </VBox>
                     </children>
                 </HBox>
             </children>
