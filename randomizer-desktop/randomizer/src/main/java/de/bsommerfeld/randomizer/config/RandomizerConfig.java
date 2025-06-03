@@ -46,13 +46,18 @@ public class RandomizerConfig extends ConfigurablePojo<RandomizerConfig> {
   @Key("builder.filters.activated")
   private List<String> builderFiltersActivated = new ArrayList<>(KeyBindType.values().length);
 
+  @CommentSection({"Debug Settings", "------"})
+  @Comment({"Whether or not CS2 needs to be focused."})
+  @Key("cs2.focus")
+  private boolean cs2Focus = true;
+
   public void setConfigPath(String configPath) {
     this.configPath = configPath;
     configPathProperty.set(configPath);
   }
 
   @PostInject
-  private void updateConfigPathProperty() {
+  private void updateProperties() {
     configPathProperty.set(configPath);
   }
 }

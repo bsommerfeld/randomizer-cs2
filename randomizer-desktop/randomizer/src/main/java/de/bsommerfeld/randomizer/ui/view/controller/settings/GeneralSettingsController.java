@@ -26,6 +26,7 @@ public class GeneralSettingsController {
   private final GeneralSettingsViewModel generalSettingsViewModel;
 
   @FXML private ToggleButton showIntroToggleButton;
+  @FXML private ToggleButton cs2FocusNeededToggleButton;
   @FXML private Button syncConfigButton;
   @FXML private TextField configPathTextField;
   @FXML private MinMaxSlider minMaxSlider;
@@ -55,6 +56,9 @@ public class GeneralSettingsController {
     showIntroToggleButton
         .selectedProperty()
         .bindBidirectional(generalSettingsViewModel.getShowIntroProperty());
+    cs2FocusNeededToggleButton
+        .selectedProperty()
+        .bindBidirectional(generalSettingsViewModel.getCs2FocusNeededProperty());
   }
 
   private void setupIntervalSlider() {
@@ -84,22 +88,34 @@ public class GeneralSettingsController {
   }
 
   private void syncStatus() {
-    BooleanBinding configPathExists = generalSettingsViewModel.getConfigPathProperty()
+    BooleanBinding configPathExists =
+        generalSettingsViewModel
+            .getConfigPathProperty()
             .isNotNull()
             .and(generalSettingsViewModel.getConfigPathProperty().isNotEmpty());
 
-    configPathExists.addListener((obs, oldVal, newVal) -> {
-      syncConfigButton.getStyleClass().removeAll("sync-config-path-success", "sync-config-path-failed");
-      syncConfigButton.getStyleClass().add(newVal ? "sync-config-path-success" : "sync-config-path-failed");
-    });
+    configPathExists.addListener(
+        (obs, oldVal, newVal) -> {
+          syncConfigButton
+              .getStyleClass()
+              .removeAll("sync-config-path-success", "sync-config-path-failed");
+          syncConfigButton
+              .getStyleClass()
+              .add(newVal ? "sync-config-path-success" : "sync-config-path-failed");
+        });
 
     syncFailedIndicator.visibleProperty().bind(configPathExists.not());
 
-    Platform.runLater(() -> {
-      boolean isSuccess = configPathExists.get();
-      syncConfigButton.getStyleClass().removeAll("sync-config-path-success", "sync-config-path-failed");
-      syncConfigButton.getStyleClass().add(isSuccess ? "sync-config-path-success" : "sync-config-path-failed");
-    });
+    Platform.runLater(
+        () -> {
+          boolean isSuccess = configPathExists.get();
+          syncConfigButton
+              .getStyleClass()
+              .removeAll("sync-config-path-success", "sync-config-path-failed");
+          syncConfigButton
+              .getStyleClass()
+              .add(isSuccess ? "sync-config-path-success" : "sync-config-path-failed");
+        });
   }
 
   @FXML

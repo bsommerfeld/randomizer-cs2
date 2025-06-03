@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * The {@code ApplicationContext} class manages and notifies state changes within an application,
@@ -22,6 +23,7 @@ public class ApplicationContext {
   private final List<Consumer<ApplicationState>> changeListener = new ArrayList<>();
 
   private volatile ApplicationState applicationState = ApplicationState.IDLING;
+  @Setter private volatile boolean checkForCS2Focus = true;
 
   public static File getAppdataFolder() {
     return APPDATA_FOLDER;
