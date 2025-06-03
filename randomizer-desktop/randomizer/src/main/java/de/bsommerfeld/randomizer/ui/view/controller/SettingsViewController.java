@@ -24,7 +24,6 @@ public class SettingsViewController {
   @FXML
   private void initialize() {
     generalToggleButton.setSelected(true);
-    generalToggleButton.setDisable(true);
     contentPane
         .getChildren()
         .setAll(viewProvider.requestView(GeneralSettingsController.class).parent());
