@@ -45,11 +45,7 @@
         <HBox fx:id="releasesButton" alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0"
               AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
               styleClass="release-bottom-bar" onMouseClicked="#onReleasesClick">
-            <Label text="Releases" styleClass="releases-label">
-                <cursor>
-                    <Cursor fx:constant="HAND"/>
-                </cursor>
-            </Label>
+            <Label text="Releases" styleClass="releases-label"/>
         </HBox>
 
         <!-- Releases View (initially positioned below visible area) -->
@@ -57,14 +53,9 @@
               AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <children>
                 <!-- Header with back button -->
-                <HBox styleClass="releases-header">
+                <HBox styleClass="releases-header" onMouseClicked="#onBackClick">
                     <children>
-                        <Button fx:id="backButton" text="← Zurück" styleClass="releases-back-button"
-                                onAction="#onBackClick">
-                            <cursor>
-                                <Cursor fx:constant="HAND"/>
-                            </cursor>
-                        </Button>
+                        <Label text="Back" styleClass="releases-back-label"/>
                         <Label text="Releases" styleClass="releases-title"/>
                     </children>
                 </HBox>

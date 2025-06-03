@@ -9,7 +9,6 @@ import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.input.MouseEvent;
@@ -88,7 +87,7 @@ public class HomeViewController {
     }
 
     @FXML
-    void onBackClick(ActionEvent event) {
+    void onBackClick(MouseEvent event) {
         if (isReleasesVisible) {
             hideReleasesView();
         }

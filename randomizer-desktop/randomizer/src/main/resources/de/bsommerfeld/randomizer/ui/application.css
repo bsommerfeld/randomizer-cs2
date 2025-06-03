@@ -1320,21 +1320,35 @@
     -fx-background-insets: 8 0 0 0;
 }
 
-.releases-label {
+.releases-label, .releases-back-label {
     -fx-font-family: SansSerif;
     -fx-font-size: 16;
     -fx-text-fill: #7E78ED;
-    -fx-graphic: url("../images/randomizerView/arrowDownIcon.png");
     -fx-content-display: left;
     -fx-opacity: 55%;
     -fx-graphic-text-gap: 8;
 }
 
-.releases-label:hover {
+.releases-label {
+    -fx-graphic: url("../images/randomizerView/arrowDownIcon.png");
+}
+
+.releases-back-label {
+    -fx-graphic: url("../images/randomizerView/arrowUpIcon.png");
+}
+
+.releases-label:hover, .releases-back-label:hover {
     -fx-text-fill: #2F27CE;
-    -fx-graphic: url("../images/randomizerView/arrowDownIconSelected.png");
     -fx-cursor: hand;
     -fx-underline: true;
+}
+
+.releases-label:hover {
+    -fx-graphic: url("../images/randomizerView/arrowDownIconSelected.png");
+}
+
+.releases-back-label:hover {
+    -fx-graphic: url("../images/randomizerView/arrowUpIconSelected.png");
 }
 
 /* Releases View Styling */
@@ -1361,19 +1375,6 @@
     -fx-padding: 8 16;
     -fx-background-color: #FBFBFE;
     -fx-background-radius: 8;
-}
-
-.releases-back-button {
-    -fx-font-family: SansSerif;
-    -fx-font-size: 14;
-    -fx-text-fill: #2F27CE;
-    -fx-background-color: transparent;
-    -fx-border: none;
-}
-
-.releases-back-button:hover {
-    -fx-text-fill: #443DFF;
-    -fx-underline: true;
 }
 
 .releases-title {
