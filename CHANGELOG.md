@@ -3,6 +3,7 @@
 ### Added
 
 - Added Release View below the HomeView
+- Added setting to switch whether CS2 has to be in focus in order that the Randomizer works
 
 ### Changed
 
