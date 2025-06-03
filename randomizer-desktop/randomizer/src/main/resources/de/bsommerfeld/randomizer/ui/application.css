@@ -241,11 +241,18 @@
     -fx-background-image: url("../images/randomizerView/pauseIcon.png");
 }
 
-.logbook-active-actions {
+.logbook-active-actions, .logbook-active-actions-vbox {
     -fx-pref-width: 296;
     -fx-pref-height: 244;
     -fx-spacing: 6;
     -fx-padding: 8 0;
+    -fx-background-color: #E6E5FF;
+    -fx-alignment: center;
+}
+
+.logbook-active-actions-vbox {
+    -fx-max-width: 148;
+    -fx-alignment: top-left;
 }
 
 .logbook-sequence-actions-name {

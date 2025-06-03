@@ -26,7 +26,14 @@
                                                 <Label fx:id="sequenceNameLabel" styleClass="logbook-sequence-name" />
                                             </children>
                                         </HBox>
-                                        <VBox fx:id="actionsVBox" styleClass="logbook-active-actions" VBox.vgrow="ALWAYS" />
+                              <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="logbook-history-scrollpane" VBox.vgrow="ALWAYS">
+                                <content>
+                                    <VBox styleClass="logbook-active-actions">
+                                       <children>
+                                          <VBox fx:id="actionsVBox" styleClass="logbook-active-actions-vbox"/>
+                                       </children></VBox>
+                                </content>
+                              </ScrollPane>
                                     </children>
                                 </VBox>
                                 <!-- Statusbereich -->
