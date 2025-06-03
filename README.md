@@ -1,6 +1,3 @@
-<img src="https://github.com/user-attachments/assets/f8e04de5-28fa-4015-91b4-c7e888982666" alt="Randomizer Logo" width="100" height="100" align="right" />
-<br><br>
-
 # <img src="https://github.com/user-attachments/assets/ab28eba7-4b88-47b4-be10-ac4487d66e23" alt="randomizer" width="24" height="24" style="vertical-align: middle;" />andomizer-CS2
 
 ![Downloads](https://img.shields.io/github/downloads/bsommerfeld/randomizer-cs2/total)
