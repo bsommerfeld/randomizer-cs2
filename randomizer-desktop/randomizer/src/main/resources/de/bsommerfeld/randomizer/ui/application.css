@@ -1,68 +1,11 @@
 @import "home-view.css";
+@import "nav-bar.css";
 
 /* Randomizer Window */
 .randomizer-window {
     -fx-pref-width: 704;
     -fx-pref-height: 504;
     -fx-background-color: #D6D6F5;
-}
-
-/* Navigation Bar */
-.navigation-bar {
-    -fx-min-width: 48;
-    -fx-pref-height: 504;
-    -fx-padding: 12 0;
-    -fx-spacing: 12;
-    -fx-background-color: #FBFBFE;
-}
-
-.navigation-bar-home, .navigation-bar-builder, .navigation-bar-randomizer, .navigation-bar-settings {
-    -fx-pref-width: 38;
-    -fx-pref-height: 28;
-    -fx-background-color: transparent;
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: right;
-    -fx-cursor: hand;
-}
-
-.navigation-bar-home {
-    -fx-background-image: url("../images/navigationbar/homeIcon.png");
-}
-
-.navigation-bar-home:hover, .navigation-bar-home:selected {
-    -fx-background-image: url("../images/navigationbar/homeIconSelected.png");
-}
-
-.navigation-bar-builder {
-    -fx-background-image: url("../images/navigationbar/builderIcon.png");
-}
-
-.navigation-bar-builder:hover, .navigation-bar-builder:selected {
-    -fx-background-image: url("../images/navigationbar/builderIconSelected.png");
-}
-
-.navigation-bar-randomizer {
-    -fx-background-image: url("../images/navigationbar/logbookIcon.png");
-}
-
-.navigation-bar-randomizer:hover, .navigation-bar-randomizer:selected {
-    -fx-background-image: url("../images/navigationbar/logbookIconSelected.png");
-}
-
-.navigation-bar-settings {
-    -fx-background-image: url("../images/navigationbar/settingsIcon.png");
-}
-
-.navigation-bar-settings:hover, .navigation-bar-settings:selected {
-    -fx-background-image: url("../images/navigationbar/settingsIconSelected.png");
-}
-
-.navigation-bar-separator, .navigation-bar-separator .line {
-    -fx-max-width: 27;
-    -fx-pref-height: 2;
-    -fx-translate-x: 7;
-    -fx-border-color: null;
-    -fx-background-color: #443DFF;
 }
 
 /* Randomizer View */
