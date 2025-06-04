@@ -30,10 +30,10 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
       new CopyOnWriteArrayList<>();
 
   private final List<Action> runningActions = new CopyOnWriteArrayList<>();
-  private volatile ActionSequence currentSequence = null;
   private final ActionRepository actionRepository;
   private final FocusManager focusManager;
   private final ApplicationContext applicationContext;
+  private volatile ActionSequence currentSequence = null;
 
   @Inject
   public DefaultActionSequenceDispatcher(
@@ -68,10 +68,6 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
 
       if (action.isInterrupted()) {
         log.info("Interrupted action processing for {}", action);
-        // If this action is part of a sequence, mark the sequence as interrupted
-        if (currentSequence != null) {
-          currentSequence.interrupt();
-        }
         return;
       }
 
