@@ -178,6 +178,7 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
   private Action getCurrentExecutingAction() {
     if (currentActionSequence == null) return null;
     return currentActionSequence.getActions().stream()
+        .filter(action -> !action.isInterrupted())
         .filter(Action::isExecuting)
         .findFirst()
         .orElse(null);
@@ -185,6 +186,7 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
 
   private void handleCurrentActionInterruption(
       String keyText, Integer mouseButton, NativeKeyEvent nativeKeyEvent, Action currentAction) {
+
     String actionKey = currentAction.getActionKey().getKey();
     boolean isKeyBindMatched =
         actionKey.equalsIgnoreCase(keyText)
