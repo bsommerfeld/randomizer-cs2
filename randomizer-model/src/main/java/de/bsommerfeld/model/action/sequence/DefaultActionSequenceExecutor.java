@@ -112,13 +112,12 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
               return;
             }
 
-            for (Action action : currentActionSequence.getActions()) {
-              action.instantInterrupt();
-            }
+            // Use the new instantInterrupt method on the sequence
+            currentActionSequence.instantInterrupt();
 
             log.warn(
-                "Application state change detected in action sequence, interrupted {} actions.",
-                currentActionSequence.getActions().size());
+                "Application state change detected, interrupted action sequence: {}",
+                currentActionSequence.getName());
 
             currentActionSequence = null;
           }
@@ -193,7 +192,16 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
 
     if (isKeyBindMatched) {
       hasReleasedAnyKey = true;
+
+      // Interrupt the action
       currentAction.interrupt();
+
+      // Also interrupt the sequence if it exists
+      if (currentActionSequence != null) {
+        currentActionSequence.interrupt();
+        log.info("Interrupting sequence {} due to action interruption", currentActionSequence.getName());
+      }
+
       log.info(
           "Interruption detected with {}: {}",
           nativeKeyEvent != null ? "Key" : "Mousebutton",
@@ -236,9 +244,27 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
   private boolean processCurrentActionSequence() {
     if (hasReleasedAnyKey) {
       hasReleasedAnyKey = false;
-      if (currentActionSequence == null || !currentActionSequence.isActive()) return true;
+
+      // Check if we have a valid sequence to process
+      if (currentActionSequence == null || !currentActionSequence.isActive()) {
+        return true;
+      }
+
+      // Check if the sequence is interrupted
+      if (currentActionSequence.isInterrupted()) {
+        log.info("Sequence {} is interrupted, skipping further processing", currentActionSequence.getName());
+        return true;
+      }
+
+      // Find any interrupted action
       Action currentAction = findInterruptedAction();
-      if (currentAction != null && executeDelayedActionIfNeeded(currentAction)) return true;
+
+      // If we found an interrupted action with a delay, try to continue it
+      if (currentAction != null && executeDelayedActionIfNeeded(currentAction)) {
+        return true;
+      }
+
+      // Check if we need to wait before processing the next sequence
       int remainingWaitTime = calculateRemainingWaitTime();
       if (remainingWaitTime > 0) {
         lastCycle = Instant.now().toEpochMilli();
@@ -249,6 +275,8 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
   }
 
   private Action findInterruptedAction() {
+    if (currentActionSequence == null) return null;
+
     return currentActionSequence.getActions().stream()
         .filter(Action::isInterrupted)
         .findFirst()
@@ -256,15 +284,31 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
   }
 
   private boolean executeDelayedActionIfNeeded(Action currentAction) {
-    if (currentAction.getInterval().isEmpty()) return false;
+    if (currentAction == null || currentAction.getInterval().isEmpty()) return false;
+
+    // Check if the sequence is interrupted
+    if (currentActionSequence != null && currentActionSequence.isInterrupted()) {
+      log.info("Sequence {} is interrupted, not redispatching action {}", 
+              currentActionSequence.getName(), currentAction);
+      return false;
+    }
+
     Instant now = Instant.now();
     Instant delayedAt = currentAction.getExpectedEnding();
     if (delayedAt != null) {
       long remainingTimeMs = delayedAt.toEpochMilli() - now.toEpochMilli();
       if (remainingTimeMs > 0) {
-        log.debug("Continuing action for {} ms (redispatched)", remainingTimeMs);
-        actionSequenceDispatcher.redispatch(currentAction, remainingTimeMs);
-        return true;
+        log.debug("Continuing action {} for {} ms (redispatched)", currentAction, remainingTimeMs);
+        try {
+          actionSequenceDispatcher.redispatch(currentAction, remainingTimeMs);
+          return true;
+        } catch (Exception e) {
+          log.error("Error redispatching action {}", currentAction, e);
+          if (currentActionSequence != null) {
+            currentActionSequence.interrupt();
+          }
+          return false;
+        }
       }
     }
     return false;
@@ -275,6 +319,10 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
   }
 
   private synchronized void chooseAndDispatchRandomSequence() {
+    // Make sure we don't have any running actions before starting a new sequence
+    actionSequenceDispatcher.discardAllRunningActions();
+
+    // Update the cache to get the latest sequences
     actionSequenceRepository.updateActionSequencesCache();
 
     List<ActionSequence> sequences =
@@ -284,13 +332,27 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
 
     if (!sequences.isEmpty()) {
       int randomIndex = ThreadLocalRandom.current().nextInt(0, sequences.size());
-      currentActionSequence = sequences.get(randomIndex);
-      actionSequenceDispatcher.dispatchSequence(currentActionSequence);
-      if (currentActionSequence == null) {
-        log.warn("To-finish action sequence vanished.");
-        return;
+      ActionSequence selectedSequence = sequences.get(randomIndex);
+
+      // Store reference before dispatching
+      currentActionSequence = selectedSequence;
+
+      try {
+        // Dispatch the sequence
+        actionSequenceDispatcher.dispatchSequence(selectedSequence);
+
+        // Check if the sequence was interrupted during dispatch
+        if (selectedSequence.isInterrupted()) {
+          log.info("Sequence {} was interrupted during dispatch", selectedSequence.getName());
+        } else {
+          log.info("Sequence {} was successfully dispatched", selectedSequence.getName());
+        }
+      } catch (Exception e) {
+        log.error("Error dispatching sequence {}", selectedSequence.getName(), e);
+      } finally {
+        // Clear the reference after dispatch is complete
+        currentActionSequence = null;
       }
-      log.info("Sequence {} was dispatched.", currentActionSequence.getName());
     } else {
       log.warn("No active ActionSequences found.");
     }
@@ -310,11 +372,21 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
     lastFocusCheckTime = currentTime;
 
     ApplicationState currentState = applicationContext.getApplicationState();
+
+    // Check if focus was gained
     if (currentState == ApplicationState.AWAITING && focusManager.isApplicationWindowInFocus()) {
       applicationContext.setApplicationState(ApplicationState.RUNNING);
       log.info("ApplicationState changed to: RUNNING");
-    } else if (currentState == ApplicationState.RUNNING
-        && !focusManager.isApplicationWindowInFocus()) {
+    } 
+    // Check if focus was lost
+    else if (currentState == ApplicationState.RUNNING && !focusManager.isApplicationWindowInFocus()) {
+      // Interrupt current sequence if it exists
+      if (currentActionSequence != null) {
+        log.info("Focus lost, interrupting current sequence: {}", currentActionSequence.getName());
+        currentActionSequence.instantInterrupt();
+      }
+
+      // Update application state
       applicationContext.setApplicationState(ApplicationState.AWAITING);
       log.info("ApplicationState changed to: AWAITING");
     }

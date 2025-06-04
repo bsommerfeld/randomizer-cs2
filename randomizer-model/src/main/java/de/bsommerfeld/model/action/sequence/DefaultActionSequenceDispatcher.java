@@ -30,6 +30,7 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
       new CopyOnWriteArrayList<>();
 
   private final List<Action> runningActions = new CopyOnWriteArrayList<>();
+  private volatile ActionSequence currentSequence = null;
   private final ActionRepository actionRepository;
   private final FocusManager focusManager;
   private final ApplicationContext applicationContext;
@@ -52,17 +53,39 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
   private void dispatch(Action action) {
     if (action == null) return;
     if (!actionRepository.isEnabled(action)) return;
-    dispatchToHandlers(action, actionHandlers);
-    runningActions.add(action);
 
-    action.execute();
-
-    if (action.isInterrupted()) {
-      log.info("Interrupted action processing");
+    // Check if the current sequence is interrupted
+    if (currentSequence != null && currentSequence.isInterrupted()) {
+      log.info("Skipping dispatch of action {} because sequence is interrupted", action);
       return;
     }
 
-    finishDispatch(action);
+    try {
+      dispatchToHandlers(action, actionHandlers);
+      runningActions.add(action);
+
+      action.execute();
+
+      if (action.isInterrupted()) {
+        log.info("Interrupted action processing for {}", action);
+        // If this action is part of a sequence, mark the sequence as interrupted
+        if (currentSequence != null) {
+          currentSequence.interrupt();
+        }
+        return;
+      }
+
+      finishDispatch(action);
+    } catch (Exception e) {
+      log.error("Error dispatching action {}", action, e);
+      // Ensure action is removed from running actions even if an exception occurs
+      runningActions.remove(action);
+      // If this action is part of a sequence, mark the sequence as interrupted
+      if (currentSequence != null) {
+        currentSequence.interrupt();
+      }
+      throw e;
+    }
   }
 
   private void finishDispatch(Action action) {
@@ -79,6 +102,11 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
    */
   @Override
   public void redispatch(Action action, long remainingTime) {
+    // Check if the current sequence is interrupted
+    if (currentSequence != null && currentSequence.isInterrupted()) {
+      log.info("Skipping redispatch of action {} because sequence is interrupted", action);
+      return;
+    }
 
     // Pre-execution check: Don't execute if already interrupted
     if (action.isInterrupted()) {
@@ -86,14 +114,31 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
       return;
     }
 
-    action.executeWithDelay(remainingTime);
+    try {
+      runningActions.add(action);
+      action.executeWithDelay(remainingTime);
 
-    // Post-execution check: Don't finish if interrupted during execution
-    if (action.isInterrupted()) {
-      log.info("Interrupted action processing");
-      return;
+      // Post-execution check: Don't finish if interrupted during execution
+      if (action.isInterrupted()) {
+        log.info("Interrupted action processing during redispatch");
+        // If this action is part of a sequence, mark the sequence as interrupted
+        if (currentSequence != null) {
+          currentSequence.interrupt();
+        }
+        return;
+      }
+
+      finishDispatch(action);
+    } catch (Exception e) {
+      log.error("Error redispatching action {}", action, e);
+      // Ensure action is removed from running actions even if an exception occurs
+      runningActions.remove(action);
+      // If this action is part of a sequence, mark the sequence as interrupted
+      if (currentSequence != null) {
+        currentSequence.interrupt();
+      }
+      throw e;
     }
-    finishDispatch(action);
   }
 
   /**
@@ -106,32 +151,78 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
     if (actionSequence == null) return;
     if (!actionSequence.isActive()) return;
 
+    // Discard any currently running actions before starting a new sequence
+    discardAllRunningActions();
+
+    // Reset any previous interrupted state
+    actionSequence.resetInterrupted();
+
+    // Set as current sequence
+    currentSequence = actionSequence;
+
     dispatchToHandlers(actionSequence, sequenceHandlers);
-    for (Action action : actionSequence.getActions()) {
-      if (applicationContext.isCheckForCS2Focus() && !focusManager.isApplicationWindowInFocus()) {
-        log.info("Interrupted sequence processing due to loss of focus");
-        return;
+
+    try {
+      for (Action action : actionSequence.getActions()) {
+        // Check for focus loss
+        if (applicationContext.isCheckForCS2Focus() && !focusManager.isApplicationWindowInFocus()) {
+          log.info("Interrupted sequence processing due to loss of focus");
+          actionSequence.interrupt();
+          break;
+        }
+
+        // Check if sequence was interrupted
+        if (actionSequence.isInterrupted()) {
+          log.info("Sequence {} was interrupted, stopping further action processing", actionSequence.getName());
+          break;
+        }
+
+        // Skip already interrupted actions
+        if (action.isInterrupted()) {
+          log.info("Skipped action {} because it was interrupted before executing", action);
+          continue;
+        }
+
+        dispatch(action);
+
+        // Check if action execution caused sequence interruption
+        if (actionSequence.isInterrupted()) {
+          log.info("Sequence {} was interrupted during action execution, stopping further processing", 
+                  actionSequence.getName());
+          break;
+        }
       }
 
-      if (action.isInterrupted()) {
-        log.info("Skipped action {} because it was interrupted before executing", action);
-        continue;
+      // Only finish processing if the sequence wasn't interrupted
+      if (!actionSequence.isInterrupted()) {
+        finishSequenceProcessing(actionSequence);
+        log.info(SEQUENCE_DISPATCHED, actionSequence);
+      } else {
+        log.info("Sequence {} was not fully dispatched due to interruption", actionSequence.getName());
       }
-
-      dispatch(action);
+    } finally {
+      // Clear current sequence reference
+      currentSequence = null;
     }
-
-    finishSequenceProcessing(actionSequence);
-    log.info(SEQUENCE_DISPATCHED, actionSequence);
   }
 
-  /** Discards all running actions. */
+  /** 
+   * Discards all running actions and interrupts the current sequence if one exists.
+   */
   @Override
   public void discardAllRunningActions() {
+    // First check if we have a current sequence and interrupt it
+    if (currentSequence != null) {
+      log.info("Interrupting current sequence: {}", currentSequence.getName());
+      currentSequence.instantInterrupt();
+    }
+
+    // Then handle any individual running actions
     if (runningActions.isEmpty()) {
-      log.info("No running actions to discard");
+      log.info("No individual running actions to discard");
       return;
     }
+
     log.info("Discarding {} running actions", runningActions.size());
     runningActions.forEach(Action::instantInterrupt);
     runningActions.clear();
@@ -143,8 +234,19 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
   }
 
   private void finishSequenceProcessing(ActionSequence actionSequence) {
+    // Make sure all actions are in a normalized state
     actionSequence.getActions().forEach(Action::normalize);
+
+    // Make sure the sequence itself is not marked as interrupted
+    if (actionSequence.isInterrupted()) {
+      log.info("Resetting interrupted state for sequence {} before finishing", actionSequence.getName());
+      actionSequence.resetInterrupted();
+    }
+
+    // Notify all handlers that the sequence is finished
     actionSequenceFinishHandlers.forEach(handler -> safeAccept(handler, actionSequence));
+
+    log.debug("Sequence processing finished for {}", actionSequence.getName());
   }
 
   /**
