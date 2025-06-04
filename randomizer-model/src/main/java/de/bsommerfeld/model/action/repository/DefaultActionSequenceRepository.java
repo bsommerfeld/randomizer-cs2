@@ -1,7 +1,9 @@
 package de.bsommerfeld.model.action.repository;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import de.bsommerfeld.model.action.sequence.ActionSequence;
+import de.bsommerfeld.model.action.spi.ActionSequenceRepository;
 import de.bsommerfeld.model.persistence.dao.ActionSequenceDao;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,15 +14,20 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Default implementation of the ActionSequenceRepository interface.
+ * This class manages action sequences and provides caching functionality.
+ */
 @Slf4j
-public class ActionSequenceRepository {
+@Singleton
+public class DefaultActionSequenceRepository implements ActionSequenceRepository {
 
     private final Map<String, ActionSequence> actionSequencesMap = new HashMap<>();
     private final ActionSequenceDao actionSequenceDao;
     private boolean isCacheUpdated = false;
 
     @Inject
-    public ActionSequenceRepository(ActionSequenceDao actionSequenceDao) {
+    public DefaultActionSequenceRepository(ActionSequenceDao actionSequenceDao) {
         this.actionSequenceDao = actionSequenceDao;
     }
 
@@ -28,36 +35,37 @@ public class ActionSequenceRepository {
      * Saves an action sequence to the storage and updates the cache.
      *
      * @param actionSequence The action sequence to be saved. It must not be null.
+     * @throws NullPointerException if the action sequence is null
      */
+    @Override
     public synchronized void saveActionSequence(ActionSequence actionSequence) {
-        Objects.requireNonNull(actionSequence, "ActionSequence darf nicht null sein");
+        Objects.requireNonNull(actionSequence, "ActionSequence must not be null");
 
         if (actionSequencesMap.containsKey(actionSequence.getName())) {
             log.warn(
-                    "ActionSequence mit dem Namen '{}' existiert bereits und wird überschrieben.",
+                    "ActionSequence with name '{}' already exists and will be overwritten.",
                     actionSequence.getName());
         }
 
         actionSequencesMap.put(actionSequence.getName(), actionSequence);
         isCacheUpdated = false;
         actionSequenceDao.saveActionSequence(actionSequence);
-        log.info("ActionSequence '{}' gespeichert.", actionSequence.getName());
+        log.info("ActionSequence '{}' saved.", actionSequence.getName());
     }
 
     /**
      * Deletes the given action sequence from the system.
      *
      * @param actionSequence the action sequence to be deleted; must not be null
-     *
-     * @throws NullPointerException     if the action sequence is null
-     * @throws IllegalArgumentException if the action sequence does not exist
+     * @throws NullPointerException if the action sequence is null
      */
+    @Override
     public synchronized void deleteActionSequence(ActionSequence actionSequence) {
-        Objects.requireNonNull(actionSequence, "ActionSequence darf nicht null sein");
+        Objects.requireNonNull(actionSequence, "ActionSequence must not be null");
 
         if (!actionSequencesMap.containsKey(actionSequence.getName())) {
             log.warn(
-                    "Versucht, eine nicht existierende ActionSequence zu löschen: {}",
+                    "Attempted to delete a non-existent ActionSequence: {}",
                     actionSequence.getName());
             return;
         }
@@ -65,26 +73,28 @@ public class ActionSequenceRepository {
         removeActionSequence(actionSequence.getName());
         isCacheUpdated = false;
         actionSequenceDao.deleteActionSequence(actionSequence);
-        log.info("ActionSequence '{}' gelöscht.", actionSequence.getName());
+        log.info("ActionSequence '{}' deleted.", actionSequence.getName());
     }
 
     /**
      * Adds an ActionSequence to the internal storage, ensuring no duplicate entries.
      *
      * @param actionSequence the ActionSequence to be added; must not be null
+     * @throws NullPointerException if the action sequence is null
      */
+    @Override
     public synchronized void addActionSequence(ActionSequence actionSequence) {
-        Objects.requireNonNull(actionSequence, "ActionSequence darf nicht null sein");
+        Objects.requireNonNull(actionSequence, "ActionSequence must not be null");
 
         if (actionSequencesMap.containsKey(actionSequence.getName())) {
             log.warn(
-                    "ActionSequence mit dem Namen '{}' existiert bereits im Speicher.",
+                    "ActionSequence with name '{}' already exists in storage.",
                     actionSequence.getName());
             return;
         }
 
         actionSequencesMap.put(actionSequence.getName(), actionSequence);
-        log.info("ActionSequence '{}' hinzugefügt.", actionSequence.getName());
+        log.info("ActionSequence '{}' added.", actionSequence.getName());
     }
 
     /**
@@ -92,27 +102,27 @@ public class ActionSequenceRepository {
      *
      * @param name the name of the action sequence to be removed
      */
+    @Override
     public synchronized void removeActionSequence(String name) {
         if (actionSequencesMap.remove(name) == null) {
             log.warn(
-                    "Keine ActionSequence mit dem Namen '{}' im Speicher gefunden, um sie zu entfernen.",
+                    "No ActionSequence with name '{}' found in storage to remove.",
                     name);
             return;
         }
-        log.info("ActionSequence '{}' entfernt.", name);
+        log.info("ActionSequence '{}' removed.", name);
     }
 
     /**
-     * Updates the action sequences cache if it is not already updated. This method is synchronized to prevent
-     * concurrent updates. If the cache is updated, it will log that the cache is up to date. If the cache is not
-     * updated, it will update the cache and log the update.
+     * Updates the action sequences cache if it is not already updated.
      */
+    @Override
     public synchronized void updateActionSequencesCache() {
         if (!isCacheUpdated) {
             updateCache();
-            log.info("Cache aktualisiert.");
+            log.info("Cache updated.");
         } else {
-            log.info("Cache ist aktuell.");
+            log.info("Cache is already up to date.");
         }
     }
 
@@ -120,27 +130,25 @@ public class ActionSequenceRepository {
      * Retrieves the action sequence associated with the given name.
      *
      * @param name the name of the action sequence to retrieve
-     *
      * @return an Optional containing the ActionSequence if found, otherwise an empty Optional
      */
+    @Override
     public synchronized Optional<ActionSequence> getActionSequence(String name) {
         return Optional.ofNullable(actionSequencesMap.get(name));
     }
 
     /**
-     * Retrieves a synchronized list of action sequences from the internal map.
+     * Retrieves a list of action sequences from the internal map.
      *
-     * @return A synchronized list containing all action sequences from the map.
+     * @return A list containing all action sequences from the map.
      */
+    @Override
     public synchronized List<ActionSequence> getActionSequences() {
         return new ArrayList<>(actionSequencesMap.values());
     }
 
     /**
-     * Updates the action sequences cache by reloading data from the data access object. The method clears the existing
-     * cache and loads the latest action sequences, then updates the cache map and sets the cache updated flag to true.
-     *
-     * <p>This method is synchronized to ensure thread safety during the update process.
+     * Updates the action sequences cache by reloading data from the data access object.
      */
     private synchronized void updateCache() {
         actionSequencesMap.clear();

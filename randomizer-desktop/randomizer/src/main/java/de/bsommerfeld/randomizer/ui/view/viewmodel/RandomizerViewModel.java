@@ -5,7 +5,7 @@ import de.bsommerfeld.model.ApplicationContext;
 import de.bsommerfeld.model.ApplicationState;
 import de.bsommerfeld.model.action.Action;
 import de.bsommerfeld.model.action.sequence.ActionSequence;
-import de.bsommerfeld.model.action.sequence.ActionSequenceDispatcher;
+import de.bsommerfeld.model.action.spi.ActionSequenceDispatcher;
 import java.util.function.Consumer;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;

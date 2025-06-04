@@ -2,7 +2,7 @@ package de.bsommerfeld.randomizer.ui.view.viewmodel.settings;
 
 import com.google.inject.Inject;
 import de.bsommerfeld.model.ApplicationContext;
-import de.bsommerfeld.model.action.sequence.ActionSequenceExecutorRunnable;
+import de.bsommerfeld.model.action.spi.ActionSequenceExecutor;
 import de.bsommerfeld.model.config.keybind.KeyBindRepository;
 import de.bsommerfeld.randomizer.bootstrap.CS2ConfigLoader;
 import de.bsommerfeld.randomizer.config.RandomizerConfig;
@@ -30,17 +30,20 @@ public class GeneralSettingsViewModel {
   private final KeyBindRepository keyBindRepository;
   private final CS2ConfigLoader CS2ConfigLoader;
   private final ApplicationContext applicationContext;
+  private final ActionSequenceExecutor actionSequenceExecutor;
 
   @Inject
   public GeneralSettingsViewModel(
       RandomizerConfig randomizerConfig,
       KeyBindRepository keyBindRepository,
       ApplicationContext applicationContext,
-      CS2ConfigLoader CS2ConfigLoader) {
+      CS2ConfigLoader CS2ConfigLoader,
+      ActionSequenceExecutor actionSequenceExecutor) {
     this.randomizerConfig = randomizerConfig;
     this.keyBindRepository = keyBindRepository;
     this.applicationContext = applicationContext;
     this.CS2ConfigLoader = CS2ConfigLoader;
+    this.actionSequenceExecutor = actionSequenceExecutor;
 
     setCS2Focus(randomizerConfig.isCs2Focus());
   }
@@ -106,8 +109,8 @@ public class GeneralSettingsViewModel {
   public void updateInterval() {
     randomizerConfig.setMinInterval(minIntervalProperty.get());
     randomizerConfig.setMaxInterval(maxIntervalProperty.get());
-    ActionSequenceExecutorRunnable.setMinWaitTime(minIntervalProperty.get());
-    ActionSequenceExecutorRunnable.setMaxWaitTime(maxIntervalProperty.get());
+    actionSequenceExecutor.setMinWaitTime(minIntervalProperty.get());
+    actionSequenceExecutor.setMaxWaitTime(maxIntervalProperty.get());
     randomizerConfig.save();
   }
 

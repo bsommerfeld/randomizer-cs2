@@ -31,7 +31,7 @@ public class PauseAction extends Action {
 
     @Override
     protected void performActionEnd(int keycode) {
-        // Da bei einer Pause keine spezifische Aktion am Ende ausgeführt werden muss,
-        // bleibt diese Methode leer.
+        // Since no specific action needs to be executed at the end of a pause,
+        // this method remains empty.
     }
 }

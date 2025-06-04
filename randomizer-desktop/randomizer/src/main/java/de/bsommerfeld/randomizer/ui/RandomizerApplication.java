@@ -2,7 +2,7 @@ package de.bsommerfeld.randomizer.ui;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
-import de.bsommerfeld.model.action.sequence.ActionSequenceDispatcher;
+import de.bsommerfeld.model.action.spi.ActionSequenceDispatcher;
 import de.bsommerfeld.model.tracker.TimeTracker;
 import de.bsommerfeld.randomizer.Main;
 import de.bsommerfeld.randomizer.config.RandomizerConfig;
@@ -26,13 +26,13 @@ public class RandomizerApplication extends Application {
 
   @Override
   public void start(Stage stage) {
-    log.debug("Starte Randomizer...");
+    log.debug("Starting Randomizer...");
     try {
       Thread.setDefaultUncaughtExceptionHandler(new UIUncaughtExceptionHandler());
       buildAndShowApplication(stage);
-      log.debug("Hauptfenster angezeigt");
+      log.debug("Main window displayed");
     } catch (Exception e) {
-      log.error("Ein Fehler ist beim Starten der Anwendung aufgetreten", e);
+      log.error("An error occurred while starting the application", e);
     }
   }
 
@@ -40,7 +40,8 @@ public class RandomizerApplication extends Application {
     ViewProvider viewProvider = Main.getInjector().getInstance(ViewProvider.class);
     TimeTracker timeTracker = Main.getInjector().getInstance(TimeTracker.class);
     RandomizerConfig randomizerConfig = Main.getInjector().getInstance(RandomizerConfig.class);
-    log.debug("Lade Hauptfenster...");
+    ActionSequenceDispatcher actionSequenceDispatcher = Main.getInjector().getInstance(ActionSequenceDispatcher.class);
+    log.debug("Loading main window...");
     Parent root = viewProvider.requestView(RandomizerWindowController.class).parent();
     Scene scene = new Scene(root);
     setupStage(stage, scene);
@@ -51,7 +52,7 @@ public class RandomizerApplication extends Application {
           } catch (NativeHookException e) {
             throw new RuntimeException(e);
           }
-          ActionSequenceDispatcher.discardAllRunningActions();
+          actionSequenceDispatcher.discardAllRunningActions();
           Platform.exit();
         });
     stage.show();

@@ -17,18 +17,15 @@ public class BaseAction extends Action {
 
     @Override
     protected void performActionStart(int keyCode) {
-        switch (getActionType()) {
-            case MOUSE -> KNUFFI.mousePress(keyCode);
-            case MOUSE_WHEEL -> KNUFFI.mouseWheel(keyCode);
-            case KEYBOARD -> KNUFFI.keyPress(keyCode);
+        if (actionExecutor != null) {
+            actionExecutor.executeActionStart(keyCode);
         }
     }
 
     @Override
     protected void performActionEnd(int keyCode) {
-        switch (getActionType()) {
-            case MOUSE -> KNUFFI.mouseRelease(keyCode);
-            case KEYBOARD -> KNUFFI.keyRelease(keyCode);
+        if (actionExecutor != null) {
+            actionExecutor.executeActionEnd(keyCode);
         }
     }
 }

@@ -10,9 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MouseMoveAction extends Action {
 
-  private static final int SMOOTH_STEPS = 50;
-  private static final int MAX_MOVE_DISTANCE = 5000;
-
   public MouseMoveAction() {
     super("Mouse move", ActionKey.of(KeyBind.EMPTY_KEY_BIND.getKey()));
   }
@@ -24,8 +21,9 @@ public class MouseMoveAction extends Action {
       int startX = startPosition.x;
       int startY = startPosition.y;
 
-      int deltaX = ThreadLocalRandom.current().nextInt(-MAX_MOVE_DISTANCE, MAX_MOVE_DISTANCE + 1);
-      int deltaY = ThreadLocalRandom.current().nextInt(-MAX_MOVE_DISTANCE, MAX_MOVE_DISTANCE + 1);
+      int maxDistance = actionConfig != null ? actionConfig.getMaxMouseMoveDistance() : 5000;
+      int deltaX = ThreadLocalRandom.current().nextInt(-maxDistance, maxDistance + 1);
+      int deltaY = ThreadLocalRandom.current().nextInt(-maxDistance, maxDistance + 1);
 
       int endX = startX + deltaX;
       int endY = startY + deltaY;
@@ -44,19 +42,34 @@ public class MouseMoveAction extends Action {
 
   @Override
   protected void performActionEnd(int keycode) {
-    // Keine Aktion erforderlich
+    // No action required
   }
 
   private void smoothMove(int startX, int startY, int endX, int endY) {
-    double dx = (endX - startX) / (double) SMOOTH_STEPS;
-    double dy = (endY - startY) / (double) SMOOTH_STEPS;
+    int steps = actionConfig != null ? actionConfig.getMouseMoveSteps() : 50;
+    int delay = actionConfig != null ? actionConfig.getMouseMoveSmoothDelay() : 10;
 
-    for (int step = 1; step <= SMOOTH_STEPS; step++) {
+    double dx = (endX - startX) / (double) steps;
+    double dy = (endY - startY) / (double) steps;
+
+    for (int step = 1; step <= steps; step++) {
       int x = (int) Math.round(startX + dx * step);
       int y = (int) Math.round(startY + dy * step);
-      KNUFFI.mouseMove(x, y);
-      KNUFFI.delay(10);
+
+      try {
+        java.awt.Robot robot = new java.awt.Robot();
+        robot.mouseMove(x, y);
+        robot.delay(delay);
+      } catch (Exception e) {
+        log.error("Error during mouse move", e);
+      }
     }
-    KNUFFI.mouseMove(endX, endY);
+
+    try {
+      java.awt.Robot robot = new java.awt.Robot();
+      robot.mouseMove(endX, endY);
+    } catch (Exception e) {
+      log.error("Error during final mouse move", e);
+    }
   }
 }

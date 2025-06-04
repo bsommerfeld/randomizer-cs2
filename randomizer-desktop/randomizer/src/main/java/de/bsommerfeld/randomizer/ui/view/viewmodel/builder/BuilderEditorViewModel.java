@@ -2,8 +2,8 @@ package de.bsommerfeld.randomizer.ui.view.viewmodel.builder;
 
 import com.google.inject.Inject;
 import de.bsommerfeld.model.action.Action;
-import de.bsommerfeld.model.action.repository.ActionRepository;
-import de.bsommerfeld.model.action.repository.ActionSequenceRepository;
+import de.bsommerfeld.model.action.spi.ActionRepository;
+import de.bsommerfeld.model.action.spi.ActionSequenceRepository;
 import de.bsommerfeld.model.action.sequence.ActionSequence;
 import java.util.ArrayList;
 import java.util.List;

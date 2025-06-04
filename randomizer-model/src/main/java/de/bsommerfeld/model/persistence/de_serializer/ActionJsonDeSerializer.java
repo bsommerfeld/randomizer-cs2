@@ -9,7 +9,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.inject.Inject;
 import de.bsommerfeld.model.action.Action;
-import de.bsommerfeld.model.action.repository.ActionRepository;
+import de.bsommerfeld.model.action.spi.ActionRepository;
 import de.bsommerfeld.model.action.value.Interval;
 import java.lang.reflect.Type;
 import lombok.extern.slf4j.Slf4j;

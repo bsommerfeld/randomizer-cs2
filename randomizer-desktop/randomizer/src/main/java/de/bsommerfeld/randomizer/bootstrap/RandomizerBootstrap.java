@@ -5,12 +5,15 @@ import com.github.kwhat.jnativehook.NativeHookException;
 import com.google.inject.Inject;
 import de.bsommerfeld.model.action.Action;
 import de.bsommerfeld.model.action.ActionKey;
+import de.bsommerfeld.model.action.config.ActionConfig;
 import de.bsommerfeld.model.action.impl.BaseAction;
 import de.bsommerfeld.model.action.impl.MouseMoveAction;
 import de.bsommerfeld.model.action.impl.PauseAction;
-import de.bsommerfeld.model.action.repository.ActionRepository;
-import de.bsommerfeld.model.action.repository.ActionSequenceRepository;
-import de.bsommerfeld.model.action.sequence.ActionSequenceExecutorRunnable;
+import de.bsommerfeld.model.action.spi.ActionExecutor;
+import de.bsommerfeld.model.action.spi.ActionRepository;
+import de.bsommerfeld.model.action.spi.ActionSequenceExecutor;
+import de.bsommerfeld.model.action.spi.ActionSequenceRepository;
+import de.bsommerfeld.model.action.spi.FocusManager;
 import de.bsommerfeld.model.config.keybind.KeyBindRepository;
 import de.bsommerfeld.model.exception.UncaughtExceptionLogger;
 import de.bsommerfeld.model.messages.Messages;
@@ -30,7 +33,10 @@ public class RandomizerBootstrap {
   @Getter private final ActionSequenceRepository actionSequenceRepository;
   @Getter private final ActionRepository actionRepository;
   private final KeyBindRepository keyBindRepository;
-  private final ActionSequenceExecutorRunnable actionSequenceExecutorRunnable;
+  private final ActionSequenceExecutor actionSequenceExecutor;
+  private final ActionExecutor actionExecutor;
+  private final FocusManager focusManager;
+  private final ActionConfig actionConfig;
   private final RandomizerConfig randomizerConfig;
   private final CS2ConfigLoader CS2ConfigLoader;
 
@@ -39,21 +45,28 @@ public class RandomizerBootstrap {
       ActionSequenceRepository actionSequenceRepository,
       ActionRepository actionRepository,
       KeyBindRepository keyBindRepository,
-      ActionSequenceExecutorRunnable actionSequenceExecutorRunnable,
+      ActionSequenceExecutor actionSequenceExecutor,
+      ActionExecutor actionExecutor,
+      FocusManager focusManager,
+      ActionConfig actionConfig,
       RandomizerConfig randomizerConfig,
       CS2ConfigLoader CS2ConfigLoader) {
     this.actionSequenceRepository = actionSequenceRepository;
     this.actionRepository = actionRepository;
     this.keyBindRepository = keyBindRepository;
-    this.actionSequenceExecutorRunnable = actionSequenceExecutorRunnable;
+    this.actionSequenceExecutor = actionSequenceExecutor;
+    this.actionExecutor = actionExecutor;
+    this.focusManager = focusManager;
+    this.actionConfig = actionConfig;
     this.randomizerConfig = randomizerConfig;
     this.CS2ConfigLoader = CS2ConfigLoader;
   }
 
   public void initializeApplication() {
-    log.info("Initialisiere Applikation...");
+    log.info("Initializing application...");
     loadConfiguration();
     loadUserKeyBindsByConfig();
+    initializeActionDependencies();
     registerActions();
     setupFileWatcher();
     Messages.cache();
@@ -63,6 +76,11 @@ public class RandomizerBootstrap {
     startExecutor();
   }
 
+  private void initializeActionDependencies() {
+    log.info("Initializing action dependencies...");
+    Action.setDependencies(actionExecutor, focusManager, actionConfig);
+  }
+
   private void loadUserKeyBindsByConfig() {
     try {
       if (randomizerConfig.getConfigPath() != null && !randomizerConfig.getConfigPath().isEmpty()) {
@@ -70,54 +88,55 @@ public class RandomizerBootstrap {
         CS2ConfigLoader.ladeUserKeyBinds();
       }
     } catch (Exception e) {
-      log.error("Fehler beim Laden der User KeyBinds", e);
+      log.error("Error loading user keybinds", e);
     }
   }
 
   private void loadConfiguration() {
-    log.info("Lade Konfiguration...");
+    log.info("Loading configuration...");
 
-    ActionSequenceExecutorRunnable.setMinWaitTime(randomizerConfig.getMinInterval());
-    ActionSequenceExecutorRunnable.setMaxWaitTime(randomizerConfig.getMaxInterval());
+    actionSequenceExecutor.setMinWaitTime(randomizerConfig.getMinInterval());
+    actionSequenceExecutor.setMaxWaitTime(randomizerConfig.getMaxInterval());
   }
 
   private void setupFileWatcher() {
-    log.info("Starte FileWatcher");
+    log.info("Starting FileWatcher");
     FileSystemWatcher fileSystemWatcher = new FileSystemWatcher();
     fileSystemWatcher.addFileChangeListener(_ -> cacheActionSequences());
     startThread(new Thread(fileSystemWatcher));
   }
 
   private void setupGlobalExceptionHandler() {
-    log.info("Richte Global Exception Handler ein...");
+    log.info("Setting up Global Exception Handler...");
     Thread.currentThread()
         .setUncaughtExceptionHandler(UncaughtExceptionLogger.DEFAULT_UNCAUGHT_EXCEPTION_LOGGER);
   }
 
   private void cacheActionSequences() {
-    log.info("Cache ActionSequences...");
+    log.info("Caching ActionSequences...");
     actionSequenceRepository.updateActionSequencesCache();
   }
 
   private void startExecutor() {
-    log.info("Starte Executor...");
-    startThread(new Thread(actionSequenceExecutorRunnable));
+    log.info("Starting Executor...");
+    Thread executorThread = actionSequenceExecutor.start();
+    executorThread.setUncaughtExceptionHandler(UncaughtExceptionLogger.DEFAULT_UNCAUGHT_EXCEPTION_LOGGER);
   }
 
   private void startThread(Thread thread) {
-    log.info("Starte Thread: {}", thread.getName());
+    log.info("Starting Thread: {}", thread.getName());
     thread.setUncaughtExceptionHandler(UncaughtExceptionLogger.DEFAULT_UNCAUGHT_EXCEPTION_LOGGER);
     thread.setDaemon(true);
     thread.start();
   }
 
   private void registerActions() {
-    log.info("Registriere Aktionen...");
+    log.info("Registering Actions...");
     actionRepository.register(new PauseAction());
     actionRepository.register(new MouseMoveAction());
     // actionRepository.register(new BaseAction("Escape", ActionKey.of("ESCAPE")));
     registerKeyBindActions();
-    log.info("{} Aktionen registriert", actionRepository.getActions().size());
+    log.info("{} Actions registered", actionRepository.getActions().size());
   }
 
   private void registerKeyBindActions() {
@@ -129,17 +148,17 @@ public class RandomizerBootstrap {
               if (!actionRepository.hasActionWithName(action.getName())) {
                 actionRepository.register(action);
               } else {
-                log.debug("Action {} existiert bereits", action.getName());
+                log.debug("Action {} already exists", action.getName());
               }
             });
   }
 
   private void registerNativeKeyHook() {
     try {
-      log.info("Registriere Native Key Hook...");
+      log.info("Registering Native Key Hook...");
       GlobalScreen.registerNativeHook();
     } catch (NativeHookException e) {
-      log.error("Fehler bei der Registrierung des Native Hooks", e);
+      log.error("Error registering Native Hook", e);
     }
   }
 }

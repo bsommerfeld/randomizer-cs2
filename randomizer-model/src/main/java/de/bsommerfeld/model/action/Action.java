@@ -1,10 +1,12 @@
 package de.bsommerfeld.model.action;
 
+import com.google.inject.Inject;
+import de.bsommerfeld.model.action.config.ActionConfig;
 import de.bsommerfeld.model.action.mapper.KeyMapper;
+import de.bsommerfeld.model.action.spi.ActionExecutor;
+import de.bsommerfeld.model.action.spi.FocusManager;
 import de.bsommerfeld.model.action.value.Interval;
 import de.bsommerfeld.model.config.keybind.KeyBind;
-import de.bsommerfeld.model.util.FocusManager;
-import java.awt.*;
 import java.time.Instant;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.AccessLevel;
@@ -14,7 +16,7 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Represents an abstract action that can be performed by a robot. The action can have a specified
+ * Represents an abstract action that can be performed. The action can have a specified
  * interval, and supports interruptions.
  */
 @Getter
@@ -23,15 +25,16 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class Action implements Cloneable {
 
   protected static final KeyMapper KEY_MAPPER = new KeyMapper();
-  protected static final Robot KNUFFI;
-  private static final int INTERVAL = 50;
 
-  static {
-    try {
-      KNUFFI = new Robot();
-    } catch (AWTException e) {
-      throw new RuntimeException(e);
-    }
+  protected static ActionExecutor actionExecutor;
+  protected static FocusManager focusManager;
+  protected static ActionConfig actionConfig;
+
+  @Inject
+  public static void setDependencies(ActionExecutor executor, FocusManager manager, ActionConfig config) {
+    actionExecutor = executor;
+    focusManager = manager;
+    actionConfig = config;
   }
 
   private final transient ActionKey actionKey;
@@ -79,7 +82,8 @@ public abstract class Action implements Cloneable {
       executeWithDelay(0);
     } else {
       if (getInterval().getMin() >= getInterval().getMax()) {
-        getInterval().setMax(getInterval().getMin() + 1); // TODO: could be 11
+        // Add a small buffer to ensure max is greater than min
+        getInterval().setMax(getInterval().getMin() + 1);
       }
       long delay =
           ThreadLocalRandom.current().nextInt(getInterval().getMin(), getInterval().getMax());
@@ -137,7 +141,8 @@ public abstract class Action implements Cloneable {
   /** Interrupting the keypress and doesn't wait for the current cycle to end. */
   public void instantInterrupt() {
     interrupted = true;
-    performActionEnd(KEY_MAPPER.getKeyCodeForKey(getActionKey().getKey()));
+    int keyCode = KEY_MAPPER.getKeyCodeForKey(getActionKey().getKey());
+    performActionEnd(keyCode);
   }
 
   /**
@@ -155,29 +160,30 @@ public abstract class Action implements Cloneable {
 
   private void interruptibleDelay(long delayInMillis) {
     int waitedTime = 0;
+    int checkInterval = actionConfig != null ? actionConfig.getInterruptCheckInterval() : 50;
 
     if (delayInMillis <= 0) return;
 
     while (waitedTime < delayInMillis) {
       if (interrupted) {
-        log.info("Delay unterbrochen!");
+        log.info("Delay interrupted!");
         return;
       }
 
-      if (!FocusManager.isCs2WindowInFocus()) { // TODO: we don't want to have this here
+      if (focusManager != null && !focusManager.isApplicationWindowInFocus()) {
         log.info("Focus lost, interrupting action: {}", getName());
         interrupt();
         return;
       }
 
       try {
-        Thread.sleep(INTERVAL);
+        Thread.sleep(checkInterval);
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
         return;
       }
 
-      waitedTime += INTERVAL;
+      waitedTime += checkInterval;
     }
   }
 
