@@ -111,8 +111,9 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
             if (currentActionSequence == null) {
               return;
             }
+
             for (Action action : currentActionSequence.getActions()) {
-              action.interrupt();
+              action.instantInterrupt();
             }
 
             log.warn(
@@ -205,8 +206,9 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
   public void run() {
     while (running && !Thread.currentThread().isInterrupted()) {
       if (!hasReleasedAnyKey && !isWaitTimeExceeded()) {
-        if (!applicationContext.isCheckForCS2Focus()) continue;
-        handleApplicationState();
+        if (applicationContext.isCheckForCS2Focus()) {
+          handleApplicationState();
+        }
         try {
           Thread.sleep(actionConfig.getInterruptCheckInterval());
         } catch (InterruptedException e) {
