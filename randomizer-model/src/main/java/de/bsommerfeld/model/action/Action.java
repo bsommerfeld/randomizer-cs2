@@ -143,6 +143,7 @@ public abstract class Action implements Cloneable {
    */
   public void interrupt() {
     interrupted = true;
+    executing = false;
   }
 
   /**
@@ -159,7 +160,7 @@ public abstract class Action implements Cloneable {
 
   /** Interrupting the keypress and doesn't wait for the current cycle to end. */
   public void instantInterrupt() {
-    interrupted = true;
+    interrupt();
     int keyCode = KEY_MAPPER.getKeyCodeForKey(getActionKey().getKey());
     performActionEnd(keyCode);
   }
