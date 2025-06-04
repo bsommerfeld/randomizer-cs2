@@ -3,6 +3,7 @@ package de.bsommerfeld.randomizer.bootstrap;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
 import com.google.inject.Inject;
+import de.bsommerfeld.model.ApplicationContext;
 import de.bsommerfeld.model.action.Action;
 import de.bsommerfeld.model.action.ActionKey;
 import de.bsommerfeld.model.action.config.ActionConfig;
@@ -37,6 +38,7 @@ public class RandomizerBootstrap {
   private final ActionExecutor actionExecutor;
   private final FocusManager focusManager;
   private final ActionConfig actionConfig;
+  private final ApplicationContext applicationContext;
   private final RandomizerConfig randomizerConfig;
   private final CS2ConfigLoader CS2ConfigLoader;
 
@@ -49,6 +51,7 @@ public class RandomizerBootstrap {
       ActionExecutor actionExecutor,
       FocusManager focusManager,
       ActionConfig actionConfig,
+      ApplicationContext applicationContext,
       RandomizerConfig randomizerConfig,
       CS2ConfigLoader CS2ConfigLoader) {
     this.actionSequenceRepository = actionSequenceRepository;
@@ -58,6 +61,7 @@ public class RandomizerBootstrap {
     this.actionExecutor = actionExecutor;
     this.focusManager = focusManager;
     this.actionConfig = actionConfig;
+    this.applicationContext = applicationContext;
     this.randomizerConfig = randomizerConfig;
     this.CS2ConfigLoader = CS2ConfigLoader;
   }
@@ -78,7 +82,7 @@ public class RandomizerBootstrap {
 
   private void initializeActionDependencies() {
     log.info("Initializing action dependencies...");
-    Action.setDependencies(actionExecutor, focusManager, actionConfig);
+    Action.setDependencies(applicationContext, actionExecutor, focusManager, actionConfig);
   }
 
   private void loadUserKeyBindsByConfig() {
@@ -120,7 +124,8 @@ public class RandomizerBootstrap {
   private void startExecutor() {
     log.info("Starting Executor...");
     Thread executorThread = actionSequenceExecutor.start();
-    executorThread.setUncaughtExceptionHandler(UncaughtExceptionLogger.DEFAULT_UNCAUGHT_EXCEPTION_LOGGER);
+    executorThread.setUncaughtExceptionHandler(
+        UncaughtExceptionLogger.DEFAULT_UNCAUGHT_EXCEPTION_LOGGER);
   }
 
   private void startThread(Thread thread) {

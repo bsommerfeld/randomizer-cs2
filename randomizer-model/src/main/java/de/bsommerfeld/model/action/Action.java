@@ -1,6 +1,7 @@
 package de.bsommerfeld.model.action;
 
 import com.google.inject.Inject;
+import de.bsommerfeld.model.ApplicationContext;
 import de.bsommerfeld.model.action.config.ActionConfig;
 import de.bsommerfeld.model.action.mapper.KeyMapper;
 import de.bsommerfeld.model.action.spi.ActionExecutor;
@@ -16,8 +17,8 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Represents an abstract action that can be performed. The action can have a specified
- * interval, and supports interruptions.
+ * Represents an abstract action that can be performed. The action can have a specified interval,
+ * and supports interruptions.
  */
 @Getter
 @Slf4j
@@ -26,17 +27,10 @@ public abstract class Action implements Cloneable {
 
   protected static final KeyMapper KEY_MAPPER = new KeyMapper();
 
+  protected static ApplicationContext applicationContext;
   protected static ActionExecutor actionExecutor;
   protected static FocusManager focusManager;
   protected static ActionConfig actionConfig;
-
-  @Inject
-  public static void setDependencies(ActionExecutor executor, FocusManager manager, ActionConfig config) {
-    actionExecutor = executor;
-    focusManager = manager;
-    actionConfig = config;
-  }
-
   private final transient ActionKey actionKey;
   private final transient ActionType actionType;
 
@@ -71,6 +65,18 @@ public abstract class Action implements Cloneable {
             : isMouseWheelEvent()
                 ? ActionType.MOUSE_WHEEL
                 : hasKey() ? ActionType.KEYBOARD : ActionType.CUSTOM;
+  }
+
+  @Inject
+  public static void setDependencies(
+      ApplicationContext context,
+      ActionExecutor executor,
+      FocusManager manager,
+      ActionConfig config) {
+    applicationContext = context;
+    actionExecutor = executor;
+    focusManager = manager;
+    actionConfig = config;
   }
 
   /**
@@ -170,7 +176,9 @@ public abstract class Action implements Cloneable {
         return;
       }
 
-      if (focusManager != null && !focusManager.isApplicationWindowInFocus()) {
+      if (applicationContext.isCheckForCS2Focus()
+          && focusManager != null
+          && !focusManager.isApplicationWindowInFocus()) {
         log.info("Focus lost, interrupting action: {}", getName());
         interrupt();
         return;
