@@ -125,6 +125,13 @@
     -fx-background-color: #CFCCFF;
 }
 
+.builder-sequences-title {
+    -fx-max-width: 100;
+    -fx-font-family: SansSerif;
+    -fx-font-size: 14;
+    -fx-text-fill: #040316;
+}
+
 .builder-sequence-entry-action-count {
     -fx-alignment: center;
     -fx-font-family: SansSerif;
@@ -135,21 +142,14 @@
     -fx-padding: 2 6;
 }
 
-.builder-sequences-title {
-    -fx-max-width: 80;
-    -fx-font-family: SansSerif;
-    -fx-font-size: 12;
-    -fx-text-fill: #040316;
-}
-
 .builder-sequences-delete-button {
-    -fx-min-height: 12;
-    -fx-max-height: 12;
+    -fx-min-height: 14;
+    -fx-max-height: 14;
     -fx-background-color: transparent;
     -fx-background-image: url("../images/builderView/deleteIcon.png");
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
-    -fx-background-size: 12;
+    -fx-background-size: 14;
     -fx-cursor: hand;
 }
 
