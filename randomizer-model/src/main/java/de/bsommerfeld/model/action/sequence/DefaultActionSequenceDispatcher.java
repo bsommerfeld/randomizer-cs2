@@ -202,8 +202,9 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
       }
     } finally {
       // Clear current sequence reference
-      currentSequence = null;
       discardAllRunningActions();
+      currentSequence.resetInterrupted();
+      currentSequence = null;
     }
   }
 
