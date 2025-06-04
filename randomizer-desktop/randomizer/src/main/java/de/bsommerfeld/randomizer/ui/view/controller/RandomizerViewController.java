@@ -77,6 +77,8 @@ public class RandomizerViewController {
 
   /** Creates the history container for the ActionSequence */
   private void createHistoryContainer(ActionSequence actionSequence) {
+    if (actionSequence == null) return;
+
     HBox container = new HBox();
     container.getStyleClass().add("logbook-history-entry-container");
 
