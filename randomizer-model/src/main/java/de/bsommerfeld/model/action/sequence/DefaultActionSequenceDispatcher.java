@@ -68,7 +68,7 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
   private void finishDispatch(Action action) {
     runningActions.remove(action);
     finishActionProcessing(action);
-    log.info(ACTION_DISPATCHED, action);
+    log.info(ACTION_DISPATCHED + " ({} ms)", action, action.getDelay());
   }
 
   /**

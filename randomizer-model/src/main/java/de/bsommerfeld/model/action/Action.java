@@ -56,6 +56,8 @@ public abstract class Action implements Cloneable {
   @ToString.Exclude
   private transient volatile Instant expectedEnding = null;
 
+  private transient volatile long delay = -1L;
+
   public Action(String name, ActionKey actionKey) {
     this.name = name;
     this.actionKey = actionKey;
@@ -91,8 +93,7 @@ public abstract class Action implements Cloneable {
         // Add a small buffer to ensure max is greater than min
         getInterval().setMax(getInterval().getMin() + 1);
       }
-      long delay =
-          ThreadLocalRandom.current().nextInt(getInterval().getMin(), getInterval().getMax());
+      delay = ThreadLocalRandom.current().nextInt(getInterval().getMin(), getInterval().getMax());
       executeWithDelay(delay);
     }
   }
