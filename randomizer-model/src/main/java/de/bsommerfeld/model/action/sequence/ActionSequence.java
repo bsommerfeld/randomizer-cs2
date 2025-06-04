@@ -43,8 +43,11 @@ public class ActionSequence {
 
   /**
    * Indicates whether the ActionSequence has been interrupted.
-   * 
-   * <p>If true, the sequence execution should be stopped as soon as possible.
+   *
+   * <p>If true, the sequence execution should be stopped as soon as possible. -- GETTER -- Checks
+   * if this ActionSequence is interrupted.
+   *
+   * @return true if the sequence is interrupted, false otherwise
    */
   private volatile boolean interrupted = false;
 
@@ -70,17 +73,8 @@ public class ActionSequence {
   }
 
   /**
-   * Checks if this ActionSequence is interrupted.
-   *
-   * @return true if the sequence is interrupted, false otherwise
-   */
-  public boolean isInterrupted() {
-    return interrupted;
-  }
-
-  /**
-   * Interrupts this ActionSequence and all its actions.
-   * This will stop the execution of the sequence as soon as possible.
+   * Interrupts this ActionSequence and all its actions. This will stop the execution of the
+   * sequence as soon as possible.
    */
   public void interrupt() {
     this.interrupted = true;
@@ -89,8 +83,8 @@ public class ActionSequence {
   }
 
   /**
-   * Interrupts this ActionSequence and all its actions immediately.
-   * This will immediately stop all actions in the sequence.
+   * Interrupts this ActionSequence and all its actions immediately. This will immediately stop all
+   * actions in the sequence.
    */
   public void instantInterrupt() {
     this.interrupted = true;
@@ -98,9 +92,7 @@ public class ActionSequence {
     log.info("ActionSequence '{}' has been immediately interrupted", name);
   }
 
-  /**
-   * Resets the interrupted state of this ActionSequence and all its actions.
-   */
+  /** Resets the interrupted state of this ActionSequence and all its actions. */
   public void resetInterrupted() {
     this.interrupted = false;
     actions.forEach(Action::normalize);
