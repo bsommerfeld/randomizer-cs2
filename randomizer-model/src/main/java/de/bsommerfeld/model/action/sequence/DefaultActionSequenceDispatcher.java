@@ -140,6 +140,7 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
   }
 
   private void finishSequenceProcessing(ActionSequence actionSequence) {
+    actionSequence.getActions().forEach(Action::normalize);
     actionSequenceFinishHandlers.forEach(handler -> safeAccept(handler, actionSequence));
   }
 

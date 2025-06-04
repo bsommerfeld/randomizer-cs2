@@ -145,6 +145,18 @@ public abstract class Action implements Cloneable {
     interrupted = true;
   }
 
+  /**
+   * Resets the state of the action to its initial state.
+   *
+   * <p>This method sets the flags `interrupted` and `executing` to `false`, effectively normalizing
+   * the state of the action. It is used to revert the action to a non-interrupted and non-executing
+   * state.
+   */
+  public void normalize() {
+    interrupted = false;
+    executing = false;
+  }
+
   /** Interrupting the keypress and doesn't wait for the current cycle to end. */
   public void instantInterrupt() {
     interrupted = true;
