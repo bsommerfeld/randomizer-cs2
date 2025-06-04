@@ -728,8 +728,12 @@
     -fx-cursor: hand;
 }
 
-.settings-options:hover, .settings-options:selected {
-    -fx-background-color: #D4D2F9;
+.settings-options:hover {
+    -fx-background-color: #DDDBFF;
+}
+
+.settings-options:selected {
+    -fx-background-color: #CFCCFF;
 }
 
 .settings-options:pressed {

@@ -105,15 +105,24 @@
 
 
 
-.builder-sequences-hbox {
+.builder-sequences-hbox, .builder-sequences-hbox-selected {
     -fx-spacing: 4;
     -fx-alignment: center;
     -fx-padding: 4;
-    -fx-background-color: #DDDBFF;
+    -fx-background-color: #E6E5FF;
+    -fx-cursor: hand;
 }
 
 .builder-sequences-hbox:hover {
-    -fx-background-color: #D4D2F9;
+    -fx-background-color: #DDDBFF;
+}
+
+.builder-sequences-hbox:pressed {
+    -fx-background-color: #ADA9EF;
+}
+
+.builder-sequences-hbox-selected {
+    -fx-background-color: #CFCCFF;
 }
 
 .builder-sequence-entry-action-count {
@@ -124,14 +133,6 @@
     -fx-background-color: rgba(68, 61, 255, 0.1);
     -fx-background-radius: 8;
     -fx-padding: 2 6;
-}
-
-.builder-sequences-hbox-selected {
-    -fx-spacing: 4;
-    -fx-alignment: center;
-    -fx-padding: 4;
-    -fx-background-color: #9E99FF;
-    -fx-cursor: hand;
 }
 
 .builder-sequences-title {
