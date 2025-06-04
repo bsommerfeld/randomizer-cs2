@@ -54,8 +54,8 @@ public class RandomizerApplication extends Application {
             // We don't want to throw anything on close request
           } finally {
             log.info("Closing application, stopping executor and discarding running actions...");
-            actionSequenceExecutor.stop();
             actionSequenceDispatcher.discardAllRunningActions();
+            actionSequenceExecutor.stop();
             Platform.exit();
           }
         });
