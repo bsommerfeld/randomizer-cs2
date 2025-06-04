@@ -1,5 +1,6 @@
 @import "home-view.css";
 @import "nav-bar.css";
+@import "builder-view.css";
 
 /* Randomizer Window */
 .randomizer-window {
@@ -120,27 +121,27 @@
 }
 
 .logbook-sequence-actions-name-start {
-    -fx-background-image: url("../images/randomizerView/startingActionIcon.png");
+    -fx-image: url("../images/randomizerView/startingActionIcon.png");
 }
 
 .logbook-sequence-actions-name-start-active {
-    -fx-background-image: url("../images/randomizerView/startingActionIconActive.png");
+    -fx-image: url("../images/randomizerView/startingActionIconActive.png");
 }
 
 .logbook-sequence-actions-name-middle {
-    -fx-background-image: url("../images/randomizerView/middleActionIcon.png");
+    -fx-image: url("../images/randomizerView/middleActionIcon.png");
 }
 
 .logbook-sequence-actions-name-middle-active {
-    -fx-background-image: url("../images/randomizerView/middleActionIconActive.png");
+    -fx-image: url("../images/randomizerView/middleActionIconActive.png");
 }
 
 .logbook-sequence-actions-name-end {
-    -fx-background-image: url("../images/randomizerView/finalActionIcon.png");
+    -fx-image: url("../images/randomizerView/finalActionIcon.png");
 }
 
 .logbook-sequence-actions-name-end-active {
-    -fx-background-image: url("../images/randomizerView/finalActionIconActive.png");
+    -fx-image: url("../images/randomizerView/finalActionIconActive.png");
 }
 
 .logbook-info {
@@ -313,161 +314,6 @@
 }
 
 /* Builder View */
-.builder-sequences {
-    -fx-min-width: 128;
-    -fx-pref-height: 504;
-    -fx-alignment: top-center;
-    -fx-background-color: #EBEBFA;
-}
-
-.builder-sequences-top {
-    -fx-pref-width: 128;
-    -fx-min-height: 24;
-    -fx-alignment: center;
-}
-
-.builder-sequences-label {
-    -fx-font-family: SansSerif;
-    -fx-font-size: 12;
-    -fx-text-alignment: center;
-    -fx-text-fill: #040316;
-    -fx-padding: 0 4;
-}
-
-.builder-sequences-buttons {
-    -fx-pref-width: 34;
-    -fx-alignment: center-right;
-    -fx-spacing: 6;
-    -fx-padding: 4 4 0 0;
-}
-
-.builder-sequences-add-sequence-button, .builder-sequences-folder-button {
-    -fx-background-color: transparent;
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center;
-}
-
-.builder-sequences-folder-button {
-    -fx-background-size: 14;
-    -fx-min-height: 14;
-    -fx-max-height: 14;
-    -fx-background-image: url("../images/builderView/folderIcon.png");
-    -fx-cursor: hand;
-}
-
-.builder-sequences-folder-button:hover {
-    -fx-background-image: url("../images/builderView/folderIconSelected.png");
-}
-
-.builder-sequences-add-sequence-button {
-    -fx-background-size: 12;
-    -fx-min-height: 12;
-    -fx-max-height: 12;
-    -fx-background-image: url("../images/builderView/addIcon.png");
-    -fx-cursor: hand;
-}
-
-.builder-sequences-add-sequence-button:hover {
-    -fx-background-image: url("../images/builderView/addIconSelected.png");
-}
-
-.builder-separator, .builder-separator .line {
-    -fx-pref-width: 128;
-    -fx-pref-height: 1;
-    -fx-background-color: #CECCFF;
-    -fx-border-color: null;
-}
-
-.builder-sequences-scrollpane {
-    -fx-pref-width: 128;
-    -fx-alignment: center;
-    -fx-spacing: 4;
-    -fx-padding: 6 0;
-    -fx-background-color: #EBEBFA;
-}
-
-.builder-sequences-scrollpane .scroll-bar:vertical {
-    -fx-pref-width: 4;
-    -fx-padding: -4 0;
-    -fx-background-color: transparent;
-}
-
-.builder-sequences-scrollpane .scroll-bar:vertical .track {
-    -fx-background-radius: 2;
-    -fx-background-color: #847EE7;
-}
-
-.builder-sequences-scrollpane .scroll-bar:vertical .thumb {
-    -fx-background-radius: 2;
-    -fx-background-insets: 0;
-    -fx-background-color: #2F27CE;
-    -fx-pref-width: 4;
-}
-
-.builder-sequences-scrollpane .scroll-bar:vertical .increment-button,
-.builder-sequences-scrollpane .scroll-bar:vertical .decrement-button {
-    -fx-background-color: transparent;
-    -fx-shape: null;
-    -fx-opacity: 0;
-}
-
-.builder-actions-sequences {
-    -fx-pref-width: 128;
-    -fx-spacing: 4;
-    -fx-alignment: top-center;
-    -fx-background-color: #EBEBFA;
-}
-
-.builder-sequences-hbox {
-    -fx-spacing: 4;
-    -fx-alignment: center;
-    -fx-padding: 4;
-    -fx-background-color: #DDDBFF;
-}
-
-.builder-sequences-hbox:hover {
-    -fx-background-color: #9E99FF;
-}
-
-.builder-sequence-entry-action-count {
-    -fx-alignment: center;
-    -fx-font-family: SansSerif;
-    -fx-font-size: 12;
-    -fx-text-fill: #443DFF;
-    -fx-background-color: rgba(68, 61, 255, 0.1);
-    -fx-background-radius: 8;
-    -fx-padding: 2 6;
-}
-
-.builder-sequences-hbox-selected {
-    -fx-spacing: 4;
-    -fx-alignment: center;
-    -fx-padding: 4;
-    -fx-background-color: #9E99FF;
-    -fx-cursor: hand;
-}
-
-.builder-sequences-title {
-    -fx-max-width: 80;
-    -fx-font-family: SansSerif;
-    -fx-font-size: 12;
-    -fx-text-fill: #040316;
-}
-
-.builder-sequences-delete-button {
-    -fx-min-height: 12;
-    -fx-max-height: 12;
-    -fx-background-color: transparent;
-    -fx-background-image: url("../images/builderView/deleteIcon.png");
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center;
-    -fx-background-size: 12;
-    -fx-cursor: hand;
-}
-
-.builder-sequences-delete-button:hover {
-    -fx-background-image: url("../images/builderView/deleteIconSelected.png");
-}
 
 /* Builder Actions View */
 
