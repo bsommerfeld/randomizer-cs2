@@ -3,6 +3,7 @@ package de.bsommerfeld.randomizer.ui.view.controller;
 import com.google.inject.Inject;
 import de.bsommerfeld.model.ApplicationState;
 import de.bsommerfeld.model.action.sequence.ActionSequence;
+import de.bsommerfeld.model.action.spi.ActionSequenceExecutor;
 import de.bsommerfeld.randomizer.ui.view.View;
 import de.bsommerfeld.randomizer.ui.view.viewmodel.RandomizerViewModel;
 import java.time.LocalTime;
@@ -34,6 +35,7 @@ public class RandomizerViewController {
       "logbook-sequence-actions-icon-end-active";
 
   private final RandomizerViewModel randomizerViewModel;
+  private final ActionSequenceExecutor actionSequenceExecutor;
 
   @FXML private Label sequenceNameLabel;
   @FXML private VBox actionsVBox;
@@ -42,8 +44,10 @@ public class RandomizerViewController {
   @FXML private ImageView cs2FocusImage;
 
   @Inject
-  public RandomizerViewController(RandomizerViewModel randomizerViewModel) {
+  public RandomizerViewController(
+      RandomizerViewModel randomizerViewModel, ActionSequenceExecutor actionSequenceExecutor) {
     this.randomizerViewModel = randomizerViewModel;
+    this.actionSequenceExecutor = actionSequenceExecutor;
   }
 
   @FXML
@@ -52,9 +56,11 @@ public class RandomizerViewController {
       randomizerViewModel.setApplicationStateToStopped();
       clearCurrentSequenceView();
       randomizerToggleButton.setText("Start");
+      actionSequenceExecutor.start();
     } else {
       randomizerViewModel.setApplicationStateToRunning();
       randomizerToggleButton.setText("Stop");
+      actionSequenceExecutor.stop();
     }
   }
 
