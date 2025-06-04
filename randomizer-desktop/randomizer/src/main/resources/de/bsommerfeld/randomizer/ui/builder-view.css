@@ -302,7 +302,7 @@
 
 .sequence-in-focus-label {
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-alignment: left;
     -fx-text-fill: #040316;
 }
