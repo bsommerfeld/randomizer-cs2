@@ -1,11 +1,11 @@
 package de.bsommerfeld.randomizer.ui.view.controller.settings;
 
 
-import java.util.function.BiConsumer;
-
 import de.bsommerfeld.randomizer.ui.view.View;
+import java.util.function.BiConsumer;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
@@ -51,6 +51,15 @@ public class TitleDescriptionSettingsController {
     public void setDescription(String text) {
         textArea.setText(text);
     }
+
+    public StringProperty titleProperty() {
+        return textField.textProperty();
+    }
+
+    public StringProperty descriptionProperty() {
+        return textArea.textProperty();
+    }
+
 
     public ReadOnlyBooleanProperty visibleProperty() {
         return root.visibleProperty();

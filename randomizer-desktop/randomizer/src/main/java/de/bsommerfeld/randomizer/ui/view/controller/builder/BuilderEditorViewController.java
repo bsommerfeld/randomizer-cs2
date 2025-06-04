@@ -24,24 +24,27 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 @View
 public class BuilderEditorViewController {
 
   private static final String ACTION_NAME_STYLING = "logbook-sequence-actions-name";
-  private static final String START_ACTION_NAME_STYLING = "logbook-sequence-actions-name-start";
-  private static final String MIDDLE_ACTION_NAME_STYLING = "logbook-sequence-actions-name-middle";
-  private static final String END_ACTION_NAME_STYLING = "logbook-sequence-actions-name-end";
-  private static final String START_ACTIVE_ACTION_NAME_STYLING =
-      "logbook-sequence-actions-name-start-active";
-  private static final String MIDDLE_ACTIVE_ACTION_NAME_STYLING =
-      "logbook-sequence-actions-name-middle-active";
-  private static final String END_ACTIVE_ACTION_NAME_STYLING =
-      "logbook-sequence-actions-name-end-active";
+  private static final String START_ACTION_ICON_STYLING = "logbook-sequence-actions-icon-start";
+  private static final String ACTION_ICON_STYLING = "logbook-sequence-actions-icon-start";
+  private static final String MIDDLE_ACTION_ICON_STYLING = "logbook-sequence-actions-icon-middle";
+  private static final String END_ACTION_ICON_STYLING = "logbook-sequence-actions-icon-end";
+  private static final String START_ACTIVE_ACTION_ICON_STYLING =
+      "logbook-sequence-actions-icon-start-active";
+  private static final String MIDDLE_ACTIVE_ACTION_ICON_STYLING =
+      "logbook-sequence-actions-icon-middle-active";
+  private static final String END_ACTIVE_ACTION_ICON_STYLING =
+      "logbook-sequence-actions-icon-end-active";
 
   private final ObjectProperty<Label> labelInFocusProperty = new SimpleObjectProperty<>();
   private final Separator dropIndicator = new Separator();
@@ -164,10 +167,13 @@ public class BuilderEditorViewController {
               settingsHolder.getChildren().setAll(tdsViewWrapper.parent());
 
               TitleDescriptionSettingsController controller = tdsViewWrapper.controller();
-              controller.setTitle(builderViewModel.getSequenceNameProperty().get());
-              controller.setDescription(builderViewModel.getSequenceDescriptionProperty().get());
 
-              // TODO: 02.03.2025 - Do this via bindings
+              controller
+                  .titleProperty()
+                  .bindBidirectional(builderViewModel.getSequenceNameProperty());
+              controller
+                  .descriptionProperty()
+                  .bindBidirectional(builderViewModel.getSequenceDescriptionProperty());
 
               fillBuilderWithActionsOfSequence(newSequence);
               actionSettingsHolder.getChildren().clear();
@@ -198,8 +204,16 @@ public class BuilderEditorViewController {
 
     labelInFocusProperty.addListener(
         (_, oldLabel, newLabel) -> {
-          if (oldLabel != null) setPositionalStyling(oldLabel, false);
-          if (newLabel != null) setPositionalStyling(newLabel, true);
+          if (oldLabel != null) {
+            HBox oldHBox = (HBox) oldLabel.getParent();
+            ImageView oldImageView = (ImageView) oldHBox.getChildren().get(0);
+            setPositionalStyling(oldImageView, false);
+          }
+          if (newLabel != null) {
+            HBox newHBox = (HBox) newLabel.getParent();
+            ImageView newImageView = (ImageView) newHBox.getChildren().get(0);
+            setPositionalStyling(newImageView, true);
+          }
         });
   }
 
@@ -219,30 +233,33 @@ public class BuilderEditorViewController {
         });
   }
 
-  private void setPositionalStyling(Label label, boolean active) {
-    int index = builderVBox.getChildren().indexOf(label);
+  private void setPositionalStyling(ImageView imageView, boolean active) {
+    HBox parentHBox = (HBox) imageView.getParent();
+    int index = builderVBox.getChildren().indexOf(parentHBox);
 
     if (index == 0) {
-      label.getStyleClass().clear();
-      label.getStyleClass().add(ACTION_NAME_STYLING);
-      label
+      imageView.getStyleClass().clear();
+      imageView.getStyleClass().add(ACTION_ICON_STYLING);
+      imageView
           .getStyleClass()
-          .add(active ? START_ACTIVE_ACTION_NAME_STYLING : START_ACTION_NAME_STYLING);
+          .add(active ? START_ACTIVE_ACTION_ICON_STYLING : START_ACTION_ICON_STYLING);
       return;
     }
 
     if (index == builderVBox.getChildren().size() - 1) {
-      label.getStyleClass().clear();
-      label.getStyleClass().add(ACTION_NAME_STYLING);
-      label.getStyleClass().add(active ? END_ACTIVE_ACTION_NAME_STYLING : END_ACTION_NAME_STYLING);
+      imageView.getStyleClass().clear();
+      imageView.getStyleClass().add(ACTION_ICON_STYLING);
+      imageView
+          .getStyleClass()
+          .add(active ? END_ACTIVE_ACTION_ICON_STYLING : END_ACTION_ICON_STYLING);
       return;
     }
 
-    label.getStyleClass().clear();
-    label.getStyleClass().add(ACTION_NAME_STYLING);
-    label
+    imageView.getStyleClass().clear();
+    imageView.getStyleClass().add(ACTION_ICON_STYLING);
+    imageView
         .getStyleClass()
-        .add(active ? MIDDLE_ACTIVE_ACTION_NAME_STYLING : MIDDLE_ACTION_NAME_STYLING);
+        .add(active ? MIDDLE_ACTIVE_ACTION_ICON_STYLING : MIDDLE_ACTION_ICON_STYLING);
   }
 
   private boolean doesAnotherActionSequenceWithThisNameExist() {
@@ -334,8 +351,11 @@ public class BuilderEditorViewController {
     settingsHolder.getChildren().setAll(tdsViewWrapper.parent());
 
     TitleDescriptionSettingsController controller = tdsViewWrapper.controller();
-    controller.setTitle(builderViewModel.getSequenceNameProperty().get());
-    controller.setDescription(builderViewModel.getSequenceDescriptionProperty().get());
+
+    controller.titleProperty().bindBidirectional(builderViewModel.getSequenceNameProperty());
+    controller
+        .descriptionProperty()
+        .bindBidirectional(builderViewModel.getSequenceDescriptionProperty());
 
     controller.setInput(
         (inputTitle, inputDescription) -> {
@@ -368,27 +388,43 @@ public class BuilderEditorViewController {
         .forEach(
             action -> {
               if (action == null) return; // in case an action is broken
+
+              HBox actionContainer = new HBox();
+              actionContainer.getStyleClass().add("logbook-sequence-actions-container");
+
+              ImageView actionIcon = new ImageView();
+              actionIcon.getStyleClass().add(ACTION_ICON_STYLING);
+
               Label actionLabel = new Label(action.getName());
-              actionLabel.setOnMouseClicked(
+              actionLabel.getStyleClass().add(ACTION_NAME_STYLING);
+
+              actionContainer.getChildren().addAll(actionIcon, actionLabel);
+
+              actionContainer.setOnMouseClicked(
                   _ -> {
                     actionSettingsController.setAction(action);
                     labelInFocusProperty.set(actionLabel);
                   });
-              setupDragAlreadyDropped(actionLabel, action); // setup special drag within listview
-              builderVBox.getChildren().add(actionLabel);
+
+              setupDragAlreadyDropped(actionContainer, action);
+              builderVBox.getChildren().add(actionContainer);
             });
 
     builderVBox.getChildren().stream()
-        .map(Label.class::cast)
-        .forEach(node -> setPositionalStyling(node, false));
+        .map(HBox.class::cast)
+        .forEach(
+            hbox -> {
+              ImageView imageView = (ImageView) hbox.getChildren().get(0);
+              setPositionalStyling(imageView, false);
+            });
   }
 
-  private void setupDragAlreadyDropped(Label label, Action action) {
-    label.setCursor(Cursor.HAND);
-    label.setOnDragDetected(
+  private void setupDragAlreadyDropped(HBox container, Action action) {
+    container.setCursor(Cursor.HAND);
+    container.setOnDragDetected(
         dragEvent -> {
-          Dragboard dragboard = label.startDragAndDrop(TransferMode.MOVE);
-          dragboard.setDragView(label.snapshot(null, null), dragEvent.getX(), dragEvent.getY());
+          Dragboard dragboard = container.startDragAndDrop(TransferMode.MOVE);
+          dragboard.setDragView(container.snapshot(null, null), dragEvent.getX(), dragEvent.getY());
 
           ClipboardContent content = new ClipboardContent();
           String serializedAction = jsonUtil.serialize(action);
@@ -400,36 +436,36 @@ public class BuilderEditorViewController {
           dragEvent.consume();
         });
 
-    label.setOnDragOver(
+    container.setOnDragOver(
         dragEvent -> {
-          if (dragEvent.getGestureSource() != label && dragEvent.getDragboard().hasString()) {
+          if (dragEvent.getGestureSource() != container && dragEvent.getDragboard().hasString()) {
             dragEvent.acceptTransferModes(TransferMode.MOVE);
 
-            int labelIndex = builderVBox.getChildren().indexOf(label);
+            int containerIndex = builderVBox.getChildren().indexOf(container);
             double mouseY = dragEvent.getY();
-            double labelHeight = label.getHeight();
+            double containerHeight = container.getHeight();
 
-            // Vereinfachte Hysterese: Nur prüfen, ob Maus im oberen oder unteren Drittel des Labels
-            // ist.
-            if (mouseY < labelHeight / 3.0) {
-              labelIndex = Math.max(0, labelIndex - 1); // Einfügen vor dem Label
-            } else if (mouseY > labelHeight * 2.0 / 3.0) {
-              labelIndex++; // Einfügen nach dem Label
+            // Vereinfachte Hysterese: Nur prüfen, ob Maus im oberen oder unteren Drittel des
+            // Containers ist.
+            if (mouseY < containerHeight / 3.0) {
+              containerIndex = Math.max(0, containerIndex - 1); // Einfügen vor dem Container
+            } else if (mouseY > containerHeight * 2.0 / 3.0) {
+              containerIndex++; // Einfügen nach dem Container
             }
             // DropIndicator hinzufügen, falls nicht vorhanden.
             if (!builderVBox.getChildren().contains(dropIndicator)) {
-              builderVBox.getChildren().add(labelIndex, dropIndicator);
+              builderVBox.getChildren().add(containerIndex, dropIndicator);
             }
             // DropIndicator Position aktualisieren, wenn nötig.
-            else if (builderVBox.getChildren().indexOf(dropIndicator) != labelIndex) {
+            else if (builderVBox.getChildren().indexOf(dropIndicator) != containerIndex) {
               builderVBox.getChildren().remove(dropIndicator);
-              builderVBox.getChildren().add(labelIndex, dropIndicator);
+              builderVBox.getChildren().add(containerIndex, dropIndicator);
             }
           }
           dragEvent.consume();
         });
 
-    label.setOnDragDropped(
+    container.setOnDragDropped(
         dragEvent -> {
           Dragboard dragboard = dragEvent.getDragboard();
           boolean success = false;
@@ -450,7 +486,5 @@ public class BuilderEditorViewController {
           builderVBox.getChildren().remove(dropIndicator); // Immer entfernen
           dragEvent.consume();
         });
-
-    // Kein DragEntered mehr nötig
   }
 }
