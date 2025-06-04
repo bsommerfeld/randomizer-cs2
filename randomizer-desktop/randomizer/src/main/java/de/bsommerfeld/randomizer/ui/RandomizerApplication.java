@@ -3,9 +3,7 @@ package de.bsommerfeld.randomizer.ui;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
 import de.bsommerfeld.model.action.spi.ActionSequenceDispatcher;
-import de.bsommerfeld.model.tracker.TimeTracker;
 import de.bsommerfeld.randomizer.Main;
-import de.bsommerfeld.randomizer.config.RandomizerConfig;
 import de.bsommerfeld.randomizer.ui.view.ViewProvider;
 import de.bsommerfeld.randomizer.ui.view.controller.RandomizerWindowController;
 import javafx.application.Application;
@@ -38,8 +36,6 @@ public class RandomizerApplication extends Application {
 
   private void buildAndShowApplication(Stage stage) {
     ViewProvider viewProvider = Main.getInjector().getInstance(ViewProvider.class);
-    TimeTracker timeTracker = Main.getInjector().getInstance(TimeTracker.class);
-    RandomizerConfig randomizerConfig = Main.getInjector().getInstance(RandomizerConfig.class);
     ActionSequenceDispatcher actionSequenceDispatcher = Main.getInjector().getInstance(ActionSequenceDispatcher.class);
     log.debug("Loading main window...");
     Parent root = viewProvider.requestView(RandomizerWindowController.class).parent();

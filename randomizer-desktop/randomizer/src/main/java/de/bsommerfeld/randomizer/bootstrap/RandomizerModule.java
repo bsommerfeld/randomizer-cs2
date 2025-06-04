@@ -5,7 +5,6 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import de.bsommerfeld.jshepherd.core.ConfigurationLoader;
 import de.bsommerfeld.model.ApplicationContext;
-import de.bsommerfeld.model.tracker.TimeTracker;
 import de.bsommerfeld.randomizer.config.RandomizerConfig;
 import de.bsommerfeld.randomizer.ui.view.ViewProvider;
 import de.bsommerfeld.randomizer.ui.view.viewmodel.HomeViewModel;
@@ -35,7 +34,6 @@ public class RandomizerModule extends AbstractModule {
     bind(HomeViewModel.class).asEagerSingleton();
     bind(ViewProvider.class).asEagerSingleton();
     bind(CS2ConfigLoader.class).asEagerSingleton();
-    bind(TimeTracker.class).asEagerSingleton();
   }
 
   @Provides
