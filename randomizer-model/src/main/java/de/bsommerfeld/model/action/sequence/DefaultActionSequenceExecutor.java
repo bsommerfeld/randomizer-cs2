@@ -343,6 +343,9 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
       int randomIndex = ThreadLocalRandom.current().nextInt(0, sequences.size());
       ActionSequence selectedSequence = sequences.get(randomIndex);
 
+      // Just to make sure everything is normalized inside this sequence
+      selectedSequence.resetInterrupted();
+
       // Store reference before dispatching
       currentActionSequence = selectedSequence;
 
@@ -358,8 +361,13 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
         }
       } catch (Exception e) {
         log.error("Error dispatching sequence {}", selectedSequence.getName(), e);
+        if (currentActionSequence != null) {
+          currentActionSequence.instantInterrupt();
+          currentActionSequence = null;
+        }
+
       } finally {
-        // Clear the reference after dispatch is complete
+        // Clear the reference after dispatch is complete OR if an error occurred during dispatch.
         currentActionSequence = null;
       }
     } else {
