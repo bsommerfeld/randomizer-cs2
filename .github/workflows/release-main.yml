@@ -89,6 +89,10 @@ jobs:
             echo "**App Installers & jDeploy Info (wie von jDeploy generiert):**"
             echo "" 
             echo -e "${JDEPLOY_BODY_PART}" 
+            echo ""
+            echo "---"
+            echo ""
+            echo "**NOTE:** When auto-updates are activated, the application will update automatically at startup."
           } > combined_release_notes.md
 
           echo "Kombinierte Notizen, die für den Release Body verwendet werden:"
