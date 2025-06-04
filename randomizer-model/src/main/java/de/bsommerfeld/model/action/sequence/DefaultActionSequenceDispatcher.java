@@ -54,7 +54,15 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
     if (!actionRepository.isEnabled(action)) return;
     dispatchToHandlers(action, actionHandlers);
     runningActions.add(action);
+    // Pre-execution check: Don't execute if already interrupted
+
+    if (action.isInterrupted()) {
+      log.info("Action {} has been interrupted and will not be executed.", action);
+      return;
+    }
     action.execute();
+
+    // Post-execution check: Don't finish if interrupted during execution
     if (action.isInterrupted()) {
       log.info("Interrupted action processing");
       return;
@@ -76,7 +84,15 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
    */
   @Override
   public void redispatch(Action action, long remainingTime) {
+    // Pre-execution check: Don't execute if already interrupted
+
+    if (action.isInterrupted()) {
+      log.info("Action {} has been interrupted and will not be re-executed.", action);
+      return;
+    }
     action.executeWithDelay(remainingTime);
+
+    // Post-execution check: Don't finish if interrupted during execution
     if (action.isInterrupted()) {
       log.info("Interrupted action processing");
       return;
