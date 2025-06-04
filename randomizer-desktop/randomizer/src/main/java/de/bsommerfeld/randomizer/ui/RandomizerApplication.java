@@ -51,6 +51,7 @@ public class RandomizerApplication extends Application {
             log.info("Unregistering native hook...");
             GlobalScreen.unregisterNativeHook();
           } catch (NativeHookException e) {
+            log.error("Failed to unregister native hook", e);
             // We don't want to throw anything on close request
           } finally {
             log.info("Closing application, stopping executor and discarding running actions...");
