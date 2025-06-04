@@ -100,10 +100,6 @@
     -fx-background-color: rgba(68, 61, 255, 0.1);
 }
 
-.logbook-sequence-actions-icon {
-    -fx-image: url("../images/randomizerView/startingActionIcon.png")
-}
-
 .logbook-sequence-actions-time-elapsed {
     -fx-font-family: SansSerif;
     -fx-font-size: 12;
@@ -120,27 +116,31 @@
     -fx-background-radius: 4;
 }
 
-.logbook-sequence-actions-name-start {
+.logbook-sequence-actions-icon {
+    -fx-image: url("../images/randomizerView/startingActionIcon.png")
+}
+
+.logbook-sequence-actions-icon-start {
     -fx-image: url("../images/randomizerView/startingActionIcon.png");
 }
 
-.logbook-sequence-actions-name-start-active {
+.logbook-sequence-actions-icon-start-active {
     -fx-image: url("../images/randomizerView/startingActionIconActive.png");
 }
 
-.logbook-sequence-actions-name-middle {
+.logbook-sequence-actions-icon-middle {
     -fx-image: url("../images/randomizerView/middleActionIcon.png");
 }
 
-.logbook-sequence-actions-name-middle-active {
+.logbook-sequence-actions-icon-middle-active {
     -fx-image: url("../images/randomizerView/middleActionIconActive.png");
 }
 
-.logbook-sequence-actions-name-end {
+.logbook-sequence-actions-icon-end {
     -fx-image: url("../images/randomizerView/finalActionIcon.png");
 }
 
-.logbook-sequence-actions-name-end-active {
+.logbook-sequence-actions-icon-end-active {
     -fx-image: url("../images/randomizerView/finalActionIconActive.png");
 }
 
@@ -522,8 +522,6 @@
     -fx-scale-x: 0.9;
     -fx-scale-y: 0.9;
 }
-
-
 
 
 .builder-config-indicator {

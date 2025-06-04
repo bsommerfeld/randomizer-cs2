@@ -22,16 +22,16 @@ import javafx.scene.layout.VBox;
 @View
 public class RandomizerViewController {
 
-  private static final String ACTION_NAME_STYLING = "logbook-sequence-actions-name";
-  private static final String START_ACTION_NAME_STYLING = "logbook-sequence-actions-name-start";
-  private static final String MIDDLE_ACTION_NAME_STYLING = "logbook-sequence-actions-name-middle";
-  private static final String END_ACTION_NAME_STYLING = "logbook-sequence-actions-name-end";
-  private static final String START_ACTIVE_ACTION_NAME_STYLING =
-      "logbook-sequence-actions-name-start-active";
-  private static final String MIDDLE_ACTIVE_ACTION_NAME_STYLING =
-      "logbook-sequence-actions-name-middle-active";
-  private static final String END_ACTIVE_ACTION_NAME_STYLING =
-      "logbook-sequence-actions-name-end-active";
+  private static final String ACTION_ICON_STYLING = "logbook-sequence-actions-icon";
+  private static final String START_ACTION_ICON_STYLING = "logbook-sequence-actions-icon-start";
+  private static final String MIDDLE_ACTION_ICON_STYLING = "logbook-sequence-actions-icon-middle";
+  private static final String END_ACTION_ICON_STYLING = "logbook-sequence-actions-icon-end";
+  private static final String START_ACTIVE_ACTION_ICON_STYLING =
+      "logbook-sequence-actions-icon-start-active";
+  private static final String MIDDLE_ACTIVE_ACTION_ICON_STYLING =
+      "logbook-sequence-actions-icon-middle-active";
+  private static final String END_ACTIVE_ACTION_ICON_STYLING =
+      "logbook-sequence-actions-icon-end-active";
 
   private final RandomizerViewModel randomizerViewModel;
 
@@ -69,7 +69,7 @@ public class RandomizerViewController {
   }
 
   /** Creates the history container for the ActionSequence */
-  private void createActionSequenceContainer(ActionSequence actionSequence) {
+  private void createHistoryContainer(ActionSequence actionSequence) {
     HBox container = new HBox();
     container.getStyleClass().add("logbook-history-entry-container");
 
@@ -88,15 +88,14 @@ public class RandomizerViewController {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
     Label actionSequenceActionExecutedAt = new Label(LocalTime.now().format(formatter));
     actionSequenceActionExecutedAt.getStyleClass().add("logbook-history-entry-executed-at");
-    centerBox.getChildren().addAll(actionSequenceActionCount, rightFiller, actionSequenceActionExecutedAt);
+    centerBox
+        .getChildren()
+        .addAll(actionSequenceActionCount, rightFiller, actionSequenceActionExecutedAt);
 
     HBox leftFiller = new HBox();
     HBox.setHgrow(leftFiller, Priority.ALWAYS);
 
-
-    container
-        .getChildren()
-        .addAll(actionSequenceNameLabel, leftFiller, centerBox);
+    container.getChildren().addAll(actionSequenceNameLabel, leftFiller, centerBox);
     historyVBox.getChildren().addFirst(container);
   }
 
@@ -105,7 +104,7 @@ public class RandomizerViewController {
         actionSequence ->
             Platform.runLater(
                 () -> {
-                  createActionSequenceContainer(actionSequence);
+                  createHistoryContainer(actionSequence);
                   sequenceNameLabel.setText("");
                   actionsVBox.getChildren().clear();
                 }));
@@ -129,10 +128,12 @@ public class RandomizerViewController {
                               if (action == null) return;
 
                               HBox sequenceAction = new HBox();
-                              sequenceAction.getStyleClass().add("logbook-sequence-actions-container");
+                              sequenceAction
+                                  .getStyleClass()
+                                  .add("logbook-sequence-actions-container");
 
                               ImageView positionalIcon = new ImageView();
-                              positionalIcon.getStyleClass().add("logbook-sequence-actions-icon");
+                              positionalIcon.getStyleClass().add(ACTION_ICON_STYLING);
 
                               Label actionLabel = new Label(action.getName());
                               actionLabel.getStyleClass().add("logbook-sequence-actions-name");
@@ -142,20 +143,26 @@ public class RandomizerViewController {
 
                               DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
                               Label timeElapsed = new Label(LocalTime.now().format(formatter));
-                              timeElapsed.getStyleClass().add("logbook-sequence-actions-time-elapsed");
+                              timeElapsed
+                                  .getStyleClass()
+                                  .add("logbook-sequence-actions-time-elapsed");
 
-
-                              sequenceAction.getChildren().addAll(positionalIcon, actionLabel, filler, timeElapsed);
+                              sequenceAction
+                                  .getChildren()
+                                  .addAll(positionalIcon, actionLabel, filler, timeElapsed);
 
                               actionsVBox.getChildren().add(sequenceAction);
-
                             });
-//                    Platform.runLater(
-//                        () -> {
-//                          actionsVBox
-//                              .getChildren()
-//                              .forEach(label -> setPositionalStyling((Label) label, false));
-//                        });
+
+                    // Set initial positional styling to get the right order
+                    actionsVBox.getChildren().stream()
+                        .filter(HBox.class::isInstance)
+                        .map(HBox.class::cast)
+                        .forEach(
+                            hbox -> {
+                              ImageView imageView = (ImageView) hbox.getChildren().get(0);
+                              setPositionalStyling(imageView, false);
+                            });
                   });
             });
 
@@ -164,13 +171,25 @@ public class RandomizerViewController {
             Platform.runLater(
                 () -> {
                   actionsVBox.getChildren().stream()
-                      .filter(Label.class::isInstance)
-                      .map(Label.class::cast)
-                      .filter(label -> label.getText() != null)
-                      .filter(label -> label.getText().equals(action.getName()))
-                      .filter(label -> !isActive(label))
+                      .filter(HBox.class::isInstance)
+                      .map(HBox.class::cast)
+                      .filter(
+                          hbox -> {
+                            Label label = (Label) hbox.getChildren().get(1);
+                            return label.getText() != null
+                                && label.getText().equals(action.getName());
+                          })
+                      .filter(
+                          hbox -> {
+                            ImageView imageView = (ImageView) hbox.getChildren().get(0);
+                            return !isActive(imageView);
+                          })
                       .findFirst()
-                      .ifPresent(label -> setPositionalStyling(label, true));
+                      .ifPresent(
+                          hbox -> {
+                            ImageView imageView = (ImageView) hbox.getChildren().get(0);
+                            setPositionalStyling(imageView, true);
+                          });
                 }));
   }
 
@@ -189,26 +208,27 @@ public class RandomizerViewController {
         });
   }
 
-  private boolean isActive(Label label) {
-    return label.getStyleClass().stream().anyMatch(style -> style.endsWith("-active"));
+  private boolean isActive(ImageView imageView) {
+    return imageView.getStyleClass().stream().anyMatch(style -> style.endsWith("-active"));
   }
 
-  private void setPositionalStyling(Label label, boolean active) {
-    int index = actionsVBox.getChildren().indexOf(label);
+  private void setPositionalStyling(ImageView imageView, boolean active) {
+    HBox parentHBox = (HBox) imageView.getParent();
+    int index = actionsVBox.getChildren().indexOf(parentHBox);
     ObservableList<Node> children = actionsVBox.getChildren();
-    ObservableList<String> styleClasses = label.getStyleClass();
+    ObservableList<String> styleClasses = imageView.getStyleClass();
 
     if (index == 0) {
       styleClasses.setAll(
-          ACTION_NAME_STYLING,
-          active ? START_ACTIVE_ACTION_NAME_STYLING : START_ACTION_NAME_STYLING);
+          ACTION_ICON_STYLING,
+          active ? START_ACTIVE_ACTION_ICON_STYLING : START_ACTION_ICON_STYLING);
     } else if (index == children.size() - 1) {
       styleClasses.setAll(
-          ACTION_NAME_STYLING, active ? END_ACTIVE_ACTION_NAME_STYLING : END_ACTION_NAME_STYLING);
+          ACTION_ICON_STYLING, active ? END_ACTIVE_ACTION_ICON_STYLING : END_ACTION_ICON_STYLING);
     } else if (index > 0 && index < children.size() - 1) {
       styleClasses.setAll(
-          ACTION_NAME_STYLING,
-          active ? MIDDLE_ACTIVE_ACTION_NAME_STYLING : MIDDLE_ACTION_NAME_STYLING);
+          ACTION_ICON_STYLING,
+          active ? MIDDLE_ACTIVE_ACTION_ICON_STYLING : MIDDLE_ACTION_ICON_STYLING);
     } else {
       System.err.println(
           "Ungültiger Index in setPositionalStyling: "
