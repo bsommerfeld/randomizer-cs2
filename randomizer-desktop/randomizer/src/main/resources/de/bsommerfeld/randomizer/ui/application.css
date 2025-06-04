@@ -36,35 +36,38 @@
     -fx-graphic: url("../images/randomizerView/sequenceIcon.png");
 }
 
-.logbook-state, .logbook-state-awaiting {
+.logbook-state {
     -fx-pref-width: 320;
     -fx-min-height: 32;
-    -fx-alignment: center;
+    -fx-alignment: center-left;
     -fx-spacing: 24;
     -fx-padding: 6 4;
     -fx-background-radius: 8;
     -fx-background-color: #E6E5FF;
 }
 
-.logbook-state-awaiting {
-    -fx-effect: innershadow(gaussian, #E37400, 12, 0.2, 0, 0);
+.logbook-not-focused-indicator {
+    -fx-image: url("../images/randomizerView/notFocusedIcon.png");
 }
 
-.logbook-state-indicator {
-    -fx-font-family: SansSerif;
-    -fx-font-size: 12;
-    -fx-text-fill: #E37400;
-    -fx-background-color: transparent;
+.logbook-state-button-container {
+    -fx-min-height: 24;
+    -fx-alignment: center;
+    -fx-translate-x: -20;
+    -fx-cursor: hand;
 }
 
 .logbook-toggle-button {
-    -fx-pref-width: 20;
-    -fx-min-height: 20;
-    -fx-max-height: 20;
-    -fx-background-color: transparent;
-    -fx-background-repeat: no-repeat;
-    -fx-background-size: 20;
-    -fx-background-image: url("../images/randomizerView/playIcon.png");
+    -fx-max-width: 120;
+    -fx-font-family: SansSerif;
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+    -fx-text-fill: #443DFF;
+    -fx-background-color: rgba(68, 61, 255, 0.1);
+    -fx-border-color: #443DFF;
+    -fx-border-radius: 6;
+    -fx-graphic: url("../images/randomizerView/playIcon.png");
+    -fx-graphic-text-gap: 8;
     -fx-cursor: hand;
 }
 
@@ -74,7 +77,14 @@
 }
 
 .logbook-toggle-button:selected {
-    -fx-background-image: url("../images/randomizerView/pauseIcon.png");
+    -fx-graphic: url("../images/randomizerView/pauseIcon.png");
+}
+
+.logbook-toggle-label {
+    -fx-font-family: SansSerif;
+    -fx-font-size: 14;
+    -fx-font-weight: bold;
+    -fx-text-fill: #443DFF;
 }
 
 .logbook-active-actions, .logbook-active-actions-vbox {

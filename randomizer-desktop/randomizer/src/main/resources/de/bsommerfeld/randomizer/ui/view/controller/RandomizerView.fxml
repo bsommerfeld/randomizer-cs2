@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.bsommerfeld.randomizer.ui.view.controller.RandomizerViewController">
@@ -30,7 +31,7 @@
                                 <content>
                                     <VBox styleClass="logbook-active-actions">
                                        <children>
-                                          <VBox fx:id="actionsVBox" styleClass="logbook-active-actions-vbox"/>
+                                          <VBox fx:id="actionsVBox" styleClass="logbook-active-actions-vbox" />
                                        </children></VBox>
                                 </content>
                               </ScrollPane>
@@ -39,9 +40,12 @@
                                 <!-- Statusbereich -->
                                 <HBox fx:id="logbookState" styleClass="logbook-state">
                                     <children>
-                                        <Label fx:id="runnerStateLabel" styleClass="logbook-state-indicator" text="Runner is stopped" visible="false" />
-                                        <ToggleButton fx:id="randomizerToggleButton" mnemonicParsing="false" onAction="#onToggle" styleClass="logbook-toggle-button" />
-                                        <Label fx:id="cs2FocusLabel" styleClass="logbook-state-indicator" text="CS2 not in focus" visible="false" />
+                              <ImageView fx:id="cs2FocusImage" pickOnBounds="true" preserveRatio="true" styleClass="logbook-not-focused-indicator" visible="false" />
+                              <HBox styleClass="logbook-state-button-container" HBox.hgrow="ALWAYS">
+                                 <children>
+                                     <ToggleButton fx:id="randomizerToggleButton" mnemonicParsing="false" onAction="#onToggle" styleClass="logbook-toggle-button" text="Start"/>
+                                 </children>
+                              </HBox>
                                     </children>
                                 </HBox>
                             </children>

@@ -39,8 +39,7 @@ public class RandomizerViewController {
   @FXML private VBox actionsVBox;
   @FXML private VBox historyVBox;
   @FXML private ToggleButton randomizerToggleButton;
-  @FXML private Label runnerStateLabel;
-  @FXML private Label cs2FocusLabel;
+  @FXML private ImageView cs2FocusImage;
   @FXML private HBox logbookState;
 
   @Inject
@@ -52,8 +51,10 @@ public class RandomizerViewController {
   void onToggle(ActionEvent event) {
     if (!randomizerToggleButton.isSelected()) {
       randomizerViewModel.setApplicationStateToStopped();
+      randomizerToggleButton.setText("Start");
     } else {
       randomizerViewModel.setApplicationStateToRunning();
+        randomizerToggleButton.setText("Stop");
     }
   }
 
@@ -196,15 +197,15 @@ public class RandomizerViewController {
   private void setupStateListener() {
     randomizerViewModel.onStateChange(
         applicationState -> {
-          if (applicationState == ApplicationState.AWAITING) {
-            runnerStateLabel.setVisible(true);
-            cs2FocusLabel.setVisible(true);
-            logbookState.getStyleClass().add("logbook-state-awaiting");
-          } else {
-            runnerStateLabel.setVisible(false);
-            cs2FocusLabel.setVisible(false);
-            logbookState.getStyleClass().remove("logbook-state-awaiting");
-          }
+            Platform.runLater(
+                () -> {
+                    if (applicationState == ApplicationState.AWAITING) {
+                        cs2FocusImage.setVisible(true);
+                        randomizerToggleButton.setText("Paused");
+                    } else {
+                        cs2FocusImage.setVisible(false);
+                    }
+                });
         });
   }
 
