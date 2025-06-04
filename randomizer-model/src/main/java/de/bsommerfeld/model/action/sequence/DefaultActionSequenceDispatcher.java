@@ -169,7 +169,9 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
 
         // Check if sequence was interrupted
         if (actionSequence.isInterrupted()) {
-          log.info("Sequence {} was interrupted, stopping further action processing", actionSequence.getName());
+          log.info(
+              "Sequence {} was interrupted, stopping further action processing",
+              actionSequence.getName());
           break;
         }
 
@@ -183,8 +185,9 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
 
         // Check if action execution caused sequence interruption
         if (actionSequence.isInterrupted()) {
-          log.info("Sequence {} was interrupted during action execution, stopping further processing", 
-                  actionSequence.getName());
+          log.info(
+              "Sequence {} was interrupted during action execution, stopping further processing",
+              actionSequence.getName());
           break;
         }
       }
@@ -194,17 +197,17 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
         finishSequenceProcessing(actionSequence);
         log.info(SEQUENCE_DISPATCHED, actionSequence);
       } else {
-        log.info("Sequence {} was not fully dispatched due to interruption", actionSequence.getName());
+        log.info(
+            "Sequence {} was not fully dispatched due to interruption", actionSequence.getName());
       }
     } finally {
       // Clear current sequence reference
       currentSequence = null;
+      discardAllRunningActions();
     }
   }
 
-  /** 
-   * Discards all running actions and interrupts the current sequence if one exists.
-   */
+  /** Discards all running actions and interrupts the current sequence if one exists. */
   @Override
   public void discardAllRunningActions() {
     // First check if we have a current sequence and interrupt it
@@ -235,7 +238,8 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
 
     // Make sure the sequence itself is not marked as interrupted
     if (actionSequence.isInterrupted()) {
-      log.info("Resetting interrupted state for sequence {} before finishing", actionSequence.getName());
+      log.info(
+          "Resetting interrupted state for sequence {} before finishing", actionSequence.getName());
       actionSequence.resetInterrupted();
     }
 
