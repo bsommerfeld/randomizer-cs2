@@ -55,18 +55,13 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
     dispatchToHandlers(action, actionHandlers);
     runningActions.add(action);
 
-    // Pre-execution check: Don't execute if already interrupted
-    if (action.isInterrupted()) {
-      log.info("Action {} has been interrupted and will not be executed.", action);
-      return;
-    }
     action.execute();
 
-    // Post-execution check: Don't finish if interrupted during execution
     if (action.isInterrupted()) {
       log.info("Interrupted action processing");
       return;
     }
+
     finishDispatch(action);
   }
 
@@ -90,6 +85,7 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
       log.info("Action {} has been interrupted and will not be re-executed.", action);
       return;
     }
+
     action.executeWithDelay(remainingTime);
 
     // Post-execution check: Don't finish if interrupted during execution
@@ -113,6 +109,11 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
         log.info("Interrupted sequence processing due to loss of focus");
         return;
       }
+
+      if (action.isInterrupted()) {
+        continue;
+      }
+
       dispatch(action);
     }
     finishSequenceProcessing(actionSequence);
