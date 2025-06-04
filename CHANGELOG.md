@@ -11,6 +11,7 @@
 - Refined history container contents
 - Refined alerts on errors
 - General Alert stylings have been improved
+- Several Code and Performance improvements
 
 ### Fixed
 
