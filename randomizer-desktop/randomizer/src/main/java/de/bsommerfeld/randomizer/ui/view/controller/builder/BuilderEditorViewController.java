@@ -449,7 +449,17 @@ public class BuilderEditorViewController {
             // DropIndicator Position aktualisieren, wenn nötig.
             else if (builderVBox.getChildren().indexOf(dropIndicator) != containerIndex) {
               builderVBox.getChildren().remove(dropIndicator);
-              builderVBox.getChildren().add(containerIndex, dropIndicator);
+
+              // Sichere Index-Berechnung
+              int childrenSize = builderVBox.getChildren().size();
+              if (containerIndex < 0) {
+                builderVBox.getChildren().addFirst(dropIndicator);
+              } else if (containerIndex >= childrenSize) {
+                builderVBox.getChildren().addLast(dropIndicator);
+
+              } else {
+                builderVBox.getChildren().add(containerIndex, dropIndicator);
+              }
             }
           }
           dragEvent.consume();
