@@ -206,6 +206,7 @@ public class RandomizerViewController {
                 if (applicationState == ApplicationState.AWAITING) {
                   cs2FocusImage.setVisible(true);
                   randomizerToggleButton.setText("Paused");
+                  clearCurrentSequenceView();
                 } else {
                   cs2FocusImage.setVisible(false);
                 }
