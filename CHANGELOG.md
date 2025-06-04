@@ -41,6 +41,7 @@
 - Fixed injection of ApplicationContext into various components
 - Fixed GitHub issues URL in UIUncaughtExceptionHandler
 - Fixed skipping GitHub releases without CHANGELOG.md asset and improved related exception handling
+- Fixed stopping the Randomizer interrupts the current sequence and every underlying Action
 
 ### Removed
 
