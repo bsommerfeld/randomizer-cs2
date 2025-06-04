@@ -66,6 +66,7 @@ public class RandomizerViewController {
   }
 
   private void clearCurrentSequenceView() {
+    randomizerViewModel.getCurrentActionSequenceProperty().set(null);
     actionsVBox.getChildren().clear();
     sequenceNameLabel.setText("");
   }
