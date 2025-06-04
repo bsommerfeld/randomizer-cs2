@@ -34,10 +34,4 @@ public record GitHubRelease(
                 new IllegalStateException(
                     MessageFormat.format("No CHANGELOG.md asset found for {0}", this.tag)));
   }
-
-  @Override
-  public String toString() {
-    return String.format(
-        "%s:%s:%s", tag, releaseDate, hasChangelogAsset() ? "CHANGELOG.md" : "No CHANGELOG.md");
-  }
 }
