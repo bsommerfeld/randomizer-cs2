@@ -9,18 +9,6 @@ public record GitHubRelease(
     String tag, ZonedDateTime releaseDate, String title, List<GitHubReleaseAsset> assets) {
 
   /**
-   * Checks if this release has a CHANGELOG.md asset.
-   *
-   * <p>Package-Private since only {@link de.bsommerfeld.randomizer.service.GitHubService} should
-   * use this method.
-   *
-   * @return true if the release has a CHANGELOG.md asset, false otherwise
-   */
-  boolean hasChangelogAsset() {
-    return assets.stream().anyMatch(asset -> "CHANGELOG.md".equals(asset.name()));
-  }
-
-  /**
    * Gets the CHANGELOG.md asset if it exists.
    *
    * @return The CHANGELOG.md asset, or null if it doesn't exist

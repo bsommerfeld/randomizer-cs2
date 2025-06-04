@@ -43,7 +43,7 @@ public class GitHubService {
    * @throws IOException If an I/O error occurs
    * @throws InterruptedException If the operation is interrupted
    */
-  public List<GitHubRelease> getRepositoryReleases(String owner, String repo)
+  private List<GitHubRelease> getRepositoryReleases(String owner, String repo)
       throws IOException, InterruptedException {
     String apiUrl = String.format("%s/repos/%s/%s/releases", GITHUB_API_URL, owner, repo);
 
@@ -75,9 +75,7 @@ public class GitHubService {
   public List<GitHubRelease> getRepositoryReleasesWithChangelog(String owner, String repo)
       throws IOException, InterruptedException {
     List<GitHubRelease> allReleases = getRepositoryReleases(owner, repo);
-    return allReleases.stream()
-        .filter(GitHubRelease::hasChangelogAsset)
-        .collect(Collectors.toList());
+    return allReleases.stream().filter(this::hasChangelogAsset).collect(Collectors.toList());
   }
 
   /**
@@ -98,16 +96,8 @@ public class GitHubService {
           ZonedDateTime releaseDate =
               ZonedDateTime.parse(
                   releaseNode.get("published_at").asText(), DateTimeFormatter.ISO_DATE_TIME);
-
           List<GitHubReleaseAsset> assets = parseAssets(releaseNode.get("assets"));
-
-          GitHubRelease gitHubRelease = new GitHubRelease(tag, releaseDate, title, assets);
-
-          // We don't want releases without the CHANGELOG.md asset since we specifically want to
-          // point the CHANGELOG out.
-          if (!gitHubRelease.hasChangelogAsset()) continue;
-
-          releases.add(gitHubRelease);
+          releases.add(new GitHubRelease(tag, releaseDate, title, assets));
         }
       }
     } catch (Exception e) {
@@ -117,6 +107,16 @@ public class GitHubService {
     }
 
     return releases;
+  }
+
+  /**
+   * Checks if the given GitHub release contains a "CHANGELOG.md" asset.
+   *
+   * @param gitHubRelease The GitHub release to check for the presence of a "CHANGELOG.md" asset
+   * @return true if the release contains a "CHANGELOG.md" asset, false otherwise
+   */
+  private boolean hasChangelogAsset(GitHubRelease gitHubRelease) {
+    return gitHubRelease.assets().stream().anyMatch(asset -> "CHANGELOG.md".equals(asset.name()));
   }
 
   /**
