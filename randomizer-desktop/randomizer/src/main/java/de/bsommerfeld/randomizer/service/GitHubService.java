@@ -101,7 +101,13 @@ public class GitHubService {
 
           List<GitHubReleaseAsset> assets = parseAssets(releaseNode.get("assets"));
 
-          releases.add(new GitHubRelease(tag, releaseDate, title, assets));
+          GitHubRelease gitHubRelease = new GitHubRelease(tag, releaseDate, title, assets);
+
+          // We don't want releases without the CHANGELOG.md asset since we specifically want to
+          // point the CHANGELOG out.
+          if (!gitHubRelease.hasChangelogAsset()) continue;
+
+          releases.add(gitHubRelease);
         }
       }
     } catch (Exception e) {
