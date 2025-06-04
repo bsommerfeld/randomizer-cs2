@@ -42,6 +42,14 @@ public class RandomizerApplication extends Application {
     ActionSequenceExecutor actionSequenceExecutor =
         Main.getInjector().getInstance(ActionSequenceExecutor.class);
     log.debug("Loading main window...");
+    buildApplication(stage, viewProvider, actionSequenceDispatcher, actionSequenceExecutor);
+  }
+
+  private void buildApplication(
+      Stage stage,
+      ViewProvider viewProvider,
+      ActionSequenceDispatcher actionSequenceDispatcher,
+      ActionSequenceExecutor actionSequenceExecutor) {
     Parent root = viewProvider.requestView(RandomizerWindowController.class).parent();
     Scene scene = new Scene(root);
     setupStage(stage, scene);

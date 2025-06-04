@@ -19,7 +19,7 @@ public class UIUncaughtExceptionHandler implements Thread.UncaughtExceptionHandl
   private static final long DIALOG_COOLDOWN_MS = 5000; // 5 seconds
 
   private static final String GITHUB_ISSUES_URL =
-      "https://github.com/Metaphoriker/randomizer-cs2/issues";
+      "https://github.com/bsommerfeld/randomizer-cs2/issues";
 
   private long lastDialogShownTime = 0;
 
@@ -32,12 +32,13 @@ public class UIUncaughtExceptionHandler implements Thread.UncaughtExceptionHandl
       lastDialogShownTime = currentTime;
 
       try {
-        Platform.runLater(() -> {
-          Alert alert = createStyledAlert();
-          VBox content = createContent();
-          alert.getDialogPane().setContent(content);
-          alert.showAndWait();
-        });
+        Platform.runLater(
+            () -> {
+              Alert alert = createStyledAlert();
+              VBox content = createContent();
+              alert.getDialogPane().setContent(content);
+              alert.showAndWait();
+            });
       } catch (Exception ex) {
         log.error(
             "An unexpected error occurred, and the error dialog could not be displayed. Secondary exception: ",
