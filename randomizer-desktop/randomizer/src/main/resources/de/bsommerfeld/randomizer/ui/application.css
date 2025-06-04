@@ -391,11 +391,6 @@
 }
 
 /* Builder Editor View */
-.builder-content {
-    -fx-pref-width: 504;
-    -fx-pref-height: 320;
-    -fx-padding: 12;
-}
 
 .builder-settings-holder {
     -fx-pref-width: 192;
@@ -416,13 +411,6 @@
     -fx-pref-width: 176;
     -fx-spacing: 6;
     -fx-alignment: center;
-}
-
-.sequence-in-focus-label {
-    -fx-font-family: SansSerif;
-    -fx-font-size: 12;
-    -fx-text-alignment: left;
-    -fx-text-fill: #040316;
 }
 
 .builder-settings-separator, .builder-settings-separator .line {
@@ -535,137 +523,8 @@
     -fx-scale-y: 0.9;
 }
 
-.sequence-builder {
-    -fx-pref-width: 300;
-    -fx-pref-height: 320;
-    -fx-alignment: center;
-    -fx-padding: 8 12;
-    -fx-background-radius: 8;
-    -fx-background-color: #E6E5FF;
-}
 
-.sequence-naming-container {
-    -fx-pref-width: 276;
-    -fx-pref-height: 30;
-}
 
-.sequence-naming {
-    -fx-alignment: center-left;
-    -fx-spacing: 4;
-}
-
-.sequence-name-label {
-    -fx-font-family: SansSerif;
-    -fx-font-size: 12;
-    -fx-text-fill: #040316;
-    -fx-graphic: url("../images/builderEditorView/sequenceIcon.png");
-}
-
-.sequence-description-label {
-    -fx-font-family: SansSerif;
-    -fx-font-size: 11;
-    -fx-text-fill: #A9A5F3;
-}
-
-.sequence-builder-buttons {
-    -fx-pref-width: 76;
-    -fx-max-height: 16;
-    -fx-spacing: 8;
-    -fx-alignment: top-right;
-}
-
-.builder-buttons-separator, .builder-buttons-separator .line {
-    -fx-pref-width: 1;
-    -fx-pref-height: 16;
-    -fx-background-color: #6B66FF;
-    -fx-border-color: null;
-}
-
-.builder-randomize-button, .builder-save-sequence-button {
-    -fx-min-width: 16;
-    -fx-min-height: 16;
-    -fx-background-color: transparent;
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center;
-    -fx-background-size: 16;
-    -fx-cursor: hand;
-}
-
-.builder-randomize-button {
-    -fx-background-image: url("../images/builderEditorView/randomizeIcon.png");
-}
-
-.builder-randomize-button:hover {
-    -fx-background-image: url("../images/builderEditorView/randomizeIconSelected.png");
-}
-
-.builder-save-sequence-button {
-    -fx-background-image: url("../images/builderEditorView/saveIcon.png");
-}
-
-.builder-save-sequence-button:hover {
-    -fx-background-image: url("../images/builderEditorView/saveIconSelected.png");
-}
-
-.builder-actions-clear-button {
-    -fx-min-width: 21;
-    -fx-min-height: 16;
-    -fx-background-color: transparent;
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center;
-    -fx-background-size: 21 16;
-    -fx-background-image: url("../images/builderEditorView/clearIcon.png");
-    -fx-cursor: hand;
-}
-
-.builder-actions-clear-button:hover {
-    -fx-background-image: url("../images/builderEditorView/clearIconSelected.png");
-}
-
-.builder-selected-actions-scrollpane {
-    -fx-pref-width: 312;
-    -fx-pref-height: 272;
-    -fx-background-color: #E6E5FF;
-}
-
-.builder-selected-actions-scrollpane .scroll-bar:vertical {
-    -fx-pref-width: 4;
-    -fx-padding: -4 0;
-    -fx-background-color: transparent;
-}
-
-.builder-selected-actions-scrollpane .scroll-bar:vertical .track {
-    -fx-background-color: #847EE7;
-    -fx-background-radius: 2;
-}
-
-.builder-selected-actions-scrollpane .scroll-bar:vertical .thumb {
-    -fx-background-color: #2F27CE;
-    -fx-background-insets: 0;
-    -fx-background-radius: 2;
-    -fx-pref-width: 4;
-}
-
-.builder-selected-actions-scrollpane .scroll-bar:vertical .increment-button,
-.builder-selected-actions-scrollpane .scroll-bar:vertical .decrement-button {
-    -fx-background-color: transparent;
-    -fx-shape: null;
-    -fx-opacity: 0;
-}
-
-.builder-selected-actions-vbox {
-    -fx-pref-width: 276;
-    -fx-pref-height: 244;
-    -fx-spacing: 6;
-    -fx-padding: 6 0;
-    -fx-background-color: #E6E5FF;
-}
-
-.builder-actions-scrollpane:focused, .builder-sequences-scrollpane:focused, .builder-selected-actions-scrollpane:focused {
-    -fx-background-insets: 0, 1;
-    -fx-focus-traversable: false;
-    -fx-focus-color: transparent;
-}
 
 .builder-config-indicator {
     -fx-pref-width: 162;
