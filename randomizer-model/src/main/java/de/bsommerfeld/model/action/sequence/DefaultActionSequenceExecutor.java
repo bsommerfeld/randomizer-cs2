@@ -284,6 +284,10 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
       int randomIndex = ThreadLocalRandom.current().nextInt(0, sequences.size());
       currentActionSequence = sequences.get(randomIndex);
       actionSequenceDispatcher.dispatchSequence(currentActionSequence);
+      if (currentActionSequence == null) {
+        log.warn("To-finish action sequence vanished.");
+        return;
+      }
       log.info("Sequence {} was dispatched.", currentActionSequence.getName());
     } else {
       log.warn("No active ActionSequences found.");
