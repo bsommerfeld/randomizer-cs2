@@ -40,7 +40,6 @@ public class RandomizerViewController {
   @FXML private VBox historyVBox;
   @FXML private ToggleButton randomizerToggleButton;
   @FXML private ImageView cs2FocusImage;
-  @FXML private HBox logbookState;
 
   @Inject
   public RandomizerViewController(RandomizerViewModel randomizerViewModel) {
@@ -51,10 +50,11 @@ public class RandomizerViewController {
   void onToggle(ActionEvent event) {
     if (!randomizerToggleButton.isSelected()) {
       randomizerViewModel.setApplicationStateToStopped();
+      clearCurrentSequenceView();
       randomizerToggleButton.setText("Start");
     } else {
       randomizerViewModel.setApplicationStateToRunning();
-        randomizerToggleButton.setText("Stop");
+      randomizerToggleButton.setText("Stop");
     }
   }
 
@@ -63,6 +63,11 @@ public class RandomizerViewController {
     setupBindings();
     setupListener();
     setupStateListener();
+  }
+
+  private void clearCurrentSequenceView() {
+    actionsVBox.getChildren().clear();
+    sequenceNameLabel.setText("");
   }
 
   private void setupBindings() {
@@ -106,8 +111,7 @@ public class RandomizerViewController {
             Platform.runLater(
                 () -> {
                   createHistoryContainer(actionSequence);
-                  sequenceNameLabel.setText("");
-                  actionsVBox.getChildren().clear();
+                  clearCurrentSequenceView();
                 }));
 
     randomizerViewModel
@@ -197,15 +201,15 @@ public class RandomizerViewController {
   private void setupStateListener() {
     randomizerViewModel.onStateChange(
         applicationState -> {
-            Platform.runLater(
-                () -> {
-                    if (applicationState == ApplicationState.AWAITING) {
-                        cs2FocusImage.setVisible(true);
-                        randomizerToggleButton.setText("Paused");
-                    } else {
-                        cs2FocusImage.setVisible(false);
-                    }
-                });
+          Platform.runLater(
+              () -> {
+                if (applicationState == ApplicationState.AWAITING) {
+                  cs2FocusImage.setVisible(true);
+                  randomizerToggleButton.setText("Paused");
+                } else {
+                  cs2FocusImage.setVisible(false);
+                }
+              });
         });
   }
 
