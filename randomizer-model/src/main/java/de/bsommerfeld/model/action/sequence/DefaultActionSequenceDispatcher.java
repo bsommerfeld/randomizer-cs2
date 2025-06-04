@@ -2,15 +2,15 @@ package de.bsommerfeld.model.action.sequence;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import de.bsommerfeld.model.ApplicationContext;
 import de.bsommerfeld.model.action.Action;
 import de.bsommerfeld.model.action.spi.ActionRepository;
 import de.bsommerfeld.model.action.spi.ActionSequenceDispatcher;
 import de.bsommerfeld.model.action.spi.FocusManager;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Default implementation of the ActionSequenceDispatcher interface.
@@ -31,11 +31,13 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
     private final List<Action> runningActions = new CopyOnWriteArrayList<>();
     private final ActionRepository actionRepository;
     private final FocusManager focusManager;
+    private final ApplicationContext applicationContext;
 
     @Inject
-    public DefaultActionSequenceDispatcher(ActionRepository actionRepository, FocusManager focusManager) {
+    public DefaultActionSequenceDispatcher(ActionRepository actionRepository, FocusManager focusManager, ApplicationContext applicationContext) {
         this.actionRepository = actionRepository;
         this.focusManager = focusManager;
+        this.applicationContext = applicationContext;
     }
 
     /**
@@ -87,7 +89,7 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
     public void dispatchSequence(ActionSequence actionSequence) {
         dispatchToHandlers(actionSequence, sequenceHandlers);
         for (Action action : actionSequence.getActions()) {
-            if (!focusManager.isApplicationWindowInFocus()) {
+            if (applicationContext.isCheckForCS2Focus() && !focusManager.isApplicationWindowInFocus()) {
                 log.info("Interrupted sequence processing due to loss of focus");
                 return;
             }
