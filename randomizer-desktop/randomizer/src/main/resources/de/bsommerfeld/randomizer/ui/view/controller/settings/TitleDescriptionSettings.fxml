@@ -1,36 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
-<VBox VBox.vgrow="ALWAYS" fx:id="root" prefHeight="184.0" prefWidth="172.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.bsommerfeld.randomizer.ui.view.controller.settings.TitleDescriptionSettingsController">
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" VBox.vgrow="ALWAYS" fx:id="root" prefHeight="184.0" prefWidth="172.0"
+      xmlns="http://javafx.com/javafx/17.0.12"
+      fx:controller="de.bsommerfeld.randomizer.ui.view.controller.settings.TitleDescriptionSettingsController">
     <children>
         <VBox VBox.vgrow="ALWAYS" fx:id="actionSettingsVBox" styleClass="builder-sequence-settings-container">
             <children>
-            <VBox spacing="2.0">
-               <children>
-                       <Label styleClass="sequence-in-focus-label" text="Sequence Settings" />
-                       <Separator styleClass="builder-settings-separator" />
-               </children>
-            </VBox>
-                <VBox prefWidth="156.0" styleClass="builder-settings-sequence-title-vbox">
+                <VBox spacing="2.0">
                     <children>
-                        <Label styleClass="builder-settings-sequence-title" text="Title" wrapText="true" />
-                        <TextField fx:id="textField" promptText="Set a name" styleClass="builder-settings-title-textfield" />
+                        <Label styleClass="sequence-in-focus-label" text="Sequence Settings"/>
+                        <Separator styleClass="builder-settings-separator"/>
                     </children>
                 </VBox>
-                <Separator styleClass="builder-sequence-settings-separator" />
+                <VBox prefWidth="156.0" styleClass="builder-settings-sequence-title-vbox">
+                    <children>
+                        <Label styleClass="builder-settings-sequence-title" text="Title" wrapText="true"/>
+                        <TextField fx:id="textField" promptText="Set a name"
+                                   styleClass="builder-settings-title-textfield"/>
+                    </children>
+                </VBox>
+                <Separator styleClass="builder-sequence-settings-separator"/>
                 <HBox alignment="CENTER_LEFT">
-                    <Label styleClass="builder-settings-sequence-description" text="Description" />
+                    <Label styleClass="builder-settings-sequence-description" text="Description"/>
                 </HBox>
                 <VBox VBox.vgrow="ALWAYS" prefWidth="156.0" styleClass="action-time-frame-vbox">
                     <children>
-                        <TextArea fx:id="textArea" prefHeight="64.0" prefWidth="156.0" promptText="Set the description" styleClass="builder-settings-description-textfield" wrapText="true" />
-                        <VBox VBox.vgrow="ALWAYS" alignment="BOTTOM_RIGHT" prefHeight="20.0" prefWidth="75.0" styleClass="settings-apply-button-container">
-                            <children>
-                                <Button mnemonicParsing="false" onAction="#onApply" styleClass="settings-apply-button" text="Apply" />
-                            </children>
-                        </VBox>
+                        <TextArea fx:id="textArea" prefHeight="64.0" prefWidth="156.0" promptText="Set the description"
+                                  styleClass="builder-settings-description-textfield" wrapText="true"/>
                     </children>
                 </VBox>
             </children>

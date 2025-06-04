@@ -356,16 +356,6 @@ public class BuilderEditorViewController {
     controller
         .descriptionProperty()
         .bindBidirectional(builderViewModel.getSequenceDescriptionProperty());
-
-    controller.setInput(
-        (inputTitle, inputDescription) -> {
-          if (inputTitle != null && !inputTitle.isBlank()) {
-            builderViewModel.getSequenceNameProperty().set(inputTitle);
-          }
-          if (inputDescription != null && !inputDescription.isBlank()) {
-            builderViewModel.getSequenceDescriptionProperty().set(inputDescription);
-          }
-        });
   }
 
   private void loadActionsView() {
