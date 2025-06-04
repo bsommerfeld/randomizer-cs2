@@ -14,11 +14,10 @@ import de.bsommerfeld.model.action.spi.ActionSequenceDispatcher;
 import de.bsommerfeld.model.action.spi.ActionSequenceExecutor;
 import de.bsommerfeld.model.action.spi.ActionSequenceRepository;
 import de.bsommerfeld.model.action.spi.FocusManager;
-import lombok.extern.slf4j.Slf4j;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Default implementation of the ActionSequenceExecutor interface.
@@ -90,6 +89,7 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
         }
         running = true;
         executorThread = new Thread(this);
+        executorThread.setDaemon(true);
         executorThread.start();
         return executorThread;
     }

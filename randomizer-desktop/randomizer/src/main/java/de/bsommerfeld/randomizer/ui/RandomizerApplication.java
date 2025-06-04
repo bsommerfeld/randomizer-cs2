@@ -3,6 +3,7 @@ package de.bsommerfeld.randomizer.ui;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
 import de.bsommerfeld.model.action.spi.ActionSequenceDispatcher;
+import de.bsommerfeld.model.action.spi.ActionSequenceExecutor;
 import de.bsommerfeld.randomizer.Main;
 import de.bsommerfeld.randomizer.ui.view.ViewProvider;
 import de.bsommerfeld.randomizer.ui.view.controller.RandomizerWindowController;
@@ -36,7 +37,10 @@ public class RandomizerApplication extends Application {
 
   private void buildAndShowApplication(Stage stage) {
     ViewProvider viewProvider = Main.getInjector().getInstance(ViewProvider.class);
-    ActionSequenceDispatcher actionSequenceDispatcher = Main.getInjector().getInstance(ActionSequenceDispatcher.class);
+    ActionSequenceDispatcher actionSequenceDispatcher =
+        Main.getInjector().getInstance(ActionSequenceDispatcher.class);
+    ActionSequenceExecutor actionSequenceExecutor =
+        Main.getInjector().getInstance(ActionSequenceExecutor.class);
     log.debug("Loading main window...");
     Parent root = viewProvider.requestView(RandomizerWindowController.class).parent();
     Scene scene = new Scene(root);
@@ -48,6 +52,7 @@ public class RandomizerApplication extends Application {
           } catch (NativeHookException e) {
             throw new RuntimeException(e);
           }
+          actionSequenceExecutor.stop();
           actionSequenceDispatcher.discardAllRunningActions();
           Platform.exit();
         });
