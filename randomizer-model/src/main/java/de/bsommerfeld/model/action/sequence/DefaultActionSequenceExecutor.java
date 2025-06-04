@@ -196,12 +196,6 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
       // Interrupt the action
       currentAction.interrupt();
 
-      // Also interrupt the sequence if it exists
-      if (currentActionSequence != null) {
-        currentActionSequence.interrupt();
-        log.info("Interrupting sequence {} due to action interruption", currentActionSequence.getName());
-      }
-
       log.info(
           "Interruption detected with {}: {}",
           nativeKeyEvent != null ? "Key" : "Mousebutton",
@@ -252,7 +246,9 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
 
       // Check if the sequence is interrupted
       if (currentActionSequence.isInterrupted()) {
-        log.info("Sequence {} is interrupted, skipping further processing", currentActionSequence.getName());
+        log.info(
+            "Sequence {} is interrupted, skipping further processing",
+            currentActionSequence.getName());
         return true;
       }
 
@@ -260,7 +256,7 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
       Action currentAction = findInterruptedAction();
 
       // If we found an interrupted action with a delay, try to continue it
-      if (currentAction != null && executeDelayedActionIfNeeded(currentAction)) {
+      if (executeDelayedActionIfNeeded(currentAction)) {
         return true;
       }
 
@@ -288,8 +284,10 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
 
     // Check if the sequence is interrupted
     if (currentActionSequence != null && currentActionSequence.isInterrupted()) {
-      log.info("Sequence {} is interrupted, not redispatching action {}", 
-              currentActionSequence.getName(), currentAction);
+      log.info(
+          "Sequence {} is interrupted, not redispatching action {}",
+          currentActionSequence.getName(),
+          currentAction);
       return false;
     }
 
@@ -377,9 +375,10 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
     if (currentState == ApplicationState.AWAITING && focusManager.isApplicationWindowInFocus()) {
       applicationContext.setApplicationState(ApplicationState.RUNNING);
       log.info("ApplicationState changed to: RUNNING");
-    } 
+    }
     // Check if focus was lost
-    else if (currentState == ApplicationState.RUNNING && !focusManager.isApplicationWindowInFocus()) {
+    else if (currentState == ApplicationState.RUNNING
+        && !focusManager.isApplicationWindowInFocus()) {
       // Interrupt current sequence if it exists
       if (currentActionSequence != null) {
         log.info("Focus lost, interrupting current sequence: {}", currentActionSequence.getName());
