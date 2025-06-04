@@ -108,6 +108,9 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
     applicationContext.registerApplicationStateChangeListener(
         state -> {
           if (state != ApplicationState.RUNNING) {
+            if (currentActionSequence == null) {
+              return;
+            }
             for (Action action : currentActionSequence.getActions()) {
               action.interrupt();
             }
@@ -115,6 +118,8 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
             log.warn(
                 "Application state change detected in action sequence, interrupted {} actions.",
                 currentActionSequence.getActions().size());
+
+            currentActionSequence = null;
           }
         });
   }
