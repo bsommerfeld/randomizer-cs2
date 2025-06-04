@@ -103,6 +103,9 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
    */
   @Override
   public void dispatchSequence(ActionSequence actionSequence) {
+    if (actionSequence == null) return;
+    if (!actionSequence.isActive()) return;
+
     dispatchToHandlers(actionSequence, sequenceHandlers);
     for (Action action : actionSequence.getActions()) {
       if (applicationContext.isCheckForCS2Focus() && !focusManager.isApplicationWindowInFocus()) {
