@@ -111,11 +111,13 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
       }
 
       if (action.isInterrupted()) {
+        log.info("Skipped action {} because it was interrupted before executing", action);
         continue;
       }
 
       dispatch(action);
     }
+
     finishSequenceProcessing(actionSequence);
     log.info(SEQUENCE_DISPATCHED, actionSequence);
   }
