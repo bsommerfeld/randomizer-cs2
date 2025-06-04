@@ -91,6 +91,7 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
     executorThread = new Thread(this);
     executorThread.setDaemon(true);
     executorThread.start();
+    log.info("Executor thread started");
     return executorThread;
   }
 
@@ -110,6 +111,7 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
       currentActionSequence = null;
     }
 
+    log.info("Executor thread stopped");
     hasReleasedAnyKey = false;
   }
 
