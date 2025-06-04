@@ -48,13 +48,16 @@ public class RandomizerApplication extends Application {
     stage.setOnCloseRequest(
         _ -> {
           try {
+            log.info("Unregistering native hook...");
             GlobalScreen.unregisterNativeHook();
           } catch (NativeHookException e) {
-            throw new RuntimeException(e);
+            // We don't want to throw anything on close request
+          } finally {
+            log.info("Closing application, stopping executor and discarding running actions...");
+            actionSequenceExecutor.stop();
+            actionSequenceDispatcher.discardAllRunningActions();
+            Platform.exit();
           }
-          actionSequenceExecutor.stop();
-          actionSequenceDispatcher.discardAllRunningActions();
-          Platform.exit();
         });
     stage.show();
   }
