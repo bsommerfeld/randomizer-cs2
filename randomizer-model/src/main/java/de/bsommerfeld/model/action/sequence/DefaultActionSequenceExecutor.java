@@ -94,7 +94,6 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
     return executorThread;
   }
 
-  /** Stops the executor. */
   @Override
   public void stop() {
     running = false;
@@ -102,6 +101,16 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
       executorThread.interrupt();
       executorThread = null;
     }
+
+    if (currentActionSequence != null) {
+      currentActionSequence.instantInterrupt();
+      log.warn(
+          "Executor stopped. Action sequence '{}' and its actions have been interrupted.",
+          currentActionSequence.getName());
+      currentActionSequence = null;
+    }
+
+    hasReleasedAnyKey = false;
   }
 
   private void registerApplicationStateChangeListener() {
