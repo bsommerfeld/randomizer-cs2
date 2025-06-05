@@ -67,8 +67,8 @@
 }
 
 .logbook-toggle-button {
-    -fx-max-width: 100;
-    -fx-min-width: 100;
+    -fx-max-width: 110;
+    -fx-min-width: 110;
     -fx-font-family: SansSerif;
     -fx-font-size: 14;
     -fx-font-weight: bold;
