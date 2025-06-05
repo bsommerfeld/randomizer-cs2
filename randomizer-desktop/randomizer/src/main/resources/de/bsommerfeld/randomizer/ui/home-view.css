@@ -1,3 +1,25 @@
+.github-top-bar {
+    -fx-padding: 4 6;
+    -fx-spacing: 4;
+    -fx-alignment: center-right;
+}
+
+.githubStars {
+    -fx-font-family: SansSerif;
+    -fx-font-size: 16;
+    -fx-text-fill: #7E78ED;
+    -fx-opacity: 55%;
+    -fx-graphic-text-gap: 4;
+    -fx-graphic: url("../images/homeView/githubStarsIcon.png");
+    -fx-cursor: hand;
+}
+
+.githubStars:hover {
+    -fx-text-fill: #2F27CE;
+    -fx-underline: true;
+    -fx-graphic: url("../images/homeView/githubStarsIconSelected.png");
+}
+
 .home-view {
     -fx-pref-width: 656;
     -fx-pref-height: 504;
