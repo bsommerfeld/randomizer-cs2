@@ -2,6 +2,7 @@ package de.bsommerfeld.randomizer.ui.view.controller;
 
 import com.google.inject.Inject;
 import de.bsommerfeld.model.ApplicationState;
+import de.bsommerfeld.model.action.Action;
 import de.bsommerfeld.model.action.sequence.ActionSequence;
 import de.bsommerfeld.model.action.spi.ActionSequenceExecutor;
 import de.bsommerfeld.randomizer.ui.view.View;
@@ -10,6 +11,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import javafx.application.Platform;
@@ -232,103 +234,135 @@ public class RandomizerViewController {
   }
 
   private void setupListener() {
-    randomizerViewModel.onActionSequenceFinished(
-        actionSequence ->
-            Platform.runLater(
-                () -> {
-                  createHistoryContainer(actionSequence);
-                  clearCurrentSequenceView();
-                }));
+    setupActionSequenceFinishedListener();
+    setupCurrentActionSequenceListener();
+    setupActionStartListener();
+    setupActionFinishedListener();
+  }
 
+  private void setupActionSequenceFinishedListener() {
+    randomizerViewModel.onActionSequenceFinished(
+        actionSequence -> Platform.runLater(() -> handleActionSequenceFinished(actionSequence)));
+  }
+
+  private void handleActionSequenceFinished(ActionSequence actionSequence) {
+    createHistoryContainer(actionSequence);
+    clearCurrentSequenceView();
+  }
+
+  private void setupCurrentActionSequenceListener() {
     randomizerViewModel
         .getCurrentActionSequenceProperty()
         .addListener(
-            (_, _, sequence) -> {
-              if (sequence == null) {
+            (_, _, newSequence) -> {
+              if (newSequence == null) {
+                clearCurrentSequenceView();
                 return;
               }
-
-              Platform.runLater(
-                  () -> {
-                    sequenceNameLabel.setText(sequence.getName());
-                    actionsVBox.getChildren().clear();
-                    sequence
-                        .getActions()
-                        .forEach(
-                            action -> {
-                              if (action == null) return;
-
-                              HBox sequenceAction = new HBox();
-                              sequenceAction
-                                  .getStyleClass()
-                                  .add("logbook-sequence-actions-container");
-
-                              ImageView positionalIcon = new ImageView();
-                              positionalIcon.getStyleClass().add(ACTION_ICON_STYLING);
-
-                              Label actionLabel = new Label(action.getName());
-                              actionLabel.getStyleClass().add("logbook-sequence-actions-name");
-
-                              HBox filler = new HBox();
-                              HBox.setHgrow(filler, Priority.ALWAYS);
-
-                              Label timeElapsed = new Label("00.00s");
-                              timeElapsed
-                                  .getStyleClass()
-                                  .add("logbook-sequence-actions-time-elapsed");
-
-                              // Start the timer for this action
-                              startActionTimer(sequenceAction, timeElapsed);
-
-                              sequenceAction
-                                  .getChildren()
-                                  .addAll(positionalIcon, actionLabel, filler, timeElapsed);
-
-                              actionsVBox.getChildren().add(sequenceAction);
-                            });
-
-                    // Set initial positional styling to get the right order
-                    actionsVBox.getChildren().stream()
-                        .filter(HBox.class::isInstance)
-                        .map(HBox.class::cast)
-                        .forEach(
-                            hbox -> {
-                              ImageView imageView = (ImageView) hbox.getChildren().get(0);
-                              setPositionalStyling(imageView, false);
-                            });
-                  });
+              Platform.runLater(() -> updateCurrentSequenceView(newSequence));
             });
+  }
 
+  private void updateCurrentSequenceView(ActionSequence sequence) {
+    sequenceNameLabel.setText(sequence.getName());
+    actionsVBox.getChildren().clear();
+    sequence
+        .getActions()
+        .forEach(
+            action -> {
+              if (action != null) {
+                actionsVBox.getChildren().add(createActionRowHBox(action));
+              }
+            });
+    applyInitialStylingToActionsInVBox();
+  }
+
+  private HBox createActionRowHBox(Action action) {
+    HBox sequenceActionHBox = new HBox();
+    sequenceActionHBox.getStyleClass().add("logbook-sequence-actions-container");
+
+    ImageView positionalIcon = new ImageView();
+    positionalIcon.getStyleClass().add(ACTION_ICON_STYLING);
+
+    Label actionLabel = new Label(action.getName());
+    actionLabel.getStyleClass().add("logbook-sequence-actions-name");
+
+    HBox filler = new HBox();
+    HBox.setHgrow(filler, Priority.ALWAYS);
+
+    Label timeElapsedLabel = new Label("00.00s"); // Initialer Zeitwert
+    timeElapsedLabel.getStyleClass().add("logbook-sequence-actions-time-elapsed");
+
+    sequenceActionHBox.getChildren().addAll(positionalIcon, actionLabel, filler, timeElapsedLabel);
+    return sequenceActionHBox;
+  }
+
+  private void applyInitialStylingToActionsInVBox() {
+    actionsVBox.getChildren().stream()
+        .filter(HBox.class::isInstance)
+        .map(HBox.class::cast)
+        .forEach(
+            hbox -> {
+              if (!hbox.getChildren().isEmpty() && hbox.getChildren().get(0) instanceof ImageView) {
+                ImageView imageView = (ImageView) hbox.getChildren().get(0);
+                setPositionalStyling(imageView, false);
+              }
+            });
+  }
+
+  private void setupActionStartListener() {
+    randomizerViewModel.onActionStart(action -> Platform.runLater(() -> handleActionStart(action)));
+  }
+
+  private void handleActionStart(Action action) {
+    findMatchingActionHBox(action.getName(), iv -> !isActive(iv))
+        .ifPresent(
+            hbox -> {
+              if (hbox.getChildren().size() > 3 && hbox.getChildren().get(3) instanceof Label) {
+                Label timeElapsedLabel = (Label) hbox.getChildren().get(3);
+                startActionTimer(hbox, timeElapsedLabel);
+              }
+            });
+  }
+
+  private void setupActionFinishedListener() {
     randomizerViewModel.onActionFinished(
-        action ->
-            Platform.runLater(
-                () -> {
-                  // Find the first non-active HBox for this action and stop its timer
-                  actionsVBox.getChildren().stream()
-                      .filter(HBox.class::isInstance)
-                      .map(HBox.class::cast)
-                      .filter(
-                          hbox -> {
-                            Label label = (Label) hbox.getChildren().get(1);
-                            return label.getText() != null
-                                && label.getText().equals(action.getName());
-                          })
-                      .filter(
-                          hbox -> {
-                            ImageView imageView = (ImageView) hbox.getChildren().get(0);
-                            return !isActive(imageView);
-                          })
-                      .findFirst()
-                      .ifPresent(
-                          hbox -> {
-                            // Stop the timer for this specific action
-                            stopActionTimerForHBox(hbox);
+        action -> Platform.runLater(() -> handleActionFinished(action)));
+  }
 
-                            // Update the icon styling
-                            ImageView imageView = (ImageView) hbox.getChildren().get(0);
-                            setPositionalStyling(imageView, true);
-                          });
-                }));
+  private void handleActionFinished(Action action) {
+    findMatchingActionHBox(action.getName(), iv -> !isActive(iv))
+        .ifPresent(
+            hbox -> {
+              stopActionTimerForHBox(hbox);
+              if (!hbox.getChildren().isEmpty() && hbox.getChildren().get(0) instanceof ImageView) {
+                ImageView imageView = (ImageView) hbox.getChildren().get(0);
+                setPositionalStyling(imageView, true);
+              }
+            });
+  }
+
+  /**
+   * Sucht eine HBox in actionsVBox, die zu einem Aktionsnamen passt und deren ImageView einem
+   * gegebenen Prädikat entspricht. Annahme: Die HBox-Struktur ist: ImageView, Label (Aktionsname),
+   * Filler, Label (Zeit).
+   */
+  private Optional<HBox> findMatchingActionHBox(
+      String actionName, java.util.function.Predicate<ImageView> imageViewPredicate) {
+    return actionsVBox.getChildren().stream()
+        .filter(HBox.class::isInstance)
+        .map(HBox.class::cast)
+        .filter(
+            hbox ->
+                hbox.getChildren().size() > 1
+                    && hbox.getChildren().get(1) instanceof Label
+                    && actionName.equals(((Label) hbox.getChildren().get(1)).getText()))
+        .filter(
+            hbox ->
+                !hbox.getChildren().isEmpty()
+                    && hbox.getChildren().get(0) instanceof ImageView
+                    && imageViewPredicate.test((ImageView) hbox.getChildren().get(0)))
+        .findFirst();
   }
 
   private void setupStateListener() {
