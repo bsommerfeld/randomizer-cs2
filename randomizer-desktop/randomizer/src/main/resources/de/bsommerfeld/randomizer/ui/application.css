@@ -454,7 +454,7 @@
     -fx-min-width: 112;
     -fx-pref-height: 18;
     -fx-padding: 0 6;
-    -fx-alignment: center;
+    -fx-text-alignment: center;
     -fx-font-family: SansSerif;
     -fx-font-size: 14;
     -fx-text-fill: #040316;
@@ -473,13 +473,6 @@
 
 .settings-options:pressed {
     -fx-background-color: #ADA9EF;
-}
-
-.settings-selection-separator, .settings-selection-separator .line {
-    -fx-pref-width: 1;
-    -fx-pref-height: 360;
-    -fx-background-color: #CECCFF;
-    -fx-border-color: null;
 }
 
 .updater-settings {
@@ -674,13 +667,6 @@
     -fx-font-family: SansSerif;
     -fx-font-size: 11;
     -fx-text-fill: #A50E0E;
-    -fx-background-color: transparent;
-}
-
-.settings-playtime {
-    -fx-font-family: SansSerif;
-    -fx-font-size: 12;
-    -fx-text-fill: #7E78ED;
     -fx-background-color: transparent;
 }
 
