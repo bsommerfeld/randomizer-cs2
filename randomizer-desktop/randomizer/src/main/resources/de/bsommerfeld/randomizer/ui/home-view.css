@@ -1,5 +1,7 @@
 .github-top-bar {
-    -fx-min-height: 32;
+    -fx-pref-height: 42;
+    -fx-min-height: 42;
+    -fx-max-height: 42;
     -fx-padding: 8 12;
     -fx-spacing: 20;
     -fx-alignment: center-right;
