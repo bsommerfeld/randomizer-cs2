@@ -58,7 +58,8 @@
 }
 
 .logbook-toggle-button {
-    -fx-max-width: 120;
+    -fx-max-width: 100;
+    -fx-min-width: 100;
     -fx-font-family: SansSerif;
     -fx-font-size: 14;
     -fx-font-weight: bold;
@@ -67,7 +68,7 @@
     -fx-border-color: #443DFF;
     -fx-border-radius: 6;
     -fx-graphic: url("../images/randomizerView/playIcon.png");
-    -fx-graphic-text-gap: 8;
+    -fx-graphic-text-gap: 10;
     -fx-cursor: hand;
 }
 
