@@ -6,7 +6,7 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<VBox VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+<VBox xmlns:fx="http://javafx.com/fxml/1" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/17.0.12"
       fx:controller="de.bsommerfeld.randomizer.ui.view.controller.settings.ActionSettingsController">
     <children>
         <VBox VBox.vgrow="ALWAYS" fx:id="actionSettingsVBox"
@@ -27,11 +27,6 @@
                             <HBox prefWidth="78" alignment="CENTER_LEFT">
                                 <children>
                                     <Button onAction="#onClear" styleClass="settings-reset-button"/>
-                                </children>
-                            </HBox>
-                            <HBox HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT">
-                                <children>
-                                    <Button onAction="#onApply" styleClass="settings-apply-button" text="Apply"/>
                                 </children>
                             </HBox>
                         </HBox>

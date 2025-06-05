@@ -1,12 +1,11 @@
 package de.bsommerfeld.randomizer.ui.view.controller.settings;
 
 import com.google.inject.Inject;
-import java.util.function.Consumer;
-
 import de.bsommerfeld.model.action.Action;
 import de.bsommerfeld.randomizer.ui.view.View;
 import de.bsommerfeld.randomizer.ui.view.component.MinMaxSlider;
 import de.bsommerfeld.randomizer.ui.view.viewmodel.settings.ActionSettingsViewModel;
+import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -26,14 +25,6 @@ public class ActionSettingsController {
     public ActionSettingsController(ActionSettingsViewModel actionSettingsViewModel) {
         this.actionSettingsViewModel = actionSettingsViewModel;
         Platform.runLater(this::initialize);
-    }
-
-    @FXML
-    void onApply(ActionEvent event) {
-        if (minMaxSlider.isEven()) return; // this should not be possible
-
-        actionSettingsViewModel.applyInterval();
-        actionSettingsViewModel.getActionInFocusProperty().set(null);
     }
 
     @FXML
