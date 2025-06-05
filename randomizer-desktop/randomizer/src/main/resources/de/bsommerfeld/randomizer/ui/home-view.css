@@ -16,8 +16,6 @@
 }
 
 .github-stars-label:hover {
-    -fx-text-fill: #2F27CE;
-    -fx-underline: true;
     -fx-graphic: url("../images/homeView/githubStarsIconSelected.png");
 }
 
