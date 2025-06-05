@@ -36,3 +36,4 @@
 ### Removed
 
 - Removed time tracking
+- Removed Apply buttons in Builder settings and replaced it with live updates
