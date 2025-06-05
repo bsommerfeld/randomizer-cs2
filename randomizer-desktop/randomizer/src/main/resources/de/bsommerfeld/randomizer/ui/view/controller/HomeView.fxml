@@ -22,9 +22,9 @@
         </HBox>
         <!-- Main Content -->
         <VBox fx:id="mainContent" alignment="CENTER" styleClass="home-view" AnchorPane.bottomAnchor="0.0"
-              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="32.0">
+              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="42.0" VBox.vgrow="ALWAYS">
             <children>
-                <ImageView fitHeight="256.0" fitWidth="256.0" pickOnBounds="true" preserveRatio="true"
+                <ImageView pickOnBounds="true" preserveRatio="true"
                            styleClass="home-view-image">
                     <image>
                         <Image url="@../../../images/homeView/randomizerLogo.png"/>
