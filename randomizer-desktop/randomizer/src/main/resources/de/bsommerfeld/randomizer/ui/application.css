@@ -47,6 +47,7 @@
 }
 
 .logbook-not-focused-indicator {
+    -fx-cursor: hand;
     -fx-image: url("../images/randomizerView/notFocusedIcon.png");
 }
 

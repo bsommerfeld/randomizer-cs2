@@ -21,6 +21,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -77,6 +78,11 @@ public class RandomizerViewController {
     setupBindings();
     setupListener();
     setupStateListener();
+    setupCS2FocusImage();
+  }
+
+  private void setupCS2FocusImage() {
+    Tooltip.install(cs2FocusImage, new Tooltip("CS2 has to be in focus!"));
   }
 
   private void clearCurrentSequenceView() {
