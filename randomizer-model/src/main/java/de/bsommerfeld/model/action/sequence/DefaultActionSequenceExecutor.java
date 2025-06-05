@@ -180,6 +180,11 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
     if (currentAction != null) {
       handleCurrentActionInterruption(keyText, mouseButton, nativeKeyEvent, currentAction);
     }
+
+    // TODO: Provide a list of currently pressed keys (maintained by the input handler/robot)
+    //  to allow direct checking against actively held keys. This avoids relying on
+    //  filtering through the current running action's state, which can lead to false positives
+    //  due to race conditions (as discovered after extensive debugging).
   }
 
   private boolean isActionSequenceInactive() {
