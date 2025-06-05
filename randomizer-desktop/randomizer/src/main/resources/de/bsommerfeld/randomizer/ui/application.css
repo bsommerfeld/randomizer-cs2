@@ -57,6 +57,15 @@
     -fx-cursor: hand;
 }
 
+.logbook-sequence-actions-time-elapsed-finished {
+    -fx-font-family: SansSerif;
+    -fx-font-size: 14;
+    -fx-text-fill: #7E78ED;
+    -fx-padding: 0 3;
+    -fx-background-radius: 4;
+    -fx-background-color: #90EE90; /* Light green background */
+}
+
 .logbook-toggle-button {
     -fx-max-width: 100;
     -fx-min-width: 100;
