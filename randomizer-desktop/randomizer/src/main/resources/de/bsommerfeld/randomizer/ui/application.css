@@ -113,7 +113,7 @@
 
 .logbook-sequence-actions-time-elapsed {
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #7E78ED;
     -fx-padding: 0 3;
     -fx-background-radius: 4;
@@ -121,7 +121,7 @@
 
 .logbook-sequence-actions-name {
     -fx-font-family: SansSerif;
-    -fx-font-size: 12px;
+    -fx-font-size: 14px;
     -fx-text-fill: #281FE0;
     -fx-padding: 0 3;
     -fx-background-radius: 4;
@@ -170,7 +170,7 @@
 .logbook-descriptions {
     -fx-pref-height: 12;
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #A9A5F3;
 }
 
@@ -228,7 +228,7 @@
 .logbook-history-entry-name {
     -fx-pref-width: 128;
     -fx-font-family: SansSerif;
-    -fx-font-size: 13;
+    -fx-font-size: 14;
     -fx-text-fill: #7E78ED;
     -fx-padding: 4;
 }
@@ -243,7 +243,7 @@
     -fx-min-width: 68;
     -fx-alignment: center;
     -fx-font-family: SansSerif;
-    -fx-font-size: 11;
+    -fx-font-size: 14;
     -fx-font-weight: bold;
     -fx-text-fill: #443DFF;
     -fx-background-color: rgba(68, 61, 255, 0.1);
@@ -255,7 +255,7 @@
     -fx-min-width: 42;
     -fx-alignment: center;
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-font-weight: bold;
     -fx-text-fill: #281FE0;
     -fx-padding: 2 4;
@@ -309,7 +309,7 @@
     -fx-pref-height: 20;
     -fx-text-fill: #EAE9FC;
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-background-color: #443DFF;
     -fx-cursor: hand;
 }
@@ -355,7 +355,7 @@
 
 .actions-category {
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #7E78ED;
     -fx-background-color: transparent;
     -fx-cursor: hand;
@@ -363,7 +363,7 @@
 
 .actions-category:hover, .actions-category:selected {
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #3129D6;
     -fx-background-color: transparent;
 }
@@ -376,7 +376,7 @@
     -fx-pref-width: 152;
     -fx-pref-height: 14;
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-prompt-text-fill: #A9A5F3;
     -fx-text-fill: #3129D6;
     -fx-background-radius: 4;
@@ -397,7 +397,7 @@
     -fx-background-radius: 4;
     -fx-background-color: #D6D4F7;
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #7E78ED;
 }
 
@@ -416,14 +416,14 @@
 
 .builder-config-indicator-label {
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #A50E0E;
 }
 
 .builder-config-hyperlink {
     -fx-background-color: transparent;
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #0800FF;
     -fx-cursor: hand;
 }
@@ -500,7 +500,7 @@
 
 .settings-description {
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #7E78ED;
 }
 
@@ -547,7 +547,7 @@
 
 .settings-repo-link {
     -fx-font-family: SansSerif;
-    -fx-font-size: 11;
+    -fx-font-size: 14;
     -fx-text-fill: #0800FF;
 }
 
@@ -572,7 +572,7 @@
     -fx-text-fill: #EAE9FC;
     -fx-text-alignment: center;
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-background-color: #443DFF;
     -fx-cursor: hand;
 }
@@ -640,7 +640,7 @@
     -fx-background-radius: 4;
     -fx-background-color: #D6D6F5;
     -fx-font-family: SansSerif;
-    -fx-font-size: 11;
+    -fx-font-size: 14;
     -fx-text-fill: #9E99FF;
 }
 
@@ -665,7 +665,7 @@
 
 .sync-failed-indicator {
     -fx-font-family: SansSerif;
-    -fx-font-size: 11;
+    -fx-font-size: 14;
     -fx-text-fill: #A50E0E;
     -fx-background-color: transparent;
 }
@@ -679,7 +679,7 @@
     -fx-background-radius: 4;
     -fx-background-color: #D6D6F5;
     -fx-font-family: SansSerif;
-    -fx-font-size: 11;
+    -fx-font-size: 14;
     -fx-text-fill: #040316;
     -fx-alignment: center;
 }
@@ -717,7 +717,7 @@
     -fx-background-color: #D6D6F5;
     -fx-text-fill: #2018B4;
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
 }
 
 /* Tooltip styling for user options */
@@ -727,6 +727,6 @@
     -fx-background-color: #EFEFEF;
     -fx-text-fill: #333333;
     -fx-font-family: SansSerif;
-    -fx-font-size: 13;
+    -fx-font-size: 14;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0, 0, 2);
 }

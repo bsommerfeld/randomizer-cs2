@@ -104,7 +104,6 @@
 }
 
 
-
 .builder-sequences-hbox, .builder-sequences-hbox-selected {
     -fx-spacing: 4;
     -fx-alignment: center;
@@ -135,7 +134,7 @@
 .builder-sequence-entry-action-count {
     -fx-alignment: center;
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #443DFF;
     -fx-background-color: rgba(68, 61, 255, 0.1);
     -fx-background-radius: 8;
@@ -192,7 +191,7 @@
 
 .sequence-description-label {
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #A9A5F3;
 }
 
@@ -335,7 +334,7 @@
 
 .builder-settings-sequence-title, .builder-settings-sequence-description {
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #040316;
 }
 
@@ -346,7 +345,7 @@
     -fx-background-radius: 4;
     -fx-background-color: #D6D4F7;
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #534BE7;
 }
 
@@ -363,7 +362,7 @@
     -fx-background-radius: 4;
     -fx-background-color: #D6D4F7;
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #534BE7;
 }
 
@@ -407,7 +406,7 @@
 
 .builder-actions-settings-duration {
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #040316;
 }
 

@@ -298,7 +298,7 @@
 
 .release-date-label {
     -fx-font-family: SansSerif;
-    -fx-font-size: 12;
+    -fx-font-size: 14;
     -fx-text-fill: #7E78ED;
     -fx-min-width: 90;
     -fx-pref-width: 90;
