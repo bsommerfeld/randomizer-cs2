@@ -20,8 +20,8 @@ public class HomeViewModel {
   private static final String GITHUB_LINK = "https://github.com/bsommerfeld/randomizer-cs2";
   private static final String DISCORD_LINK = "https://discord.gg/782s5ExhFy";
 
-  @Getter private final IntegerProperty starsProperty = new SimpleIntegerProperty(-1);
-  @Getter private final IntegerProperty forksProperty = new SimpleIntegerProperty(-1);
+  @Getter private final IntegerProperty starsProperty = new SimpleIntegerProperty();
+  @Getter private final IntegerProperty forksProperty = new SimpleIntegerProperty();
 
   private final GitHubConfig gitHubConfig;
   private final GitHubService gitHubService;

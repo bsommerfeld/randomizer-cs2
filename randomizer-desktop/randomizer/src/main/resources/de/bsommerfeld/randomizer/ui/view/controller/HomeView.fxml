@@ -16,8 +16,8 @@
         <HBox styleClass="github-top-bar" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
               AnchorPane.topAnchor="0.0" onMouseClicked="#onRepositoryDetailsClick" HBox.hgrow="ALWAYS">
             <children>
-                <Label fx:id="starsLabel" styleClass="github-stars-label" text="-1"/>
-                <Label fx:id="forksLabel" styleClass="github-forks-label" text="-1"/>
+                <Label fx:id="starsLabel" styleClass="github-stars-label"/>
+                <Label fx:id="forksLabel" styleClass="github-forks-label"/>
             </children>
         </HBox>
         <!-- Main Content -->
