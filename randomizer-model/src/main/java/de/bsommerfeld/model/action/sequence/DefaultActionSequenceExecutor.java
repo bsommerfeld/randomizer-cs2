@@ -191,6 +191,10 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
     return currentActionSequence.getActions().stream()
         .filter(action -> !action.isInterrupted())
         .filter(Action::isExecuting)
+        // If we don't have this line of code we end up in a race condition, which will cause this
+        // Action to interrupt itself, since the executing state is faster than this shit here.
+        // So it's basically panicking for nothing, screaming "Oh.. Oh my button gets pressed
+        // already!!!", while pressing itself..
         .filter(action -> !action.hasEnded())
         .findFirst()
         .orElse(null);
