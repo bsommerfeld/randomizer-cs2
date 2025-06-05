@@ -15,7 +15,7 @@
     <children>
         <HBox styleClass="github-top-bar" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <children>
-                <Label styleClass="github-stars-label" text="-1"/>
+                <Label fx:id="starsLabel" styleClass="github-stars-label" text="-1"/>
             </children>
         </HBox>
         <!-- Main Content -->
