@@ -8,6 +8,10 @@ import de.bsommerfeld.randomizer.ui.view.View;
 import de.bsommerfeld.randomizer.ui.view.viewmodel.RandomizerViewModel;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -36,6 +40,8 @@ public class RandomizerViewController {
 
   private final RandomizerViewModel randomizerViewModel;
   private final ActionSequenceExecutor actionSequenceExecutor;
+  private final Map<HBox, Timer> actionTimers = new HashMap<>();
+  private final Map<HBox, Long> actionStartTimes = new HashMap<>();
 
   @FXML private Label sequenceNameLabel;
   @FXML private VBox actionsVBox;
@@ -75,6 +81,117 @@ public class RandomizerViewController {
     randomizerViewModel.getCurrentActionSequenceProperty().set(null);
     actionsVBox.getChildren().clear();
     sequenceNameLabel.setText("");
+
+    // Stop all timers
+    for (Timer timer : actionTimers.values()) {
+      timer.cancel();
+    }
+    actionTimers.clear();
+    actionStartTimes.clear();
+  }
+
+  /**
+   * Formats the elapsed time in seconds as "00.00s".
+   *
+   * @param elapsedTimeMillis the elapsed time in milliseconds
+   * @return the formatted time string
+   */
+  private String formatElapsedTime(long elapsedTimeMillis) {
+    double seconds = elapsedTimeMillis / 1000.0;
+    return String.format("%05.2fs", seconds);
+  }
+
+  /**
+   * Starts a timer for the given action that updates the timeElapsed label periodically.
+   *
+   * @param actionContainer the HBox containing the action
+   * @param timeElapsedLabel the label to update
+   */
+  private void startActionTimer(HBox actionContainer, Label timeElapsedLabel) {
+    // Cancel any existing timer for this action
+    if (actionTimers.containsKey(actionContainer)) {
+      actionTimers.get(actionContainer).cancel();
+    }
+
+    // Record the start time
+    actionStartTimes.put(actionContainer, System.currentTimeMillis());
+
+    // Create a new timer
+    Timer timer = new Timer(true);
+    actionTimers.put(actionContainer, timer);
+
+    // Schedule a task to update the label every 100ms
+    timer.scheduleAtFixedRate(
+        new TimerTask() {
+          @Override
+          public void run() {
+            long currentTime = System.currentTimeMillis();
+            long startTime = actionStartTimes.getOrDefault(actionContainer, currentTime);
+            long elapsedTime = currentTime - startTime;
+
+            Platform.runLater(
+                () -> {
+                  timeElapsedLabel.setText(formatElapsedTime(elapsedTime));
+                });
+          }
+        },
+        0,
+        100);
+  }
+
+  /**
+   * Stops the timer for the first action with the given name and updates the timeElapsed label with
+   * the final time. This method finds the first non-active action with the given name and stops its
+   * timer.
+   *
+   * @param actionName the name of the action
+   */
+  private void stopActionTimer(String actionName) {
+    // Find the first non-active HBox for this action
+    actionsVBox.getChildren().stream()
+        .filter(HBox.class::isInstance)
+        .map(HBox.class::cast)
+        .filter(
+            hbox -> {
+              Label label = (Label) hbox.getChildren().get(1);
+              return label.getText() != null && label.getText().equals(actionName);
+            })
+        .filter(
+            hbox -> {
+              ImageView imageView = (ImageView) hbox.getChildren().get(0);
+              return !isActive(imageView);
+            })
+        .findFirst()
+        .ifPresent(this::stopActionTimerForHBox);
+  }
+
+  /**
+   * Stops the timer for the given action container and updates the timeElapsed label with the final
+   * time.
+   *
+   * @param actionContainer the HBox containing the action
+   */
+  private void stopActionTimerForHBox(HBox actionContainer) {
+    // Get the timeElapsed label
+    Label timeElapsedLabel = (Label) actionContainer.getChildren().get(3);
+
+    // Calculate the final elapsed time
+    long currentTime = System.currentTimeMillis();
+    long startTime = actionStartTimes.getOrDefault(actionContainer, currentTime);
+    long elapsedTime = currentTime - startTime;
+
+    // Update the label with the final time
+    timeElapsedLabel.setText(formatElapsedTime(elapsedTime));
+
+    // Apply the finished styling
+    timeElapsedLabel.getStyleClass().remove("logbook-sequence-actions-time-elapsed");
+    timeElapsedLabel.getStyleClass().add("logbook-sequence-actions-time-elapsed-finished");
+
+    // Cancel the timer
+    if (actionTimers.containsKey(actionContainer)) {
+      actionTimers.get(actionContainer).cancel();
+      actionTimers.remove(actionContainer);
+    }
   }
 
   private void setupBindings() {
@@ -155,11 +272,13 @@ public class RandomizerViewController {
                               HBox filler = new HBox();
                               HBox.setHgrow(filler, Priority.ALWAYS);
 
-                              DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-                              Label timeElapsed = new Label(LocalTime.now().format(formatter));
+                              Label timeElapsed = new Label("00.00s");
                               timeElapsed
                                   .getStyleClass()
                                   .add("logbook-sequence-actions-time-elapsed");
+
+                              // Start the timer for this action
+                              startActionTimer(sequenceAction, timeElapsed);
 
                               sequenceAction
                                   .getChildren()
@@ -184,6 +303,7 @@ public class RandomizerViewController {
         action ->
             Platform.runLater(
                 () -> {
+                  // Find the first non-active HBox for this action and stop its timer
                   actionsVBox.getChildren().stream()
                       .filter(HBox.class::isInstance)
                       .map(HBox.class::cast)
@@ -201,6 +321,10 @@ public class RandomizerViewController {
                       .findFirst()
                       .ifPresent(
                           hbox -> {
+                            // Stop the timer for this specific action
+                            stopActionTimerForHBox(hbox);
+
+                            // Update the icon styling
                             ImageView imageView = (ImageView) hbox.getChildren().get(0);
                             setPositionalStyling(imageView, true);
                           });
