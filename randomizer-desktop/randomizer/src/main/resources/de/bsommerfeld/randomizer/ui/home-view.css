@@ -6,11 +6,12 @@
 
 .github-stars-label {
     -fx-font-family: SansSerif;
-    -fx-font-size: 16;
+    -fx-font-size: 24;
     -fx-text-fill: #7E78ED;
     -fx-opacity: 55%;
     -fx-graphic-text-gap: 4;
     -fx-graphic: url("../images/homeView/githubStarsIcon.png");
+    -fx-content-display: right;
     -fx-cursor: hand;
 }
 
