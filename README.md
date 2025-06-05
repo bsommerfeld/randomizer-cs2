@@ -1,6 +1,7 @@
 # <img src="https://github.com/user-attachments/assets/ab28eba7-4b88-47b4-be10-ac4487d66e23" alt="randomizer" width="24" height="24" style="vertical-align: middle;" />andomizer-CS2
 
 ![NPM Downloads](https://img.shields.io/npm/d18m/randomizer-cs2?style=plastic)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/bsommerfeld/randomizer-cs2)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
