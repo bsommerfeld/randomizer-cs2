@@ -1,15 +1,17 @@
 package de.bsommerfeld.randomizer.ui.view.controller;
 
 import com.google.inject.Inject;
-import de.bsommerfeld.randomizer.config.RandomizerConfig;
 import de.bsommerfeld.randomizer.ui.view.View;
 import de.bsommerfeld.randomizer.ui.view.ViewProvider;
 import de.bsommerfeld.randomizer.ui.view.controller.builder.BuilderViewController;
 import de.bsommerfeld.randomizer.ui.view.viewmodel.NavigationBarViewModel;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import lombok.extern.slf4j.Slf4j;
@@ -18,124 +20,108 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class NavigationBarController {
 
-  private final RandomizerConfig randomizerConfig;
   private final NavigationBarViewModel navigationBarViewModel;
   private final ViewProvider viewProvider;
-
+  private final Map<Class<?>, Consumer<?>> viewInitializers = new HashMap<>();
   @FXML private ToggleButton homeButton;
   @FXML private ToggleButton randomizerButton;
   @FXML private ToggleButton builderButton;
   @FXML private ToggleButton settingsButton;
-  @FXML private Button updateIndicatorButton;
+  private List<ToggleButton> navButtons;
 
   @Inject
   public NavigationBarController(
-      RandomizerConfig randomizerConfig,
-      NavigationBarViewModel navigationBarViewModel,
-      ViewProvider viewProvider) {
-    this.randomizerConfig = randomizerConfig;
+      NavigationBarViewModel navigationBarViewModel, ViewProvider viewProvider) {
     this.navigationBarViewModel = navigationBarViewModel;
     this.viewProvider = viewProvider;
   }
 
   @FXML
   private void initialize() {
-    setupBindings();
-    setupToggleButtonLogic();
-    addTooltips();
-    toggle(homeButton);
-  }
+    navButtons = Arrays.asList(homeButton, randomizerButton, builderButton, settingsButton);
 
-  private void setupBindings() {
-    addListenerForSelectedViewChange();
-  }
+    setupViewInitializers();
+    setupNavigationButton(homeButton, "Home", HomeViewController.class);
+    setupNavigationButton(randomizerButton, "Randomizer", RandomizerViewController.class);
+    setupNavigationButton(builderButton, "Builder", BuilderViewController.class);
+    setupNavigationButton(settingsButton, "Settings", SettingsViewController.class);
 
-  private void addListenerForSelectedViewChange() {
     navigationBarViewModel
         .getSelectedView()
-        .addListener((_, _, newView) -> triggerViewChange(newView));
+        .addListener((obs, oldView, newView) -> triggerViewChange(newView));
+
+    if (navigationBarViewModel.getSelectedView().get() == null) {
+      Platform.runLater(() -> selectButton(homeButton, HomeViewController.class));
+    } else {
+      Class<?> currentView = navigationBarViewModel.getSelectedView().get();
+      navButtons.stream()
+          .filter(btn -> getViewClassForButton(btn).equals(currentView))
+          .findFirst()
+          .ifPresent(btn -> Platform.runLater(() -> btn.setSelected(true)));
+    }
   }
 
-  private void addTooltips() {
-    addTooltipToButton(homeButton, "Home");
-    addTooltipToButton(randomizerButton, "Randomizer");
-    addTooltipToButton(builderButton, "Builder");
-    addTooltipToButton(settingsButton, "Settings");
+  private void setupViewInitializers() {
+    viewInitializers.put(
+        HomeViewController.class, (Consumer<HomeViewController>) HomeViewController::updateView);
   }
 
-  private void addTooltipToButton(ToggleButton toggleButton, String tooltipText) {
+  private void setupNavigationButton(ToggleButton button, String tooltipText, Class<?> viewClass) {
+    button.setUserData(viewClass);
     Tooltip tooltip = new Tooltip(tooltipText);
     tooltip.getStyleClass().add("tooltip-user-options");
-    Tooltip.install(toggleButton, tooltip);
-  }
+    Tooltip.install(button, tooltip);
 
-  private void triggerViewChange(Class<?> newView) {
-    if (newView != null) {
-      viewProvider.triggerViewChange(newView);
-    }
-  }
-
-  private void toggle(ToggleButton button) {
-    button.setSelected(!button.isSelected());
-  }
-
-  private void setupToggleButtonLogic() {
-    addToggleButtonListener(
-        homeButton, HomeViewController.class, randomizerButton, builderButton, settingsButton);
-    addToggleButtonListener(
-        randomizerButton,
-        RandomizerViewController.class,
-        homeButton,
-        builderButton,
-        settingsButton);
-    addToggleButtonListener(
-        builderButton, BuilderViewController.class, homeButton, randomizerButton, settingsButton);
-    addToggleButtonListener(
-        settingsButton, SettingsViewController.class, homeButton, randomizerButton, builderButton);
-  }
-
-  private void addToggleButtonListener(
-      ToggleButton button, Class<?> newView, ToggleButton... otherButtons) {
     button
         .selectedProperty()
-        .addListener(createToggleButtonListener(button, newView, otherButtons));
+        .addListener(
+            (obs, wasSelected, isSelected) -> {
+              if (isSelected) {
+                selectButton(button, viewClass);
+              } else {
+                ensureAtLeastOneButtonSelected(button);
+              }
+            });
   }
 
-  private ChangeListener<Boolean> createToggleButtonListener(
-      ToggleButton button, Class<?> newView, ToggleButton... otherButtons) {
-    return (_, _, isSelected) -> handleToggleSelection(button, newView, isSelected, otherButtons);
+  private void selectButton(ToggleButton selectedButton, Class<?> viewClass) {
+    if (navigationBarViewModel.getSelectedView().get() != viewClass) {
+      navigationBarViewModel.setSelectedView(viewClass);
+    }
+    for (ToggleButton btn : navButtons) {
+      if (btn != selectedButton && btn.isSelected()) {
+        btn.setSelected(false);
+      }
+    }
+    if (!selectedButton.isSelected()) {
+      selectedButton.setSelected(true);
+    }
   }
 
-  private void handleToggleSelection(
-      ToggleButton button, Class<?> newView, boolean isSelected, ToggleButton... otherButtons) {
-    if (isSelected) {
-      navigationBarViewModel.setSelectedView(newView);
-      deselectOtherButtons(otherButtons);
+  private void ensureAtLeastOneButtonSelected(ToggleButton deselectedButton) {
+    boolean anotherButtonIsSelected =
+        navButtons.stream().anyMatch(btn -> btn != deselectedButton && btn.isSelected());
+    if (!anotherButtonIsSelected) {
+      Platform.runLater(() -> deselectedButton.setSelected(true));
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T> void triggerViewChange(Class<T> newViewClass) {
+    if (newViewClass == null) {
+      return;
+    }
+
+    Consumer<T> initializer = (Consumer<T>) viewInitializers.get(newViewClass);
+
+    if (initializer != null) {
+      viewProvider.triggerViewChange(newViewClass, initializer);
     } else {
-      reactivateButtonIfNoneSelected(button, otherButtons);
+      viewProvider.triggerViewChange(newViewClass);
     }
   }
 
-  private void deselectOtherButtons(ToggleButton... otherButtons) {
-    for (ToggleButton otherButton : otherButtons) {
-      if (otherButton.isSelected()) {
-        otherButton.setSelected(false);
-      }
-    }
-  }
-
-  private void reactivateButtonIfNoneSelected(ToggleButton button, ToggleButton... otherButtons) {
-    if (!isAnotherButtonSelected(otherButtons)) {
-      Platform.runLater(() -> button.setSelected(true));
-    }
-  }
-
-  private boolean isAnotherButtonSelected(ToggleButton... buttons) {
-    for (ToggleButton button : buttons) {
-      if (button.isSelected()) {
-        return true;
-      }
-    }
-    return false;
+  private Class<?> getViewClassForButton(ToggleButton button) {
+    return (Class<?>) button.getUserData();
   }
 }

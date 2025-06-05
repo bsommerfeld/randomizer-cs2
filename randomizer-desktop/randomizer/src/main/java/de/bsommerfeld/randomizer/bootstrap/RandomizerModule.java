@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import de.bsommerfeld.jshepherd.core.ConfigurationLoader;
 import de.bsommerfeld.model.ApplicationContext;
 import de.bsommerfeld.randomizer.config.RandomizerConfig;
+import de.bsommerfeld.randomizer.service.GitHubConfig;
 import de.bsommerfeld.randomizer.service.GitHubService;
 import de.bsommerfeld.randomizer.ui.view.ViewProvider;
 import de.bsommerfeld.randomizer.ui.view.viewmodel.HomeViewModel;
@@ -36,6 +37,7 @@ public class RandomizerModule extends AbstractModule {
     bind(ViewProvider.class).asEagerSingleton();
     bind(CS2ConfigLoader.class).asEagerSingleton();
     bind(GitHubService.class).asEagerSingleton();
+    bind(GitHubConfig.class).asEagerSingleton();
   }
 
   @Provides

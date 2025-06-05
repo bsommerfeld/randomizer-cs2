@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Singleton;
 import de.bsommerfeld.randomizer.service.model.GitHubRelease;
 import de.bsommerfeld.randomizer.service.model.GitHubReleaseAsset;
+import de.bsommerfeld.randomizer.service.model.GitHubRepositoryDetails;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -32,6 +33,67 @@ public class GitHubService {
   public GitHubService() {
     this.httpClient = HttpClient.newHttpClient();
     this.objectMapper = new ObjectMapper();
+  }
+
+  /**
+   * Fetches details for a specific GitHub repository, including stars and forks.
+   *
+   * @param owner The owner of the repository.
+   * @param repo The name of the repository.
+   * @return Details of the repository.
+   * @throws IOException If an I/O error occurs.
+   * @throws InterruptedException If the operation is interrupted.
+   */
+  public GitHubRepositoryDetails getRepositoryDetails(String owner, String repo)
+      throws IOException, InterruptedException {
+    String apiUrl = String.format("%s/repos/%s/%s", GITHUB_API_URL, owner, repo);
+
+    HttpRequest request =
+        HttpRequest.newBuilder()
+            .uri(URI.create(apiUrl))
+            .header("Accept", "application/vnd.github.v3+json")
+            .GET()
+            .build();
+
+    HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+    if (response.statusCode() != 200) {
+      throw new IOException(
+          "Failed to fetch repository details: HTTP "
+              + response.statusCode()
+              + " Body: "
+              + response.body());
+    }
+
+    return parseRepositoryDetails(response.body());
+  }
+
+  /**
+   * Parses the JSON response from the GitHub API into a GitHubRepositoryDetails object.
+   *
+   * @param json The JSON response from the GitHub API.
+   * @return A GitHubRepositoryDetails object.
+   * @throws IOException If parsing fails.
+   */
+  private GitHubRepositoryDetails parseRepositoryDetails(String json) throws IOException {
+    try {
+      JsonNode repoNode = objectMapper.readTree(json);
+
+      String name = repoNode.path("name").asText(null);
+      String description = repoNode.path("description").asText(null);
+      int stargazersCount = repoNode.path("stargazers_count").asInt(0);
+      int forksCount = repoNode.path("forks_count").asInt(0);
+      String htmlUrl = repoNode.path("html_url").asText(null);
+
+      if (name == null || htmlUrl == null) {
+        throw new IOException("Required fields (name, html_url) are missing in API response.");
+      }
+
+      return new GitHubRepositoryDetails(name, description, stargazersCount, forksCount, htmlUrl);
+    } catch (Exception e) {
+      System.err.println("Error parsing GitHub repository details: " + e.getMessage());
+      throw new IOException("Error parsing GitHub repository details: " + e.getMessage(), e);
+    }
   }
 
   /**
