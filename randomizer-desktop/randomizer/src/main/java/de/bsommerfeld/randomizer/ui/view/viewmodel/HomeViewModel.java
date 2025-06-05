@@ -3,7 +3,7 @@ package de.bsommerfeld.randomizer.ui.view.viewmodel;
 import com.google.inject.Inject;
 import de.bsommerfeld.randomizer.service.GitHubConfig;
 import de.bsommerfeld.randomizer.service.GitHubService;
-import de.bsommerfeld.randomizer.service.model.GitHubRepositoryDetails;
+import de.bsommerfeld.randomizer.service.model.GitHubRelease;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
@@ -11,6 +11,8 @@ import java.util.concurrent.CompletableFuture;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,6 +21,8 @@ public class HomeViewModel {
 
   private static final String GITHUB_LINK = "https://github.com/bsommerfeld/randomizer-cs2";
   private static final String DISCORD_LINK = "https://discord.gg/782s5ExhFy";
+
+  private final ObservableList<GitHubRelease> releasesList = FXCollections.observableArrayList();
 
   @Getter private final IntegerProperty starsProperty = new SimpleIntegerProperty();
   @Getter private final IntegerProperty forksProperty = new SimpleIntegerProperty();
@@ -40,39 +44,49 @@ public class HomeViewModel {
     Desktop.getDesktop().browse(URI.create(DISCORD_LINK));
   }
 
-  public void updateRepositoryDetails() {
-    log.info("Updating repository details..");
-    CompletableFuture.runAsync(
+  public ObservableList<GitHubRelease> getReleasesList() {
+    return FXCollections.unmodifiableObservableList(releasesList);
+  }
+
+  public void updateReleases() {
+    log.info("Updating releases...");
+    CompletableFuture.supplyAsync(
             () -> {
-              GitHubRepositoryDetails gitHubRepositoryDetails = null;
               try {
-                gitHubRepositoryDetails =
-                    gitHubService.getRepositoryDetails(
-                        gitHubConfig.getAuthor(), gitHubConfig.getRepository());
+                return gitHubService.getRepositoryReleasesWithChangelog(
+                    gitHubConfig.getAuthor(), gitHubConfig.getRepository());
               } catch (IOException | InterruptedException e) {
-                log.error(e.getMessage());
+                log.error("Error updating releases: {}", e.getMessage(), e);
                 throw new RuntimeException(e);
               }
+            })
+        .thenAcceptAsync(releasesList::addAll, Platform::runLater);
+  }
+
+  public void updateRepositoryDetails() {
+    log.info("Updating repository details..");
+    CompletableFuture.supplyAsync(
+            () -> {
+              try {
+                return gitHubService.getRepositoryDetails(
+                    gitHubConfig.getAuthor(), gitHubConfig.getRepository());
+              } catch (IOException | InterruptedException e) {
+                log.error("Error updating repository details: {} ", e.getMessage());
+                throw new RuntimeException(e);
+              }
+            })
+        .thenAcceptAsync(
+            gitHubRepositoryDetails -> {
+              log.info("Gathered repository details successfully - updating view..");
+
               final int stars = gitHubRepositoryDetails.stargazersCount();
               final int forks = gitHubRepositoryDetails.forksCount();
 
-              log.info("Gathered repository details successfully - updating view..");
+              starsProperty.set(stars);
+              forksProperty.set(forks);
 
-              Platform.runLater(
-                  () -> {
-                    starsProperty.set(stars);
-                    forksProperty.set(forks);
-
-                    log.info("View successfully updated with {} stars and {} forks", stars, forks);
-                  });
-            })
-        .exceptionally(
-            throwable -> {
-              log.error(
-                  "Failed to query GitHub information from {}/{}",
-                  gitHubConfig.getAuthor(),
-                  gitHubConfig.getRepository());
-              return null;
-            });
+              log.info("View successfully updated with {} stars and {} forks", stars, forks);
+            },
+            Platform::runLater);
   }
 }
