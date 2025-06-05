@@ -117,21 +117,26 @@ public abstract class Action implements Cloneable {
    *     the action
    */
   public void executeWithDelay(long delay) {
+    log.debug("DEBUGGING: Starting executeWithDelay for {} with delay {}", getName(), delay);
     int keyCode = KEY_MAPPER.getKeyCodeForKey(getActionKey().getKey());
     setExecuting(true);
     setInterrupted(false);
 
     try {
       performActionStart(keyCode);
+      log.debug("DEBUGGING: About to start delay for {}", getName());
       performInterruptibleDelay(delay);
+      log.debug("DEBUGGING: Delay finished for {}, interrupted: {}", getName(), isInterrupted());
 
       if (!isInterrupted()) {
         performActionEnd(keyCode);
+        log.debug("DEBUGGING: Action end performed for {}", getName());
       } else {
         log.info("Action interrupted, skipping action end for: {}", getActionKey().getKey());
       }
     } finally {
       setExecuting(false);
+      log.debug("DEBUGGING: Set executing=false for {}", getName());
     }
   }
 
@@ -184,6 +189,8 @@ public abstract class Action implements Cloneable {
 
     if (delayInMillis <= 0) return;
 
+    long start = System.currentTimeMillis();
+
     while (waitedTime < delayInMillis) {
       if (interrupted) {
         log.info("Delay interrupted!");
@@ -198,6 +205,10 @@ public abstract class Action implements Cloneable {
         return;
       }
 
+      /*
+       * Due to this, we have a slight off-time of a few milliseconds.
+       * Makes 2385 ms to 2572 ms and 6664 ms to 7166 ms
+       */
       try {
         Thread.sleep(checkInterval);
       } catch (InterruptedException e) {
@@ -207,6 +218,8 @@ public abstract class Action implements Cloneable {
 
       waitedTime += checkInterval;
     }
+
+    log.info("{} ran for {} ms", this.getName(), System.currentTimeMillis() - start);
   }
 
   private boolean isMouseWheelEvent() {

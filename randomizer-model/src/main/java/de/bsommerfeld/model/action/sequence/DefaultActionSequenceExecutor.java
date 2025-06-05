@@ -296,12 +296,31 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
   private Action findInterruptedAction() {
     if (currentActionSequence == null) return null;
 
-    // Only find actions that are interrupted but still have a valid expected ending time
-    // This prevents redispatching actions that were already fully executed
-    return currentActionSequence.getActions().stream()
-        .filter(action -> action.isInterrupted() && action.getExpectedEnding() != null)
-        .findFirst()
-        .orElse(null);
+    Action found =
+        currentActionSequence.getActions().stream()
+            .filter(
+                action -> {
+                  boolean interrupted = action.isInterrupted();
+                  boolean hasExpectedEnding = action.getExpectedEnding() != null;
+                  boolean executing = action.isExecuting();
+
+                  log.debug(
+                      "DEBUGGING: Action {} - interrupted: {}, hasExpectedEnding: {}, executing: {}",
+                      action.getName(),
+                      interrupted,
+                      hasExpectedEnding,
+                      executing);
+
+                  return interrupted && hasExpectedEnding;
+                })
+            .findFirst()
+            .orElse(null);
+
+    if (found != null) {
+      log.debug("DEBUGGING: Found interrupted action: {}", found.getName());
+    }
+
+    return found;
   }
 
   private boolean executeDelayedActionIfNeeded(Action currentAction) {

@@ -60,6 +60,11 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
       return;
     }
 
+    if (action.isExecuting()) {
+      log.warn("Action {} is already executing, skipping duplicate dispatch", action);
+      return;
+    }
+
     try {
       dispatchToHandlers(action, actionHandlers);
       runningActions.add(action);
@@ -98,6 +103,11 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
    */
   @Override
   public void redispatch(Action action, long remainingTime) {
+    if (action.isExecuting()) {
+      log.warn("Action {} is already executing, skipping redispatch", action);
+      return;
+    }
+
     // Check if the current sequence is interrupted
     if (currentSequence != null && currentSequence.isInterrupted()) {
       log.info("Skipping redispatch of action {} because sequence is interrupted", action);

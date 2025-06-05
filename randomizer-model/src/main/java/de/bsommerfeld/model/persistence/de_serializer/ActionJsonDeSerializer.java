@@ -61,10 +61,17 @@ public class ActionJsonDeSerializer implements JsonSerializer<Action>, JsonDeser
 
   private Action assembleAction(
       JsonObject jsonObject, String actionName, JsonDeserializationContext context) {
-    Action action = actionRepository.getByName(actionName);
-    validateAction(actionName, action);
-    Interval interval = context.deserialize(jsonObject.get(INTERVAL_KEY), Interval.class);
-    action.setInterval(interval);
-    return action;
+    Action templateAction = actionRepository.getByName(actionName);
+    validateAction(actionName, templateAction);
+
+    try {
+      // Clone the action to avoid sharing the same instance
+      Action action = templateAction.clone();
+      Interval interval = context.deserialize(jsonObject.get(INTERVAL_KEY), Interval.class);
+      action.setInterval(interval);
+      return action;
+    } catch (CloneNotSupportedException e) {
+      throw new RuntimeException("Failed to clone action: " + actionName, e);
+    }
   }
 }
