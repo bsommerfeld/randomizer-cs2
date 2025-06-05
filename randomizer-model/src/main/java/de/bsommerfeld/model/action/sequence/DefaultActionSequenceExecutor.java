@@ -191,6 +191,7 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
     return currentActionSequence.getActions().stream()
         .filter(action -> !action.isInterrupted())
         .filter(Action::isExecuting)
+        .filter(action -> !action.hasEnded())
         .findFirst()
         .orElse(null);
   }
