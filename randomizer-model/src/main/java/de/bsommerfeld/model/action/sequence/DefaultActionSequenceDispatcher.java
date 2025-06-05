@@ -203,7 +203,7 @@ public class DefaultActionSequenceDispatcher implements ActionSequenceDispatcher
     } finally {
       // Clear current sequence reference
       discardAllRunningActions();
-      currentSequence.resetInterrupted();
+      // Don't reset interrupted state here as it could cause double key presses
       currentSequence = null;
     }
   }

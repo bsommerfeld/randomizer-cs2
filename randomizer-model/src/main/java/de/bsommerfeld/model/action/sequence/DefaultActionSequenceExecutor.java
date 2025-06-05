@@ -286,8 +286,10 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
   private Action findInterruptedAction() {
     if (currentActionSequence == null) return null;
 
+    // Only find actions that are interrupted but still have a valid expected ending time
+    // This prevents redispatching actions that were already fully executed
     return currentActionSequence.getActions().stream()
-        .filter(Action::isInterrupted)
+        .filter(action -> action.isInterrupted() && action.getExpectedEnding() != null)
         .findFirst()
         .orElse(null);
   }
@@ -304,13 +306,23 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
       return false;
     }
 
+    // Don't redispatch if the action is already executing to prevent double key presses
+    if (currentAction.isExecuting()) {
+      log.info("Action {} is already executing, not redispatching", currentAction);
+      return false;
+    }
+
     Instant now = Instant.now();
     Instant delayedAt = currentAction.getExpectedEnding();
+
+    // Only redispatch if the action has a valid expected ending time and remaining time is positive
     if (delayedAt != null) {
       long remainingTimeMs = delayedAt.toEpochMilli() - now.toEpochMilli();
       if (remainingTimeMs > 0) {
         log.debug("Continuing action {} for {} ms (redispatched)", currentAction, remainingTimeMs);
         try {
+          // Normalize the action before redispatching to ensure a clean state
+          currentAction.normalize();
           actionSequenceDispatcher.redispatch(currentAction, remainingTimeMs);
           return true;
         } catch (Exception e) {
@@ -320,7 +332,11 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
           }
           return false;
         }
+      } else {
+        log.debug("Action {} has no remaining time, not redispatching", currentAction);
       }
+    } else {
+      log.debug("Action {} has no expected ending time, not redispatching", currentAction);
     }
     return false;
   }
