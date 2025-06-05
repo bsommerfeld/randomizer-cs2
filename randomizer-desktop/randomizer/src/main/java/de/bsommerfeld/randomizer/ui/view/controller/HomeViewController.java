@@ -27,11 +27,13 @@ import lombok.extern.slf4j.Slf4j;
 public class HomeViewController {
 
   private static final Duration ANIMATION_DURATION = Duration.millis(400);
+
   private final HomeViewModel homeViewModel;
   // Release data storage
   private final Map<String, ReleaseData> releasesData = new HashMap<>();
   @FXML private AnchorPane rootPane;
   @FXML private VBox mainContent;
+  @FXML private Label starsLabel;
   @FXML private VBox releasesView;
   @FXML private VBox releasesListContent;
   @FXML private Label changelogTitle;
@@ -48,7 +50,12 @@ public class HomeViewController {
   private void initialize() {
     setupResponsiveLayout();
     setupReleasesData();
+    setupGitHubDetailsBindings();
     populateReleasesList();
+  }
+
+  private void setupGitHubDetailsBindings() {
+    starsLabel.textProperty().bind(homeViewModel.getStarsProperty().asString());
   }
 
   public void updateView() {
