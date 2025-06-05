@@ -60,7 +60,7 @@ public class HomeViewModel {
                 throw new RuntimeException(e);
               }
             })
-        .thenAcceptAsync(releasesList::addAll, Platform::runLater);
+        .thenAcceptAsync(releasesList::setAll, Platform::runLater);
   }
 
   public void updateRepositoryDetails() {
