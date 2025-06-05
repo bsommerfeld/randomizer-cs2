@@ -31,9 +31,12 @@ public class HomeViewController {
   private final HomeViewModel homeViewModel;
   // Release data storage
   private final Map<String, ReleaseData> releasesData = new HashMap<>();
+
   @FXML private AnchorPane rootPane;
   @FXML private VBox mainContent;
   @FXML private Label starsLabel;
+  @FXML private Label forksLabel;
+
   @FXML private VBox releasesView;
   @FXML private VBox releasesListContent;
   @FXML private Label changelogTitle;
@@ -61,6 +64,7 @@ public class HomeViewController {
 
   private void setupGitHubDetailsBindings() {
     starsLabel.textProperty().bind(homeViewModel.getStarsProperty().asString());
+    forksLabel.textProperty().bind(homeViewModel.getForksProperty().asString());
   }
 
   public void updateView() {
