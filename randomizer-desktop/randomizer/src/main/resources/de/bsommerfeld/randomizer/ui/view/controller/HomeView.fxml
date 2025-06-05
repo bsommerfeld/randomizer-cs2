@@ -7,13 +7,13 @@
 
 <AnchorPane fx:id="rootPane" prefHeight="504.0" prefWidth="656.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.bsommerfeld.randomizer.ui.view.controller.HomeViewController">
     <children>
-      <HBox styleClass="github-top-bar" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-         <children>
-            <Label styleClass="githubStars" text="test" />
-         </children>
-      </HBox>
+        <HBox styleClass="github-top-bar" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <children>
+                <Label styleClass="github-stars-label" text="test" />
+            </children>
+        </HBox>
         <!-- Main Content -->
-        <VBox fx:id="mainContent" alignment="CENTER" prefHeight="504.0" prefWidth="656.0" styleClass="home-view" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <VBox fx:id="mainContent" alignment="CENTER" styleClass="home-view" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="24.0">
             <children>
                 <ImageView fitHeight="256.0" fitWidth="256.0" pickOnBounds="true" preserveRatio="true" styleClass="home-view-image">
                     <image>

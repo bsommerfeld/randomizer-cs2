@@ -4,7 +4,7 @@
     -fx-alignment: center-right;
 }
 
-.githubStars {
+.github-stars-label {
     -fx-font-family: SansSerif;
     -fx-font-size: 16;
     -fx-text-fill: #7E78ED;
@@ -14,15 +14,13 @@
     -fx-cursor: hand;
 }
 
-.githubStars:hover {
+.github-stars-label:hover {
     -fx-text-fill: #2F27CE;
     -fx-underline: true;
     -fx-graphic: url("../images/homeView/githubStarsIconSelected.png");
 }
 
 .home-view {
-    -fx-pref-width: 656;
-    -fx-pref-height: 504;
     -fx-alignment: center;
 }
 
