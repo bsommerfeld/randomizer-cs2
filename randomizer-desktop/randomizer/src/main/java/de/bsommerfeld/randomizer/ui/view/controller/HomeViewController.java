@@ -55,7 +55,9 @@ public class HomeViewController {
   }
 
   @FXML
-  private void onRepositoryDetailsClick(MouseEvent event) {}
+  private void onRepositoryDetailsClick(MouseEvent event) {
+    onGitHubOpen(event);
+  }
 
   private void setupGitHubDetailsBindings() {
     starsLabel.textProperty().bind(homeViewModel.getStarsProperty().asString());
