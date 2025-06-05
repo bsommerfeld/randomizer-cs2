@@ -131,40 +131,11 @@ public class RandomizerViewController {
             long startTime = actionStartTimes.getOrDefault(actionContainer, currentTime);
             long elapsedTime = currentTime - startTime;
 
-            Platform.runLater(
-                () -> {
-                  timeElapsedLabel.setText(formatElapsedTime(elapsedTime));
-                });
+            Platform.runLater(() -> timeElapsedLabel.setText(formatElapsedTime(elapsedTime)));
           }
         },
         0,
         100);
-  }
-
-  /**
-   * Stops the timer for the first action with the given name and updates the timeElapsed label with
-   * the final time. This method finds the first non-active action with the given name and stops its
-   * timer.
-   *
-   * @param actionName the name of the action
-   */
-  private void stopActionTimer(String actionName) {
-    // Find the first non-active HBox for this action
-    actionsVBox.getChildren().stream()
-        .filter(HBox.class::isInstance)
-        .map(HBox.class::cast)
-        .filter(
-            hbox -> {
-              Label label = (Label) hbox.getChildren().get(1);
-              return label.getText() != null && label.getText().equals(actionName);
-            })
-        .filter(
-            hbox -> {
-              ImageView imageView = (ImageView) hbox.getChildren().get(0);
-              return !isActive(imageView);
-            })
-        .findFirst()
-        .ifPresent(this::stopActionTimerForHBox);
   }
 
   /**
@@ -303,8 +274,8 @@ public class RandomizerViewController {
         .map(HBox.class::cast)
         .forEach(
             hbox -> {
-              if (!hbox.getChildren().isEmpty() && hbox.getChildren().get(0) instanceof ImageView) {
-                ImageView imageView = (ImageView) hbox.getChildren().get(0);
+              if (!hbox.getChildren().isEmpty()
+                  && hbox.getChildren().getFirst() instanceof ImageView imageView) {
                 setPositionalStyling(imageView, false);
               }
             });
@@ -318,8 +289,8 @@ public class RandomizerViewController {
     findMatchingActionHBox(action.getName(), iv -> !isActive(iv))
         .ifPresent(
             hbox -> {
-              if (hbox.getChildren().size() > 3 && hbox.getChildren().get(3) instanceof Label) {
-                Label timeElapsedLabel = (Label) hbox.getChildren().get(3);
+              if (hbox.getChildren().size() > 3
+                  && hbox.getChildren().get(3) instanceof Label timeElapsedLabel) {
                 startActionTimer(hbox, timeElapsedLabel);
               }
             });
@@ -335,8 +306,8 @@ public class RandomizerViewController {
         .ifPresent(
             hbox -> {
               stopActionTimerForHBox(hbox);
-              if (!hbox.getChildren().isEmpty() && hbox.getChildren().get(0) instanceof ImageView) {
-                ImageView imageView = (ImageView) hbox.getChildren().get(0);
+              if (!hbox.getChildren().isEmpty()
+                  && hbox.getChildren().getFirst() instanceof ImageView imageView) {
                 setPositionalStyling(imageView, true);
               }
             });
