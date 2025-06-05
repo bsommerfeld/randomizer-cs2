@@ -50,6 +50,7 @@ public class HomeViewModel {
                     gitHubService.getRepositoryDetails(
                         gitHubConfig.getAuthor(), gitHubConfig.getRepository());
               } catch (IOException | InterruptedException e) {
+                log.error(e.getMessage());
                 throw new RuntimeException(e);
               }
               final int stars = gitHubRepositoryDetails.stargazersCount();
