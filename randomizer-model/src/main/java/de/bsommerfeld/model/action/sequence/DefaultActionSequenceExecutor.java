@@ -229,6 +229,7 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
   /** The main execution loop for the executor. */
   @Override
   public void run() {
+    handleApplicationState();
     while (running && !Thread.currentThread().isInterrupted()) {
       if (!hasReleasedAnyKey && !isWaitTimeExceeded()) {
         if (applicationContext.isCheckForCS2Focus()) {
@@ -436,6 +437,14 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
     lastFocusCheckTime = currentTime;
 
     ApplicationState currentState = applicationContext.getApplicationState();
+
+    // In case that the CS2 Focus was needed before but couldn't be found and then the option got
+    //  switched to not needed, but the state already is AWAITING. Just to wake up the executor.
+    if (currentState == ApplicationState.AWAITING && !applicationContext.isCheckForCS2Focus()) {
+      applicationContext.setApplicationState(ApplicationState.IDLING);
+      log.info("Set application state to IDLING after CS2 Focus is not needed anymore.");
+      return;
+    }
 
     // Check if focus was gained
     if (currentState == ApplicationState.AWAITING && focusManager.isApplicationWindowInFocus()) {
