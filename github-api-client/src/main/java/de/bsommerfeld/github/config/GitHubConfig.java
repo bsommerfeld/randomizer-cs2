@@ -1,4 +1,4 @@
-package de.bsommerfeld.randomizer.service;
+package de.bsommerfeld.github.config;
 
 import lombok.Value;
 

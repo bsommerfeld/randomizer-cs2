@@ -1,4 +1,4 @@
-package de.bsommerfeld.randomizer.service.model;
+package de.bsommerfeld.github.model;
 
 /**
  * Represents basic details of a GitHub repository.

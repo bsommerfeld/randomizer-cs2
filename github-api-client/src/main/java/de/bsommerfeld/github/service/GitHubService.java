@@ -1,11 +1,11 @@
-package de.bsommerfeld.randomizer.service;
+package de.bsommerfeld.github.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Singleton;
-import de.bsommerfeld.randomizer.service.model.GitHubRelease;
-import de.bsommerfeld.randomizer.service.model.GitHubReleaseAsset;
-import de.bsommerfeld.randomizer.service.model.GitHubRepositoryDetails;
+import de.bsommerfeld.github.model.GitHubRelease;
+import de.bsommerfeld.github.model.GitHubReleaseAsset;
+import de.bsommerfeld.github.model.GitHubRepositoryDetails;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;

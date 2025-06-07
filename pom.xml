@@ -60,6 +60,7 @@
     <modules>
         <module>randomizer-desktop</module>
         <module>randomizer-model</module>
+        <module>github-api-client</module>
     </modules>
 
     <build>

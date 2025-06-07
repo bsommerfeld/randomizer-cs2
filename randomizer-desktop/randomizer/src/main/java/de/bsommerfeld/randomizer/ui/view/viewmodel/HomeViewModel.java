@@ -1,9 +1,9 @@
 package de.bsommerfeld.randomizer.ui.view.viewmodel;
 
 import com.google.inject.Inject;
-import de.bsommerfeld.randomizer.service.GitHubConfig;
-import de.bsommerfeld.randomizer.service.GitHubService;
-import de.bsommerfeld.randomizer.service.model.GitHubRelease;
+import de.bsommerfeld.github.config.GitHubConfig;
+import de.bsommerfeld.github.model.GitHubRelease;
+import de.bsommerfeld.github.service.GitHubService;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;

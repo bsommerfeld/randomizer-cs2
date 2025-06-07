@@ -1,4 +1,4 @@
-package de.bsommerfeld.randomizer.service.model;
+package de.bsommerfeld.github.model;
 
 import java.text.MessageFormat;
 import java.time.ZonedDateTime;
