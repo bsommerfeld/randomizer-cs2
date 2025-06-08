@@ -202,18 +202,18 @@
 
 .sequence-builder-buttons {
     -fx-pref-width: 76;
-    -fx-max-height: 16;
+    -fx-max-height: 20;
     -fx-spacing: 8;
     -fx-alignment: top-right;
 }
 
 .builder-randomize-button, .builder-save-sequence-button {
-    -fx-min-width: 16;
-    -fx-min-height: 16;
+    -fx-min-width: 20;
+    -fx-min-height: 20;
     -fx-background-color: transparent;
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
-    -fx-background-size: 16;
+    -fx-background-size: 20;
     -fx-cursor: hand;
 }
 
