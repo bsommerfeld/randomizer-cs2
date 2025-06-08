@@ -499,11 +499,11 @@
 }
 
 .settings-auto-update {
-    -fx-max-width: 463;
+    -fx-max-width: 420;
 }
 
 .settings-auto-update-container {
-    -fx-max-width: 463;
+    -fx-max-width: 420;
     -fx-spacing: 4;
     -fx-alignment: center-left;
 }
