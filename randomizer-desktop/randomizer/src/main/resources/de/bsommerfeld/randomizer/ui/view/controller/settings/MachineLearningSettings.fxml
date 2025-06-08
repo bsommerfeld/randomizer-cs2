@@ -8,7 +8,7 @@
 <VBox xmlns:fx="http://javafx.com/fxml/1" alignment="center" prefHeight="344.0" prefWidth="480.0"
       styleClass="updater-settings" stylesheets="@../../../application.css"
       xmlns="http://javafx.com/javafx/17.0.12"
-      fx:controller="de.bsommerfeld.randomizer.ui.view.controller.settings.GeneralSettingsController">
+      fx:controller="de.bsommerfeld.randomizer.ui.view.controller.settings.MachineLearningSettingsController">
     <children>
         <HBox styleClass="settings-auto-update" HBox.hgrow="ALWAYS">
             <children>
