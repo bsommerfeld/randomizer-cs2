@@ -384,8 +384,10 @@ public class BuilderEditorViewController {
               Label actionLabel = new Label(action.getName());
               actionLabel.getStyleClass().add(ACTION_NAME_STYLING);
 
+              HBox filler = new HBox();
+              HBox.setHgrow(filler, Priority.ALWAYS);
+
               HBox actionSettings = new HBox();
-              HBox.setHgrow(actionSettings, Priority.ALWAYS);
               actionSettings.getStyleClass().add("builder-sequence-actions-settings");
 
               Label actionInterval = new Label();
@@ -397,7 +399,7 @@ public class BuilderEditorViewController {
 
               actionSettings.getChildren().addAll(actionInterval, deleteAction);
 
-              actionContainer.getChildren().addAll(actionIcon, actionLabel, actionSettings);
+              actionContainer.getChildren().addAll(actionIcon, actionLabel, filler, actionSettings);
 
               actionContainer.setOnMouseClicked(
                   _ -> {

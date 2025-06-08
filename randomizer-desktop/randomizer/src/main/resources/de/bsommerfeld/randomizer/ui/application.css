@@ -130,6 +130,7 @@
 }
 
 .logbook-sequence-actions-name {
+    -fx-pref-width: 124;
     -fx-font-family: SansSerif;
     -fx-font-size: 14px;
     -fx-text-fill: #281FE0;

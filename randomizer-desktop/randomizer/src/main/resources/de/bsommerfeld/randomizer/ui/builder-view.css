@@ -287,9 +287,8 @@
 
 
 .builder-sequence-actions-settings {
-    -fx-pref-width: 192;
+    -fx-pref-width: 156;
     -fx-alignment: center-right;
-    -fx-padding: 0 4;
     -fx-spacing: 12;
 }
 
