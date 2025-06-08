@@ -14,15 +14,16 @@
             <children>
                 <VBox styleClass="settings-auto-update-container" VBox.vgrow="ALWAYS">
                     <children>
-                        <Label styleClass="settings-title" text="Activat Machine Learning"/>
-                        <Label styleClass="settings-description" text="Mir fällt keine gute Beschreibung ein"/>
+                        <Label styleClass="settings-title" text="Machine Learning"/>
+                        <Label styleClass="settings-description"
+                               text="Activate Machine Learning for sequence generation."/>
                     </children>
                 </VBox>
                 <HBox HBox.hgrow="ALWAYS"/>
                 <HBox prefHeight="16.0" prefWidth="48.0" styleClass="settings-toggle-button-container">
                     <children>
                         <ToggleButton fx:id="activateMachineLearningToggleButton" mnemonicParsing="false"
-                                      styleClass="settings-toggle-button"/>
+                                      styleClass="settings-toggle-button" disable="true"/>
                     </children>
                 </HBox>
             </children>
