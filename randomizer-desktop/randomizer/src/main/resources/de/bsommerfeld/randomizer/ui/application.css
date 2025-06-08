@@ -454,22 +454,28 @@
 .settings-selection {
     -fx-pref-width: 412;
     -fx-min-height: 344;
-    -fx-padding: 0 6 0 0;
+    -fx-padding: 0 6;
     -fx-background-color: #9C99FF;
     -fx-background-radius: 8 0 0 8;
     -fx-alignment: center-right;
 }
 
+.settings-selection-container {
+    -fx-max-width: 148;
+    -fx-pref-height: 344;
+    -fx-spacing: 6;
+    -fx-alignment: center-left;
+}
+
 .settings-options {
-    -fx-min-width: 112;
-    -fx-pref-height: 18;
+    -fx-min-width: 148;
     -fx-padding: 0 6;
-    -fx-text-alignment: center;
+    -fx-alignment: center-left;
     -fx-font-family: SansSerif;
-    -fx-font-size: 14;
+    -fx-font-size: 15;
     -fx-text-fill: #040316;
     -fx-background-radius: 4;
-    -fx-background-color: #E6E5FF;
+    -fx-background-color: transparent;
     -fx-cursor: hand;
 }
 

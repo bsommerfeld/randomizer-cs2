@@ -12,7 +12,12 @@
                     <children>
                         <HBox styleClass="settings-selection" HBox.hgrow="ALWAYS">
                             <children>
-                                <ToggleButton fx:id="generalToggleButton" mnemonicParsing="false" styleClass="settings-options" text="General" />
+                        <VBox styleClass="settings-selection-container" VBox.vgrow="ALWAYS">
+                           <children>
+                                      <ToggleButton fx:id="generalToggleButton" mnemonicParsing="false" styleClass="settings-options" text="General" />
+                                      <ToggleButton fx:id="machineLearningToggleButton" mnemonicParsing="false" styleClass="settings-options" text="Machine Learning" />
+                           </children>
+                        </VBox>
                             </children>
                         </HBox>
                     </children>

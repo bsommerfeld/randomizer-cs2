@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="center" prefHeight="344.0" prefWidth="480.0"
+      styleClass="updater-settings" stylesheets="@../../../application.css"
+      xmlns="http://javafx.com/javafx/17.0.12"
+      fx:controller="de.bsommerfeld.randomizer.ui.view.controller.settings.GeneralSettingsController">
+    <children>
+        <HBox styleClass="settings-auto-update" HBox.hgrow="ALWAYS">
+            <children>
+                <VBox styleClass="settings-auto-update-container" VBox.vgrow="ALWAYS">
+                    <children>
+                        <Label styleClass="settings-title" text="Activat Machine Learning"/>
+                        <Label styleClass="settings-description" text="Mir fällt keine gute Beschreibung ein"/>
+                    </children>
+                </VBox>
+                <HBox HBox.hgrow="ALWAYS"/>
+                <HBox prefHeight="16.0" prefWidth="48.0" styleClass="settings-toggle-button-container">
+                    <children>
+                        <ToggleButton fx:id="activateMachineLearningToggleButton" mnemonicParsing="false"
+                                      styleClass="settings-toggle-button"/>
+                    </children>
+                </HBox>
+            </children>
+        </HBox>
+        <Separator styleClass="settings-separator"/>
+    </children>
+</VBox>
