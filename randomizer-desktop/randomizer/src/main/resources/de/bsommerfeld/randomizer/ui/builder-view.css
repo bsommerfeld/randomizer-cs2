@@ -294,10 +294,11 @@
 }
 
 .builder-sequence-action-interval {
+    -fx-pref-width: 128;
     -fx-font-family: SansSerif;
     -fx-font-size: 14;
     -fx-text-fill: #534BE7;
-    -fx-alignment: center;
+    -fx-alignment: center-left;
 }
 
 /* Builder Settings View */
