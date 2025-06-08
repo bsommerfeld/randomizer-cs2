@@ -468,14 +468,14 @@
 }
 
 .settings-options {
+    -fx-background-color: #b8b6e8;
     -fx-min-width: 148;
     -fx-padding: 0 6;
-    -fx-alignment: center-left;
+    -fx-alignment: center;
     -fx-font-family: SansSerif;
     -fx-font-size: 15;
     -fx-text-fill: #040316;
     -fx-background-radius: 4;
-    -fx-background-color: transparent;
     -fx-cursor: hand;
 }
 
