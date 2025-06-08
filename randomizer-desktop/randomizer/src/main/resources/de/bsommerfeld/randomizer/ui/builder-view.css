@@ -141,7 +141,7 @@
     -fx-padding: 2 6;
 }
 
-.builder-sequences-delete-button {
+.builder-sequences-delete-button, .builder-sequence-actions-settings-delete {
     -fx-min-height: 14;
     -fx-max-height: 14;
     -fx-background-color: transparent;
@@ -152,8 +152,13 @@
     -fx-cursor: hand;
 }
 
-.builder-sequences-delete-button:hover {
+.builder-sequences-delete-button:hover, .builder-sequence-actions-settings-delete:hover {
     -fx-background-image: url("../images/builderView/deleteIconSelected.png");
+}
+
+.builder-sequences-delete-button:pressed, .builder-sequence-actions-settings-delete:pressed {
+    -fx-scale-x: 0.9;
+    -fx-scale-y: 0.9;
 }
 
 /* Builder Editor View */
@@ -295,6 +300,20 @@
     -fx-focus-color: transparent;
 }
 
+
+.builder-sequence-actions-settings {
+    -fx-pref-width: 192;
+    -fx-alignment: center-right;
+    -fx-padding: 0 4;
+    -fx-spacing: 12;
+}
+
+.builder-sequence-action-interval {
+    -fx-font-family: SansSerif;
+    -fx-font-size: 14;
+    -fx-text-fill: #534BE7;
+    -fx-alignment: center;
+}
 
 /* Builder Settings View */
 .builder-settings-holder {
