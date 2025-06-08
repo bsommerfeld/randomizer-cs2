@@ -59,10 +59,6 @@
                                                 onAction="#onSaveSequence" styleClass="builder-save-sequence-button"/>
                                         <Button fx:id="randomizeButton" mnemonicParsing="false" onAction="#onRandomize"
                                                 styleClass="builder-randomize-button"/>
-                                        <Separator orientation="VERTICAL" prefHeight="14.0"
-                                                   styleClass="builder-buttons-separator"/>
-                                        <Button fx:id="actionsClearButton" mnemonicParsing="false"
-                                                onAction="#onActionsClear" styleClass="builder-actions-clear-button"/>
                                     </children>
                                 </HBox>
                             </children>

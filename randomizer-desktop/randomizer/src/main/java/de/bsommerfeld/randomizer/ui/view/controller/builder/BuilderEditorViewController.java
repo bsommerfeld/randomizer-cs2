@@ -64,7 +64,6 @@ public class BuilderEditorViewController {
 
   @FXML private Button randomizeButton;
   @FXML private Button saveSequenceButton;
-  @FXML private Button actionsClearButton;
 
   @FXML private VBox builderVBox;
 
@@ -190,10 +189,6 @@ public class BuilderEditorViewController {
         .bind(builderViewModel.getCurrentActionSequenceProperty().isNull());
 
     randomizeButton
-        .disableProperty()
-        .bind(builderViewModel.getCurrentActionSequenceProperty().isNull());
-
-    actionsClearButton
         .disableProperty()
         .bind(builderViewModel.getCurrentActionSequenceProperty().isNull());
 

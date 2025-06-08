@@ -240,21 +240,6 @@
     -fx-border-color: null;
 }
 
-.builder-actions-clear-button {
-    -fx-min-width: 21;
-    -fx-min-height: 16;
-    -fx-background-color: transparent;
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center;
-    -fx-background-size: 21 16;
-    -fx-background-image: url("../images/builderEditorView/clearIcon.png");
-    -fx-cursor: hand;
-}
-
-.builder-actions-clear-button:hover {
-    -fx-background-image: url("../images/builderEditorView/clearIconSelected.png");
-}
-
 .builder-selected-actions-scrollpane {
     -fx-pref-width: 312;
     -fx-pref-height: 272;
