@@ -8,7 +8,6 @@ import de.bsommerfeld.randomizer.ui.RandomizerApplication;
 import de.bsommerfeld.randomizer.ui.view.View;
 import de.bsommerfeld.randomizer.ui.view.ViewProvider;
 import de.bsommerfeld.randomizer.ui.view.ViewWrapper;
-import de.bsommerfeld.randomizer.ui.view.component.MinMaxSlider;
 import de.bsommerfeld.randomizer.ui.view.controller.settings.ActionSettingsController;
 import de.bsommerfeld.randomizer.ui.view.controller.settings.TitleDescriptionSettingsController;
 import de.bsommerfeld.randomizer.ui.view.viewmodel.builder.BuilderViewModel;
@@ -391,7 +390,7 @@ public class BuilderEditorViewController {
 
               Label actionInterval = new Label();
               actionInterval.getStyleClass().add("builder-sequence-action-interval");
-              actionInterval.setText(String.valueOf(action.getInterval()));
+              actionInterval.setText(action.getInterval().getMin() + "ms" + " - " + action.getInterval().getMax() + "ms");
 
               Button deleteAction = new Button();
               deleteAction.getStyleClass().add("builder-sequence-actions-settings-delete");
