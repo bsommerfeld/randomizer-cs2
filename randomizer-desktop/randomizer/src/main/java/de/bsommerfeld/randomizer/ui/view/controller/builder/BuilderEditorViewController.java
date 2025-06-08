@@ -408,6 +408,13 @@ public class BuilderEditorViewController {
 
               setupDragAlreadyDropped(actionContainer, action);
               builderVBox.getChildren().add(actionContainer);
+
+                deleteAction.setOnAction(
+                    event -> {
+                        builderViewModel.removeAction(action);
+                        actionSettingsController.setAction(null);
+                        labelInFocusProperty.set(null);
+                    });
             });
 
     builderVBox.getChildren().stream()
