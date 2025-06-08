@@ -8,7 +8,6 @@ import de.bsommerfeld.randomizer.ui.RandomizerApplication;
 import de.bsommerfeld.randomizer.ui.view.View;
 import de.bsommerfeld.randomizer.ui.view.ViewProvider;
 import de.bsommerfeld.randomizer.ui.view.ViewWrapper;
-import de.bsommerfeld.randomizer.ui.view.component.MinMaxSlider;
 import de.bsommerfeld.randomizer.ui.view.controller.settings.ActionSettingsController;
 import de.bsommerfeld.randomizer.ui.view.controller.settings.TitleDescriptionSettingsController;
 import de.bsommerfeld.randomizer.ui.view.viewmodel.builder.BuilderViewModel;
@@ -30,7 +29,6 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 @View
@@ -224,7 +222,7 @@ public class BuilderEditorViewController {
         viewProvider.requestView(ActionSettingsController.class).controller();
     actionSettingsController.bindOnVisibleProperty(
         visible -> {
-              if (visible)
+          if (visible)
             actionSettingsHolder
                 .getChildren()
                 .setAll(viewProvider.requestView(ActionSettingsController.class).parent());
@@ -390,20 +388,7 @@ public class BuilderEditorViewController {
               Label actionLabel = new Label(action.getName());
               actionLabel.getStyleClass().add(ACTION_NAME_STYLING);
 
-              HBox actionSettings = new HBox();
-              HBox.setHgrow(actionSettings, Priority.ALWAYS);
-              actionSettings.getStyleClass().add("builder-sequence-actions-settings");
-
-              MinMaxSlider actionDuration = new MinMaxSlider();
-              actionDuration.getStyleClass().add("range-slider-action-interval");
-              actionDuration.getStyleClass().add("builder-sequence-actions-settings-duration");
-
-              Button deleteAction = new Button();
-              deleteAction.getStyleClass().add("builder-sequence-actions-settings-delete");
-
-              actionSettings.getChildren().addAll(actionDuration, deleteAction);
-
-              actionContainer.getChildren().addAll(actionIcon, actionLabel, actionSettings);
+              actionContainer.getChildren().addAll(actionIcon, actionLabel);
 
               actionContainer.setOnMouseClicked(
                   _ -> {
