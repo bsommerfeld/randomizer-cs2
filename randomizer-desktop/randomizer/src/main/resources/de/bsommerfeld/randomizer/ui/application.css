@@ -280,7 +280,7 @@
 
 
 .range-slider {
-    -fx-pref-width: 346;
+    -fx-pref-width: 380;
     -fx-pref-height: 12;
     -fx-padding: 8 2;
 }
@@ -499,18 +499,18 @@
 }
 
 .updater-settings {
-    -fx-pref-width: 480;
+    -fx-pref-width: 554;
     -fx-pref-height: 344;
     -fx-spacing: 12;
     -fx-alignment: center-left;
 }
 
 .settings-auto-update {
-    -fx-max-width: 420;
+    -fx-max-width: 494;
 }
 
 .settings-auto-update-container {
-    -fx-max-width: 420;
+    -fx-max-width: 494;
     -fx-spacing: 4;
     -fx-alignment: center-left;
 }
@@ -555,14 +555,14 @@
 }
 
 .settings-separator, .settings-separator .line {
-    -fx-max-width: 463;
+    -fx-max-width: 494;
     -fx-pref-height: 1;
     -fx-background-color: #CECCFF;
     -fx-border-color: null;
 }
 
 .settings-update-repo {
-    -fx-pref-width: 480;
+    -fx-pref-width: 494;
     -fx-pref-height: 32;
     -fx-spacing: 4;
     -fx-alignment: center-left;
@@ -581,7 +581,7 @@
 }
 
 .settings-check-for-update {
-    -fx-pref-width: 480;
+    -fx-pref-width: 494;
     -fx-pref-height: 58;
     -fx-spacing: 4;
     -fx-alignment: center-left;
@@ -657,7 +657,7 @@
 }
 
 .config-path-textfield {
-    -fx-pref-width: 426;
+    -fx-pref-width: 480;
     -fx-pref-height: 16;
     -fx-padding: 2 6;
     -fx-background-radius: 4;
