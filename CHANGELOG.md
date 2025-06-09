@@ -2,6 +2,8 @@
 
 ### Added
 
+- Added history count label
+
 ### Changed
 
 ### Fixed
