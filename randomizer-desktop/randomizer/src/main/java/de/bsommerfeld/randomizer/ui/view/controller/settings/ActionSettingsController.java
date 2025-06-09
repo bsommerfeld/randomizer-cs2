@@ -24,7 +24,6 @@ public class ActionSettingsController {
   @Inject
   public ActionSettingsController(ActionSettingsViewModel actionSettingsViewModel) {
     this.actionSettingsViewModel = actionSettingsViewModel;
-    Platform.runLater(this::initialize);
   }
 
   @FXML
@@ -32,6 +31,7 @@ public class ActionSettingsController {
     minMaxSlider.setMinMaxValue(0, 1);
   }
 
+  @FXML
   private void initialize() {
     initializeMinMaxSlider();
     setupBindings();
@@ -41,6 +41,7 @@ public class ActionSettingsController {
     minMaxSlider.setTimeUnit(MinMaxSlider.TimeUnit.MILLISECONDS);
     minMaxSlider.setMinLowerValue(0);
     minMaxSlider.setMaxHigherValue(9999);
+    minMaxSlider.showLabels(false);
     minMaxSlider
         .getMinProperty()
         .bindBidirectional(actionSettingsViewModel.getMinIntervalProperty());
