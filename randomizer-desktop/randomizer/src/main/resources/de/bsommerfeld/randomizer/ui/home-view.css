@@ -350,11 +350,12 @@
 }
 
 .changelog-text-flow {
-    -fx-background-color: #FFFFFF;
+    -fx-background-color: #FBFBFE;
     -fx-line-spacing: 1.2;
     -fx-font-family: 'Segoe UI', SansSerif;
     -fx-font-size: 14;
     -fx-text-fill: #333333;
+    -fx-padding: 8;
 }
 
 .changelog-placeholder {
