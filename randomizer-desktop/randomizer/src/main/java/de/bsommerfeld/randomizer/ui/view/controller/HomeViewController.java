@@ -71,6 +71,10 @@ public class HomeViewController {
       log.error("Failed to update GitHub: {}", e.getMessage(), e);
       showReleaseLoadingError();
     }
+
+    if(releasesData.isEmpty()) {
+      showReleaseLoadingError();
+    }
   }
 
   /** Shows an error message when releases cannot be loaded */
