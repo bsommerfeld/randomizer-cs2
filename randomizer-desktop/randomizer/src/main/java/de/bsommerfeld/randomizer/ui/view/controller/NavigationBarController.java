@@ -40,7 +40,6 @@ public class NavigationBarController {
   private void initialize() {
     navButtons = Arrays.asList(homeButton, randomizerButton, builderButton, settingsButton);
 
-    setupViewInitializers();
     setupNavigationButton(homeButton, "Home", HomeViewController.class);
     setupNavigationButton(randomizerButton, "Randomizer", RandomizerViewController.class);
     setupNavigationButton(builderButton, "Builder", BuilderViewController.class);
@@ -59,11 +58,6 @@ public class NavigationBarController {
           .findFirst()
           .ifPresent(btn -> Platform.runLater(() -> btn.setSelected(true)));
     }
-  }
-
-  private void setupViewInitializers() {
-    viewInitializers.put(
-        HomeViewController.class, (Consumer<HomeViewController>) HomeViewController::updateView);
   }
 
   private void setupNavigationButton(ToggleButton button, String tooltipText, Class<?> viewClass) {

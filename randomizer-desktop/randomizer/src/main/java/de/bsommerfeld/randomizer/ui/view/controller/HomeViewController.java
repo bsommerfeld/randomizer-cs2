@@ -65,9 +65,10 @@ public class HomeViewController {
 
     try {
       homeViewModel.updateReleases();
-      log.debug("Release update initiated successfully");
+      updateView();
+      log.debug("GitHub update initiated successfully");
     } catch (Exception e) {
-      log.error("Failed to update releases: {}", e.getMessage(), e);
+      log.error("Failed to update GitHub: {}", e.getMessage(), e);
       showReleaseLoadingError();
     }
   }
@@ -101,7 +102,7 @@ public class HomeViewController {
     forksLabel.textProperty().bind(homeViewModel.getForksProperty().asString());
   }
 
-  public void updateView() {
+  private void updateView() {
     homeViewModel.updateRepositoryDetails();
   }
 
