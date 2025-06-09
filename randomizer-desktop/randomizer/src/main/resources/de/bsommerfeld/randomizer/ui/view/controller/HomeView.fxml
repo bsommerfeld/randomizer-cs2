@@ -15,10 +15,10 @@
             fx:controller="de.bsommerfeld.randomizer.ui.view.controller.HomeViewController">
     <children>
         <HBox styleClass="github-top-bar" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-              AnchorPane.topAnchor="0.0" onMouseClicked="#onRepositoryDetailsClick" HBox.hgrow="ALWAYS">
+              AnchorPane.topAnchor="0.0" HBox.hgrow="ALWAYS">
             <children>
-                <Label fx:id="starsLabel" styleClass="github-stars-label"/>
-                <Label fx:id="forksLabel" styleClass="github-forks-label"/>
+                <Label fx:id="starsLabel" styleClass="github-stars-label" onMouseClicked="#onRepositoryDetailsClick"/>
+                <Label fx:id="forksLabel" styleClass="github-forks-label" onMouseClicked="#onRepositoryDetailsClick"/>
             </children>
         </HBox>
         <!-- Main Content -->
@@ -97,7 +97,8 @@
                                             styleClass="changelog-scroll" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
                                     <VBox fx:id="changelogContent" styleClass="changelog-content">
                                         <!-- TextFlow for markdown rendering -->
-                                        <TextFlow fx:id="changelogTextFlow" styleClass="changelog-text-flow" VBox.vgrow="ALWAYS"/>
+                                        <TextFlow fx:id="changelogTextFlow" styleClass="changelog-text-flow"
+                                                  VBox.vgrow="ALWAYS"/>
                                     </VBox>
                                 </ScrollPane>
                             </children>
