@@ -110,5 +110,11 @@
             <artifactId>github-api-client</artifactId>
             <version>${revision}</version>
         </dependency>
+        <!-- Markdown support -->
+        <dependency>
+            <groupId>org.commonmark</groupId>
+            <artifactId>commonmark</artifactId>
+            <version>0.21.0</version>
+        </dependency>
     </dependencies>
 </project>

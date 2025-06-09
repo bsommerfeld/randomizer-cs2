@@ -6,6 +6,7 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.text.TextFlow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -95,11 +96,8 @@
                                 <ScrollPane fx:id="changelogScrollPane" fitToWidth="true" hbarPolicy="NEVER"
                                             styleClass="changelog-scroll" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
                                     <VBox fx:id="changelogContent" styleClass="changelog-content">
-                                        <children>
-                                            <Label fx:id="changelogText" styleClass="changelog-placeholder"
-                                                   text="Klicken Sie auf ein Release links, um die Changelog-Details zu sehen."
-                                                   wrapText="true"/>
-                                        </children>
+                                        <!-- TextFlow for markdown rendering -->
+                                        <TextFlow fx:id="changelogTextFlow" styleClass="changelog-text-flow" VBox.vgrow="ALWAYS"/>
                                     </VBox>
                                 </ScrollPane>
                             </children>
