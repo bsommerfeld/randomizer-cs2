@@ -231,6 +231,8 @@ public class BuilderEditorViewController {
 
   private void setPositionalStyling(ImageView imageView, boolean active) {
     HBox parentHBox = (HBox) imageView.getParent();
+    parentHBox.getStyleClass().clear();
+    parentHBox.getStyleClass().add(active ? "logbook-sequence-actions-container-selected" : "logbook-sequence-actions-container");
     int index = builderVBox.getChildren().indexOf(parentHBox);
 
     if (index == 0) {

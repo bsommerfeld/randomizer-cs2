@@ -121,6 +121,12 @@
     -fx-background-color: rgba(68, 61, 255, 0.1);
 }
 
+.logbook-sequence-actions-container-selected {
+    -fx-alignment: center-left;
+    -fx-spacing: 6;
+    -fx-background-color: #c0bdf5;
+}
+
 .logbook-sequence-actions-time-elapsed {
     -fx-font-family: SansSerif;
     -fx-font-size: 14;
