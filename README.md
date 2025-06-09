@@ -92,7 +92,7 @@ Save time by downloading our [pre-made and playtested sequences](https://github.
 
 <!-- SCREENSHOT PLACEHOLDER: Randomizer in Action -->
 <p align="center">
-  [PLACEHOLDER: Add screenshot or GIF of the randomizer working with CS2]
+  <img src="https://github.com/user-attachments/assets/5ddae49f-e2b2-45a5-8568-1c360cfbec42" alt="Randomizer Settings" width=500>
   <br>
   <small>See Randomizer-CS2 in action, triggering unexpected movements during gameplay</small>
 </p>
