@@ -5,13 +5,15 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.bsommerfeld.randomizer.ui.view.controller.RandomizerViewController">
+<AnchorPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.bsommerfeld.randomizer.ui.view.controller.RandomizerViewController">
     <children>
         <!-- Die VBox füllt den gesamten AnchorPane -->
-        <VBox stylesheets="@../../application.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <VBox stylesheets="@../../application.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+              AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
                 <!-- Obere Box mit fester Mindesthöhe -->
-                <VBox minHeight="92.0" VBox.vgrow="NEVER" />
+                <VBox minHeight="92.0" VBox.vgrow="NEVER"/>
 
                 <!-- Mittlerer Bereich: enthält links und rechts -->
                 <HBox alignment="CENTER" spacing="12" styleClass="randomizer-view" VBox.vgrow="ALWAYS">
@@ -24,57 +26,76 @@
                                     <children>
                                         <HBox styleClass="logbook-active-sequence">
                                             <children>
-                                                <Label fx:id="sequenceNameLabel" styleClass="logbook-sequence-name" />
+                                                <Label fx:id="sequenceNameLabel" styleClass="logbook-sequence-name"/>
                                             </children>
                                         </HBox>
-                              <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="logbook-history-scrollpane" VBox.vgrow="ALWAYS">
-                                <content>
-                                    <VBox styleClass="logbook-active-actions">
-                                       <children>
-                                          <VBox fx:id="actionsVBox" styleClass="logbook-active-actions-vbox" />
-                                       </children></VBox>
-                                </content>
-                              </ScrollPane>
+                                        <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER"
+                                                    styleClass="logbook-history-scrollpane" VBox.vgrow="ALWAYS">
+                                            <content>
+                                                <VBox styleClass="logbook-active-actions">
+                                                    <children>
+                                                        <VBox fx:id="actionsVBox"
+                                                              styleClass="logbook-active-actions-vbox"/>
+                                                    </children>
+                                                </VBox>
+                                            </content>
+                                        </ScrollPane>
                                     </children>
                                 </VBox>
                                 <!-- Statusbereich -->
                                 <HBox fx:id="logbookState" styleClass="logbook-state">
                                     <children>
-                              <ImageView fx:id="cs2FocusImage" pickOnBounds="true" preserveRatio="true" styleClass="logbook-not-focused-indicator" visible="false" />
-                              <HBox styleClass="logbook-state-button-container" HBox.hgrow="ALWAYS">
-                                 <children>
-                                     <ToggleButton fx:id="randomizerToggleButton" mnemonicParsing="false" onAction="#onToggle" styleClass="logbook-toggle-button" text="Start"/>
-                                 </children>
-                              </HBox>
+                                        <ImageView fx:id="cs2FocusImage" pickOnBounds="true" preserveRatio="true"
+                                                   styleClass="logbook-not-focused-indicator" visible="false"/>
+                                        <HBox styleClass="logbook-state-button-container" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <ToggleButton fx:id="randomizerToggleButton" mnemonicParsing="false"
+                                                              onAction="#onToggle" styleClass="logbook-toggle-button"
+                                                              text="Start"/>
+                                            </children>
+                                        </HBox>
                                     </children>
                                 </HBox>
                             </children>
                         </VBox>
-                  <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
-                     <children>
-      
+                        <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                            <children>
+
                                 <!-- History-Bereich, der vertikal mitwachsen soll -->
                                 <VBox styleClass="logbook-sequence-history" VBox.vgrow="ALWAYS">
                                     <children>
-                                        <Label styleClass="logbook-history-label" text="History" wrapText="true" />
-                                        <Label styleClass="logbook-descriptions" text="Shows the last sequences that were running" wrapText="true" />
-                                        <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="logbook-history-scrollpane" VBox.vgrow="ALWAYS">
+                                        <HBox>
+                                            <VBox>
+                                                <Label styleClass="logbook-history-label" text="History"
+                                                       wrapText="true"/>
+                                                <Label styleClass="logbook-descriptions"
+                                                       text="Shows the last sequences that were running"
+                                                       wrapText="true"/>
+                                            </VBox>
+                                            <HBox HBox.hgrow="ALWAYS"/>
+                                            <VBox alignment="CENTER">
+                                                <Label fx:id="historyCountLabel" styleClass="logbook-history-count-label" text="0"
+                                                       wrapText="true"/>
+                                            </VBox>
+                                        </HBox>
+                                        <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER"
+                                                    styleClass="logbook-history-scrollpane" VBox.vgrow="ALWAYS">
                                             <content>
-                                                <VBox fx:id="historyVBox" styleClass="logbook-history-content" />
+                                                <VBox fx:id="historyVBox" styleClass="logbook-history-content"/>
                                             </content>
                                         </ScrollPane>
                                     </children>
                                 </VBox>
-                     </children>
-                  </VBox>
+                            </children>
+                        </VBox>
                     </children>
                     <padding>
-                        <Insets left="12.0" right="12.0" />
+                        <Insets left="12.0" right="12.0"/>
                     </padding>
                 </HBox>
 
                 <!-- Untere Box mit fester Mindesthöhe -->
-                <VBox minHeight="92.0" VBox.vgrow="NEVER" />
+                <VBox minHeight="92.0" VBox.vgrow="NEVER"/>
             </children>
         </VBox>
     </children>

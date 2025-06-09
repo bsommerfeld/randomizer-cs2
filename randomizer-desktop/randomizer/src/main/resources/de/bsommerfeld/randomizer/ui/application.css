@@ -278,6 +278,19 @@
     -fx-padding: 2 4;
 }
 
+.logbook-history-count-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+    -fx-background-color: rgba(0, 122, 204, 0.42);
+    -fx-background-radius: 50%;
+    -fx-padding: 8px 12px;
+    -fx-min-width: 36px;
+    -fx-min-height: 36px;
+    -fx-alignment: center;
+    -fx-border-radius: 50%;
+}
+
 
 .range-slider {
     -fx-pref-width: 380;

@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -49,6 +50,7 @@ public class RandomizerViewController {
   @FXML private Label sequenceNameLabel;
   @FXML private VBox actionsVBox;
   @FXML private VBox historyVBox;
+  @FXML private Label historyCountLabel;
   @FXML private ToggleButton randomizerToggleButton;
   @FXML private ImageView cs2FocusImage;
 
@@ -79,10 +81,19 @@ public class RandomizerViewController {
     setupListener();
     setupStateListener();
     setupCS2FocusImage();
+    setupHistoryCountLabelBindings();
   }
 
   private void setupCS2FocusImage() {
     Tooltip.install(cs2FocusImage, new Tooltip("CS2 has to be in focus!"));
+  }
+
+  private void setupHistoryCountLabelBindings() {
+    historyVBox
+        .getChildren()
+        .addListener(
+            (ListChangeListener<Node>)
+                _ -> historyCountLabel.setText(String.valueOf(historyVBox.getChildren().size())));
   }
 
   private void clearCurrentSequenceView() {
