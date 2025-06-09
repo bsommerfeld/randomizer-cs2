@@ -18,6 +18,7 @@
 - Updated alert styling with modernized CSS classes
 - Simplified configuration loading logic and improved UI synchronization
 - Dynamically load randomizer version from properties file and update application title
+- Improved Starting/Stopping the Executor
 
 ### Fixed
 
