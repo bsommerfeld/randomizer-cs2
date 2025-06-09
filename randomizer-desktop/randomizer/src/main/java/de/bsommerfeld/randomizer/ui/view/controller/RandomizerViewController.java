@@ -65,11 +65,11 @@ public class RandomizerViewController {
       randomizerViewModel.setApplicationStateToStopped();
       clearCurrentSequenceView();
       randomizerToggleButton.setText("Start");
-      actionSequenceExecutor.start();
+      actionSequenceExecutor.stop();
     } else {
       randomizerViewModel.setApplicationStateToRunning();
       randomizerToggleButton.setText("Stop");
-      actionSequenceExecutor.stop();
+      actionSequenceExecutor.start();
     }
   }
 
