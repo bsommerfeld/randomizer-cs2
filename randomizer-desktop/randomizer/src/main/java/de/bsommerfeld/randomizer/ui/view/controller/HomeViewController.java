@@ -1,16 +1,20 @@
 package de.bsommerfeld.randomizer.ui.view.controller;
 
 import com.google.inject.Inject;
+import de.bsommerfeld.github.model.GitHubRelease;
 import de.bsommerfeld.randomizer.ui.RandomizerApplication;
 import de.bsommerfeld.randomizer.ui.view.View;
 import de.bsommerfeld.randomizer.ui.view.viewmodel.HomeViewModel;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
 import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.Alert;
@@ -52,9 +56,25 @@ public class HomeViewController {
   @FXML
   private void initialize() {
     setupResponsiveLayout();
-    setupReleasesData();
     setupGitHubDetailsBindings();
-    populateReleasesList();
+    setupReleasesData();
+
+    try {
+      homeViewModel.updateReleases();
+      log.debug("Release update initiated successfully");
+    } catch (Exception e) {
+      log.error("Failed to update releases: {}", e.getMessage(), e);
+      showReleaseLoadingError();
+    }
+  }
+
+  private void showReleaseLoadingError() {
+    Platform.runLater(() -> {
+      Label errorLabel = new Label("Fehler beim Laden der Releases");
+      errorLabel.getStyleClass().add("error-label");
+      releasesListContent.getChildren().clear();
+      releasesListContent.getChildren().add(errorLabel);
+    });
   }
 
   @FXML
@@ -97,66 +117,47 @@ public class HomeViewController {
   }
 
   private void setupReleasesData() {
-    // Sample release data - später aus ViewModel oder Service
-    releasesData.put(
-        "v1.2.0",
-        new ReleaseData(
-            "v1.2.0",
-            "03.06.2025",
-            "🚀 Neue Features:\n"
-                + "• Verbesserte Performance um 40%\n"
-                + "• Neue Action Sequence Templates\n"
-                + "• Enhanced CS2 Integration\n"
-                + "• Erweiterte Hotkey-Unterstützung\n\n"
-                + "🐛 Bug-Fixes:\n"
-                + "• Behoben: Crash beim Laden großer Konfigurationen\n"
-                + "• Behoben: Memory Leak in Action Dispatcher\n"
-                + "• Behoben: UI-Freezing bei langen Sequenzen\n\n"
-                + "⚠️ Bekannte Probleme:\n"
-                + "• Gelegentliche Verbindungsprobleme bei sehr langsamer Internetverbindung\n"
-                + "• Beta-Feature 'Smart Randomization' noch experimentell"));
+    homeViewModel.getReleasesList().addListener((ListChangeListener<GitHubRelease>) change -> {
+      while (change.next()) { // ← Das war das fehlende Stück!
+        if (change.wasAdded()) {
+          change.getAddedSubList().forEach(release -> {
+            log.debug("Processing release: {}", release.tag());
 
-    releasesData.put(
-        "v1.1.0",
-        new ReleaseData(
-            "v1.1.0",
-            "20.05.2025",
-            "✨ Highlights:\n"
-                + "• Action Sequence Builder komplett überarbeitet\n"
-                + "• Neue intuitive Benutzeroberfläche\n"
-                + "• Unterstützung für komplexe Timing-Patterns\n\n"
-                + "🔧 Verbesserungen:\n"
-                + "• Stabilität der Action-Ausführung erhöht\n"
-                + "• Bessere Fehlerbehandlung\n"
-                + "• Optimierte Speicherverwaltung\n\n"
-                + "🎯 Compatibility:\n"
-                + "• CS2 Version 1.39+ erforderlich\n"
-                + "• Windows 10+ und macOS 11+ unterstützt\n"
-                + "• Java 21+ vorausgesetzt\n\n"
-                + "📦 Migration:\n"
-                + "Backup Ihrer Konfigurationen vor dem Update empfohlen!"));
+            homeViewModel.fetchChangelog(release)
+                    .thenAcceptAsync(changelog -> {
+                      Platform.runLater(() -> {
+                        releasesData.put(release.tag(),
+                                new ReleaseData(release.title(),
+                                        release.releaseDate().toString(),
+                                        changelog));
+                        populateReleasesList();
+                        log.debug("Added release: {}", release.tag());
+                      });
+                    })
+                    .exceptionally(throwable -> {
+                      log.error("Error loading changelog for release {}: {}",
+                              release.tag(), throwable.getMessage());
+                      Platform.runLater(() -> {
+                        releasesData.put(release.tag(),
+                                new ReleaseData(release.title(),
+                                        release.releaseDate().toString(),
+                                        "Changelog could not be loaded"));
+                        populateReleasesList();
+                      });
+                      return null;
+                    });
+          });
+        }
 
-    releasesData.put(
-        "v1.0.0",
-        new ReleaseData(
-            "v1.0.0",
-            "01.05.2025",
-            "🎉 Erste stabile Version!\n\n"
-                + "🌟 Hauptfeatures:\n"
-                + "• Vollständige CS2 Integration\n"
-                + "• Drag & Drop Action Sequence Builder\n"
-                + "• Erweiterte Randomizer-Funktionen\n"
-                + "• Benutzerfreundliche Oberfläche\n"
-                + "• Umfangreiche Konfigurationsmöglichkeiten\n\n"
-                + "⚙️ System-Anforderungen:\n"
-                + "• Windows 10+ oder macOS 11+\n"
-                + "• Java 21+\n"
-                + "• CS2 installiert und konfiguriert\n"
-                + "• Mindestens 2GB RAM verfügbar\n\n"
-                + "🎮 Erste Schritte:\n"
-                + "1. CS2 Config-Pfad in Einstellungen setzen\n"
-                + "2. Action Sequences konfigurieren\n"
-                + "3. Randomizer starten und genießen!"));
+        if (change.wasRemoved()) {
+          change.getRemoved().forEach(release -> {
+            releasesData.remove(release.tag());
+            populateReleasesList();
+            log.debug("Removed release: {}", release.tag());
+          });
+        }
+      }
+    });
   }
 
   private void populateReleasesList() {
