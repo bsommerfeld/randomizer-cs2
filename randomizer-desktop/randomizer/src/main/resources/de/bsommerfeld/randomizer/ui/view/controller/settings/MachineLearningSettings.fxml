@@ -16,7 +16,7 @@
                     <children>
                         <Label styleClass="settings-title" text="Machine Learning"/>
                         <Label styleClass="settings-description"
-                               text="Activate Machine Learning for sequence generation."/>
+                               text="Activate Machine Learning for sequence generation"/>
                     </children>
                 </VBox>
                 <HBox HBox.hgrow="ALWAYS"/>

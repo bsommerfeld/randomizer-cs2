@@ -36,7 +36,7 @@
                 <VBox styleClass="settings-auto-update-container" VBox.vgrow="ALWAYS">
                     <children>
                         <Label styleClass="settings-title" text="CS2 Focus"/>
-                        <Label styleClass="settings-description" text="CS2 needs to be in Focus."/>
+                        <Label styleClass="settings-description" text="CS2 needs to be in Focus in order to execute actions"/>
                     </children>
                 </VBox>
                 <HBox HBox.hgrow="ALWAYS"/>
