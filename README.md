@@ -62,40 +62,40 @@ Save time by downloading our [pre-made and playtested sequences](https://github.
 
 ## 📸 Preview
 
-<!-- SCREENSHOT PLACEHOLDER: Home Screen -->
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/a130ae15-ee0c-4e75-bb77-341905cadb96" alt="Randomizer Home Screen" width=500>
-  <br>
-  <small>Home screen showing the main dashboard with quick access to all features</small>
-</p>
-
-<!-- SCREENSHOT PLACEHOLDER: Sequence Builder -->
-<p align="center">
-  [PLACEHOLDER: Add screenshot of the Sequence Builder interface]
-  <br>
-  <small>The Sequence Builder interface where users can drag and drop actions to create custom sequences</small>
-</p>
-
-<!-- SCREENSHOT PLACEHOLDER: Action Categories -->
-<p align="center">
-  [PLACEHOLDER: Add screenshot of the Action Categories panel]
-  <br>
-  <small>Browse through different categories of actions including movement, weapon handling, and inventory management</small>
-</p>
-
-<!-- SCREENSHOT PLACEHOLDER: Settings Screen -->
-<p align="center">
-  [PLACEHOLDER: Add screenshot of the Settings screen]
-  <br>
-  <small>Configure timing intervals, focus detection, and other preferences in the Settings panel</small>
-</p>
-
-<!-- SCREENSHOT PLACEHOLDER: Randomizer in Action -->
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/5ddae49f-e2b2-45a5-8568-1c360cfbec42" alt="Randomizer Settings" width=500>
-  <br>
-  <small>See Randomizer-CS2 in action, triggering unexpected movements during gameplay</small>
-</p>
+<table>
+  <tr>
+    <td>
+      <p align="center">
+        <img src="https://github.com/user-attachments/assets/a130ae15-ee0c-4e75-bb77-341905cadb96" alt="Randomizer Home Screen" width=500>
+        <br>
+        <small>Home screen showing the main dashboard with quick access to all features</small>
+      </p>
+    </td>
+    <td>
+      <p align="center">
+        <img src="https://github.com/user-attachments/assets/39d5405d-57e0-4275-8ea0-f2d924ac8129" alt="Randomizer Builder" width=500>
+        <br>
+        <small>The Sequence Builder interface where users can drag and drop actions to create custom sequences</small>
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <p align="center">
+        <img src="https://github.com/user-attachments/assets/7a4c7446-450e-4e26-8789-89c330a8f28f" alt="Randomizer Settings" width=500>
+        <br>
+        <small>Configure timing intervals, focus detection, and other preferences in the Settings panel</small>
+      </p>
+    </td>
+    <td>
+      <p align="center">
+        <img src="https://github.com/user-attachments/assets/0b748b06-1ce9-4b7b-a569-c19599310277" alt="Randomizer Settings" width=500>
+        <br>
+        <small>See the Randomizer live in action</small>
+      </p>
+    </td>
+  </tr>
+</table>
 
 ---
 
