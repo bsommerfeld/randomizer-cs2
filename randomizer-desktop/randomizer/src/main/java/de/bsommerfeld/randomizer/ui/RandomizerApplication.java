@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RandomizerApplication extends Application {
 
-  private static final int MIN_WIDTH = 704;
+  private static final int MIN_WIDTH = 778;
   private static final int MIN_HEIGHT = 536;
   private static final int MAX_WIDTH = 1280;
   private static final int MAX_HEIGHT = 720;
