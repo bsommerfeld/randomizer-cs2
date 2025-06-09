@@ -449,23 +449,26 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
       return;
     }
 
-    // Check if focus was gained
-    if (currentState == ApplicationState.AWAITING && focusManager.isApplicationWindowInFocus()) {
-      applicationContext.setApplicationState(ApplicationState.RUNNING);
-      log.info("ApplicationState changed to: RUNNING");
-    }
-    // Check if focus was lost
-    else if (currentState == ApplicationState.RUNNING
-        && !focusManager.isApplicationWindowInFocus()) {
-      // Interrupt current sequence if it exists
-      if (currentActionSequence != null) {
-        log.info("Focus lost, interrupting current sequence: {}", currentActionSequence.getName());
-        currentActionSequence.instantInterrupt();
+    if (applicationContext.isCheckForCS2Focus()) {
+      // Check if focus was gained
+      if (currentState == ApplicationState.AWAITING && focusManager.isApplicationWindowInFocus()) {
+        applicationContext.setApplicationState(ApplicationState.RUNNING);
+        log.info("ApplicationState changed to: RUNNING");
       }
+      // Check if focus was lost
+      else if (currentState == ApplicationState.RUNNING
+          && !focusManager.isApplicationWindowInFocus()) {
+        // Interrupt current sequence if it exists
+        if (currentActionSequence != null) {
+          log.info(
+              "Focus lost, interrupting current sequence: {}", currentActionSequence.getName());
+          currentActionSequence.instantInterrupt();
+        }
 
-      // Update application state
-      applicationContext.setApplicationState(ApplicationState.AWAITING);
-      log.info("ApplicationState changed to: AWAITING");
+        // Update application state
+        applicationContext.setApplicationState(ApplicationState.AWAITING);
+        log.info("ApplicationState changed to: AWAITING");
+      }
     }
   }
 }
