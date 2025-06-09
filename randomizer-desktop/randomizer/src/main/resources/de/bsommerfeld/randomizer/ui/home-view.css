@@ -245,6 +245,7 @@
     -fx-background-color: #FBFBFE;
     -fx-background-radius: 8;
     -fx-padding: 8;
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 2);
 }
 
 .releases-list-scroll {
@@ -259,7 +260,7 @@
 
 /* Release Entry Styling */
 .release-entry {
-    -fx-spacing: 10;
+    -fx-spacing: 8;
     -fx-padding: 14 16;
     -fx-background-color: #F8F8FC;
     -fx-background-radius: 8;
@@ -299,16 +300,16 @@
     -fx-font-size: 15;
     -fx-font-weight: bold;
     -fx-text-fill: #040316;
-    -fx-min-width: 90;
-    -fx-pref-width: 90;
+    -fx-min-width: 48;
+    -fx-pref-width: 48;
 }
 
 .release-date-label {
     -fx-font-family: 'Segoe UI', SansSerif;
     -fx-font-size: 14;
     -fx-text-fill: #7E78ED;
-    -fx-min-width: 100;
-    -fx-pref-width: 100;
+    -fx-min-width: 142;
+    -fx-pref-width: 142;
 }
 
 .release-status-indicator {
@@ -318,6 +319,7 @@
     -fx-alignment: center;
     -fx-min-width: 24;
     -fx-pref-width: 24;
+    -fx-translate-y: -1;
 }
 
 /* Right Column - fills remaining horizontal space */
@@ -335,8 +337,8 @@
     -fx-font-weight: bold;
     -fx-text-fill: #040316;
     -fx-padding: 0 0 12 0;
-    -fx-min-height: 32;
-    -fx-pref-height: 32;
+    -fx-min-height: 38;
+    -fx-pref-height: 38;
     -fx-border-color: transparent transparent #E6E5FF transparent;
     -fx-border-width: 0 0 1 0;
 }
@@ -344,19 +346,11 @@
 .changelog-scroll {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
-}
-
-.changelog-content {
-    -fx-padding: 20;
-    -fx-background-color: #FFFFFF;
-    -fx-background-radius: 8;
-    -fx-border-color: #E6E5FF;
-    -fx-border-width: 1;
-    -fx-border-radius: 8;
-    -fx-min-height: 200;
+    -fx-fit-to-width: true;
 }
 
 .changelog-text-flow {
+    -fx-background-color: #FFFFFF;
     -fx-line-spacing: 1.2;
     -fx-font-family: 'Segoe UI', SansSerif;
     -fx-font-size: 14;
@@ -375,20 +369,30 @@
 /* Scroll Bar Styling */
 .releases-list-scroll .scroll-bar:vertical,
 .changelog-scroll .scroll-bar:vertical {
-    -fx-background-color: #E6E5FF;
-    -fx-background-radius: 4;
-    -fx-pref-width: 8;
+    -fx-pref-width: 4;
+    -fx-padding: -4 0;
+    -fx-background-color: transparent;
 }
 
 .releases-list-scroll .scroll-bar:vertical .thumb,
 .changelog-scroll .scroll-bar:vertical .thumb {
-    -fx-background-color: #443DFF;
-    -fx-background-radius: 4;
+    -fx-background-color: #2F27CE;
+    -fx-background-insets: 0;
+    -fx-background-radius: 2;
+    -fx-pref-width: 4;
 }
 
 .releases-list-scroll .scroll-bar:vertical .track,
 .changelog-scroll .scroll-bar:vertical .track {
+    -fx-background-color: #847EE7;
+    -fx-background-radius: 2;
+}
+
+.releases-list-scroll .scroll-bar:vertical .track .increment-button,
+.changelog-scroll .scroll-bar:vertical .track .increment-button {
     -fx-background-color: transparent;
+    -fx-shape: null;
+    -fx-opacity: 0;
 }
 
 /* Ensure proper spacing and alignment */

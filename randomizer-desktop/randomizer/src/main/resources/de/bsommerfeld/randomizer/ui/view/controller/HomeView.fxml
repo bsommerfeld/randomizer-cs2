@@ -95,11 +95,11 @@
                                        text="Wählen Sie ein Release aus"/>
                                 <ScrollPane fx:id="changelogScrollPane" fitToWidth="true" hbarPolicy="NEVER"
                                             styleClass="changelog-scroll" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
-                                    <VBox fx:id="changelogContent" styleClass="changelog-content">
-                                        <!-- TextFlow for markdown rendering -->
+
+                                    <VBox VBox.vgrow="SOMETIMES" style="-fx-background-color: #FFFFFFF">
                                         <TextFlow fx:id="changelogTextFlow" styleClass="changelog-text-flow"
                                                   VBox.vgrow="ALWAYS"/>
-                                    </VBox>
+
                                 </ScrollPane>
                             </children>
                         </VBox>
