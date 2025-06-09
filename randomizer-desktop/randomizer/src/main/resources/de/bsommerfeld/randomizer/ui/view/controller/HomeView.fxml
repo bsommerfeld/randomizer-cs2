@@ -99,7 +99,7 @@
                                     <VBox VBox.vgrow="SOMETIMES" style="-fx-background-color: #FFFFFFF">
                                         <TextFlow fx:id="changelogTextFlow" styleClass="changelog-text-flow"
                                                   VBox.vgrow="ALWAYS"/>
-
+                                    </VBox>
                                 </ScrollPane>
                             </children>
                         </VBox>
