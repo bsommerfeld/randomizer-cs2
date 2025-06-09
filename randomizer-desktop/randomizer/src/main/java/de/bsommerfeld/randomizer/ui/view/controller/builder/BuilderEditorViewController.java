@@ -392,12 +392,25 @@ public class BuilderEditorViewController {
 
               Label actionInterval = new Label();
               actionInterval.getStyleClass().add("builder-sequence-action-interval");
-              actionInterval.setText(action.getInterval().getMin() + "ms" + " - " + action.getInterval().getMax() + "ms");
+              actionInterval.setText(
+                  action.getInterval().getMin()
+                      + "ms"
+                      + " - "
+                      + action.getInterval().getMax()
+                      + "ms");
 
               Button deleteAction = new Button();
               deleteAction.getStyleClass().add("builder-sequence-actions-settings-delete");
 
               actionSettings.getChildren().addAll(actionInterval, deleteAction);
+              actionSettingsController.onChange(
+                  () ->
+                      actionInterval.setText(
+                          action.getInterval().getMin()
+                              + "ms"
+                              + " - "
+                              + action.getInterval().getMax()
+                              + "ms"));
 
               actionContainer.getChildren().addAll(actionIcon, actionLabel, filler, actionSettings);
 
@@ -410,12 +423,12 @@ public class BuilderEditorViewController {
               setupDragAlreadyDropped(actionContainer, action);
               builderVBox.getChildren().add(actionContainer);
 
-                deleteAction.setOnAction(
-                    event -> {
-                        builderViewModel.removeAction(action);
-                        actionSettingsController.setAction(null);
-                        labelInFocusProperty.set(null);
-                    });
+              deleteAction.setOnAction(
+                  event -> {
+                    builderViewModel.removeAction(action);
+                    actionSettingsController.setAction(null);
+                    labelInFocusProperty.set(null);
+                  });
             });
 
     builderVBox.getChildren().stream()

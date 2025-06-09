@@ -15,72 +15,77 @@ import javafx.scene.layout.VBox;
 @View
 public class ActionSettingsController {
 
-    private final ActionSettingsViewModel actionSettingsViewModel;
+  private final ActionSettingsViewModel actionSettingsViewModel;
 
-    @FXML private VBox actionSettingsVBox;
-    @FXML private Label actionInFocusLabel;
-    @FXML private MinMaxSlider minMaxSlider;
+  @FXML private VBox actionSettingsVBox;
+  @FXML private Label actionInFocusLabel;
+  @FXML private MinMaxSlider minMaxSlider;
 
-    @Inject
-    public ActionSettingsController(ActionSettingsViewModel actionSettingsViewModel) {
-        this.actionSettingsViewModel = actionSettingsViewModel;
-        Platform.runLater(this::initialize);
-    }
+  @Inject
+  public ActionSettingsController(ActionSettingsViewModel actionSettingsViewModel) {
+    this.actionSettingsViewModel = actionSettingsViewModel;
+    Platform.runLater(this::initialize);
+  }
 
-    @FXML
-    void onClear(ActionEvent event) {
-        minMaxSlider.setMinMaxValue(0, 1);
-    }
+  @FXML
+  void onClear(ActionEvent event) {
+    minMaxSlider.setMinMaxValue(0, 1);
+  }
 
-    private void initialize() {
-        initializeMinMaxSlider();
-        setupBindings();
-    }
+  private void initialize() {
+    initializeMinMaxSlider();
+    setupBindings();
+  }
 
-    private void initializeMinMaxSlider() {
-        minMaxSlider.setTimeUnit(MinMaxSlider.TimeUnit.MILLISECONDS);
-        minMaxSlider.setMinLowerValue(0);
-        minMaxSlider.setMaxHigherValue(9999);
-        minMaxSlider
-                .getMinProperty()
-                .bindBidirectional(actionSettingsViewModel.getMinIntervalProperty());
-        minMaxSlider
-                .getMaxProperty()
-                .bindBidirectional(actionSettingsViewModel.getMaxIntervalProperty());
-    }
+  private void initializeMinMaxSlider() {
+    minMaxSlider.setTimeUnit(MinMaxSlider.TimeUnit.MILLISECONDS);
+    minMaxSlider.setMinLowerValue(0);
+    minMaxSlider.setMaxHigherValue(9999);
+    minMaxSlider
+        .getMinProperty()
+        .bindBidirectional(actionSettingsViewModel.getMinIntervalProperty());
+    minMaxSlider
+        .getMaxProperty()
+        .bindBidirectional(actionSettingsViewModel.getMaxIntervalProperty());
+  }
 
-    private void setupBindings() {
-        // this is important, since if there is no action to adjust,
-        // we don't need this view
-        actionSettingsVBox
-                .visibleProperty()
-                .bind(actionSettingsViewModel.getActionInFocusProperty().isNotNull());
+  private void setupBindings() {
+    // this is important, since if there is no action to adjust,
+    // we don't need this view
+    actionSettingsVBox
+        .visibleProperty()
+        .bind(actionSettingsViewModel.getActionInFocusProperty().isNotNull());
 
-        actionSettingsViewModel
-                .getActionInFocusProperty()
-                .addListener(
-                        (_, _, newValue) -> {
-                            if (newValue == null) return;
-                            actionInFocusLabel.setText(newValue.getName());
+    actionSettingsViewModel
+        .getActionInFocusProperty()
+        .addListener(
+            (_, _, newValue) -> {
+              if (newValue == null) return;
+              actionInFocusLabel.setText(newValue.getName());
 
-                            /*
-                             * even if it seems nonsensly to set this manually, since we already bound it bidirectional
-                             * to each other, this is still needed, because otherwise the values are not correctly set whyever.
-                             */
-                            Platform.runLater(
-                                    () -> {
-                                        minMaxSlider.setMinMaxValue(
-                                                actionSettingsViewModel.getMinIntervalProperty().get(),
-                                                actionSettingsViewModel.getMaxIntervalProperty().get());
-                                    });
-                        });
-    }
+              /*
+               * even if it seems nonsensly to set this manually, since we already bound it bidirectional
+               * to each other, this is still needed, because otherwise the values are not correctly set whyever.
+               */
+              Platform.runLater(
+                  () -> {
+                    minMaxSlider.setMinMaxValue(
+                        actionSettingsViewModel.getMinIntervalProperty().get(),
+                        actionSettingsViewModel.getMaxIntervalProperty().get());
+                  });
+            });
+  }
 
-    public void bindOnVisibleProperty(Consumer<Boolean> consumer) {
-        actionSettingsVBox.visibleProperty().addListener((_, _, newValue) -> consumer.accept(newValue));
-    }
+  public void bindOnVisibleProperty(Consumer<Boolean> consumer) {
+    actionSettingsVBox.visibleProperty().addListener((_, _, newValue) -> consumer.accept(newValue));
+  }
 
-    public void setAction(Action action) {
-        actionSettingsViewModel.getActionInFocusProperty().set(action);
-    }
+  public void onChange(Runnable callback) {
+    minMaxSlider.getMinProperty().addListener((_, _, newNumber) -> callback.run());
+    minMaxSlider.getMaxProperty().addListener((_, _, newNumber) -> callback.run());
+  }
+
+  public void setAction(Action action) {
+    actionSettingsViewModel.getActionInFocusProperty().set(action);
+  }
 }
