@@ -38,7 +38,6 @@ public class HomeViewController {
   private static final Duration ANIMATION_DURATION = Duration.millis(400);
 
   private final HomeViewModel homeViewModel;
-  // Release data storage
   private final Map<String, ReleaseData> releasesData = new HashMap<>();
 
   @FXML private AnchorPane rootPane;
@@ -51,7 +50,6 @@ public class HomeViewController {
   @FXML private Label changelogTitle;
   @FXML private TextFlow changelogTextFlow;
   private boolean isReleasesVisible = false;
-  private String selectedReleaseVersion = null;
 
   @Inject
   public HomeViewController(HomeViewModel homeViewModel) {
@@ -227,7 +225,6 @@ public class HomeViewController {
     if (release != null) {
       changelogTitle.setText("Changelog " + version);
       renderMarkdown(release.getChangelog());
-      selectedReleaseVersion = version;
 
       log.debug("Selected release: {}", version);
     }
