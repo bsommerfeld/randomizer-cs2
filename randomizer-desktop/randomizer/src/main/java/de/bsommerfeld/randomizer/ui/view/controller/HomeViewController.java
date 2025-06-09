@@ -81,7 +81,7 @@ public class HomeViewController {
   private void showReleaseLoadingError() {
     Platform.runLater(
         () -> {
-          Label errorLabel = new Label("Fehler beim Laden der Releases");
+          Label errorLabel = new Label("Error while loading release data");
           errorLabel.getStyleClass().add("error-label");
           releasesListContent.getChildren().clear();
           releasesListContent.getChildren().add(errorLabel);
