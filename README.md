@@ -85,16 +85,16 @@ Save time by downloading our [pre-made and playtested sequences](https://github.
 
 <!-- SCREENSHOT PLACEHOLDER: Settings Screen -->
 <p align="center">
-  [PLACEHOLDER: Add screenshot of the Settings screen]
+  <img src="https://github.com/user-attachments/assets/5ddae49f-e2b2-45a5-8568-1c360cfbec42" alt="Randomizer Settings" width=500>
   <br>
   <small>Configure timing intervals, focus detection, and other preferences in the Settings panel</small>
 </p>
 
-<!-- SCREENSHOT PLACEHOLDER: Randomizer in Action -->
+<!-- SCREENSHOT PLACEHOLDER: Settings Screen -->
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/5ddae49f-e2b2-45a5-8568-1c360cfbec42" alt="Randomizer Settings" width=500>
+  <img src="https://github.com/user-attachments/assets/0b748b06-1ce9-4b7b-a569-c19599310277" alt="Randomizer Settings" width=500>
   <br>
-  <small>See Randomizer-CS2 in action, triggering unexpected movements during gameplay</small>
+  <small>See the Randomizer live in action</small>
 </p>
 
 ---
