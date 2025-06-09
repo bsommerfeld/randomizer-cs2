@@ -355,6 +355,8 @@
     -fx-font-family: 'Segoe UI', SansSerif;
     -fx-font-size: 14;
     -fx-text-fill: #333333;
+    -fx-min-height: -fx-pref-height;
+    -fx-pref-height: -fx-max-height;
 }
 
 .changelog-placeholder {
