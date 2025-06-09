@@ -21,6 +21,7 @@
 - Simplified configuration loading logic and improved UI synchronization
 - Dynamically load randomizer version from properties file and update application title
 - Improved Starting/Stopping the Executor
+- Interval settings for each action can be seen in the Builder directly now
 
 ### Fixed
 
@@ -36,6 +37,7 @@
 - Fixed skipping GitHub releases without CHANGELOG.md asset and improved related exception handling
 - Fixed stopping the Randomizer interrupts the current sequence and every underlying Action
 - Fixed handling of actions when execution stopped mid-sequence
+- And much more stuff we didn't remember
 
 ### Removed
 
