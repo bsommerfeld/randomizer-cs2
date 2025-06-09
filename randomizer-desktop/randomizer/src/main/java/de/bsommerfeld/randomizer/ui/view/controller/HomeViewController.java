@@ -6,10 +6,9 @@ import de.bsommerfeld.randomizer.ui.RandomizerApplication;
 import de.bsommerfeld.randomizer.ui.view.View;
 import de.bsommerfeld.randomizer.ui.view.viewmodel.HomeViewModel;
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-
 import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
@@ -35,6 +34,8 @@ import lombok.extern.slf4j.Slf4j;
 @View
 public class HomeViewController {
 
+  private static final DateTimeFormatter DATE_FORMATTER =
+      DateTimeFormatter.ofPattern("dd.MM.yyy HH:mm");
   private static final Duration ANIMATION_DURATION = Duration.millis(400);
 
   private final HomeViewModel homeViewModel;
@@ -71,22 +72,23 @@ public class HomeViewController {
     }
   }
 
-  /**
-   * Shows an error message when releases cannot be loaded
-   */
+  /** Shows an error message when releases cannot be loaded */
   private void showReleaseLoadingError() {
-    Platform.runLater(() -> {
-      Label errorLabel = new Label("Fehler beim Laden der Releases");
-      errorLabel.getStyleClass().add("error-label");
-      releasesListContent.getChildren().clear();
-      releasesListContent.getChildren().add(errorLabel);
+    Platform.runLater(
+        () -> {
+          Label errorLabel = new Label("Fehler beim Laden der Releases");
+          errorLabel.getStyleClass().add("error-label");
+          releasesListContent.getChildren().clear();
+          releasesListContent.getChildren().add(errorLabel);
 
-      // Clear changelog and show error message
-      changelogTextFlow.getChildren().clear();
-      Text errorText = new Text("Could not load release information. Please check your internet connection and try again.");
-      errorText.getStyleClass().add("changelog-placeholder");
-      changelogTextFlow.getChildren().add(errorText);
-    });
+          // Clear changelog and show error message
+          changelogTextFlow.getChildren().clear();
+          Text errorText =
+              new Text(
+                  "Could not load release information. Please check your internet connection and try again.");
+          errorText.getStyleClass().add("changelog-placeholder");
+          changelogTextFlow.getChildren().add(errorText);
+        });
   }
 
   @FXML
@@ -129,47 +131,67 @@ public class HomeViewController {
   }
 
   private void setupReleasesData() {
-    homeViewModel.getReleasesList().addListener((ListChangeListener<GitHubRelease>) change -> {
-      while (change.next()) { // ← Das war das fehlende Stück!
-        if (change.wasAdded()) {
-          change.getAddedSubList().forEach(release -> {
-            log.debug("Processing release: {}", release.tag());
+    homeViewModel
+        .getReleasesList()
+        .addListener(
+            (ListChangeListener<GitHubRelease>)
+                change -> {
+                  while (change.next()) {
+                    if (change.wasAdded()) {
+                      change.getAddedSubList().forEach(this::handleReleaseAdded);
+                    }
 
-            homeViewModel.fetchChangelog(release)
-                    .thenAcceptAsync(changelog -> {
-                      Platform.runLater(() -> {
-                        releasesData.put(release.tag(),
-                                new ReleaseData(release.title(),
-                                        release.releaseDate().toString(),
-                                        changelog));
-                        populateReleasesList();
-                        log.debug("Added release: {}", release.tag());
-                      });
-                    })
-                    .exceptionally(throwable -> {
-                      log.error("Error loading changelog for release {}: {}",
-                              release.tag(), throwable.getMessage());
-                      Platform.runLater(() -> {
-                        releasesData.put(release.tag(),
-                                new ReleaseData(release.title(),
-                                        release.releaseDate().toString(),
-                                        "Changelog could not be loaded"));
-                        populateReleasesList();
-                      });
-                      return null;
-                    });
-          });
-        }
+                    if (change.wasRemoved()) {
+                      change.getRemoved().forEach(this::handleReleaseRemoved);
+                    }
+                  }
+                });
+  }
 
-        if (change.wasRemoved()) {
-          change.getRemoved().forEach(release -> {
-            releasesData.remove(release.tag());
-            populateReleasesList();
-            log.debug("Removed release: {}", release.tag());
-          });
-        }
-      }
-    });
+  private void handleReleaseAdded(GitHubRelease release) {
+    log.debug("Processing release: {}", release.tag());
+
+    homeViewModel
+        .fetchChangelog(release)
+        .thenAcceptAsync(changelog -> handleChangelogLoaded(release, changelog))
+        .exceptionally(throwable -> handleChangelogError(release, throwable));
+  }
+
+  private void handleChangelogLoaded(GitHubRelease release, String changelog) {
+    Platform.runLater(
+        () -> {
+          String formattedDate = formatReleaseDate(release);
+          ReleaseData releaseData = new ReleaseData(release.title(), formattedDate, changelog);
+
+          releasesData.put(release.tag(), releaseData);
+          populateReleasesList();
+          log.debug("Added release: {}", release.tag());
+        });
+  }
+
+  private Void handleChangelogError(GitHubRelease release, Throwable throwable) {
+    log.error("Error loading changelog for release {}: {}", release.tag(), throwable.getMessage());
+
+    Platform.runLater(
+        () -> {
+          String formattedDate = formatReleaseDate(release);
+          ReleaseData releaseData =
+              new ReleaseData(release.title(), formattedDate, "Changelog could not be loaded");
+
+          releasesData.put(release.tag(), releaseData);
+          populateReleasesList();
+        });
+    return null;
+  }
+
+  private void handleReleaseRemoved(GitHubRelease release) {
+    releasesData.remove(release.tag());
+    populateReleasesList();
+    log.debug("Removed release: {}", release.tag());
+  }
+
+  private String formatReleaseDate(GitHubRelease release) {
+    return release.releaseDate().format(DATE_FORMATTER);
   }
 
   private void populateReleasesList() {
@@ -187,7 +209,7 @@ public class HomeViewController {
 
   /**
    * Creates a release entry HBox with version, date, and status indicator.
-   * 
+   *
    * @param release The release data to display
    * @return An HBox containing the release entry UI
    */
@@ -231,8 +253,8 @@ public class HomeViewController {
   }
 
   /**
-   * Renders markdown text in the changelog TextFlow.
-   * Supports basic markdown features like headers, lists, and code blocks.
+   * Renders markdown text in the changelog TextFlow. Supports basic markdown features like headers,
+   * lists, and code blocks.
    *
    * @param markdown The markdown text to render
    */
@@ -271,25 +293,21 @@ public class HomeViewController {
     log.debug("Rendered markdown with {} lines", lines.length);
   }
 
-  /**
-   * Adds a placeholder text when no changelog is available
-   */
+  /** Adds a placeholder text when no changelog is available */
   private void addPlaceholderText() {
     Text placeholder = new Text("No changelog available for this release.");
     placeholder.getStyleClass().add("changelog-placeholder");
     changelogTextFlow.getChildren().add(placeholder);
   }
 
-  /**
-   * Adds an empty line to the TextFlow
-   */
+  /** Adds an empty line to the TextFlow */
   private void addEmptyLine() {
     changelogTextFlow.getChildren().add(new Text("\n"));
   }
 
   /**
    * Adds a header text with the specified font size
-   * 
+   *
    * @param text The header text
    * @param fontSize The font size to use
    */
@@ -302,7 +320,7 @@ public class HomeViewController {
 
   /**
    * Adds a list item with a bullet point
-   * 
+   *
    * @param text The list item text
    */
   private void addListItem(String text) {
@@ -316,7 +334,7 @@ public class HomeViewController {
 
   /**
    * Adds normal text to the TextFlow
-   * 
+   *
    * @param text The text to add
    */
   private void addNormalText(String text) {
@@ -325,7 +343,7 @@ public class HomeViewController {
 
   /**
    * Processes a line that contains inline code (text surrounded by backticks)
-   * 
+   *
    * @param line The line to process
    */
   private void processLineWithCode(String line) {
