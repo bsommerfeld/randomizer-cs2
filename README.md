@@ -71,7 +71,7 @@ Save time by downloading our [pre-made and playtested sequences](https://github.
 
 <!-- SCREENSHOT PLACEHOLDER: Sequence Builder -->
 <p align="center">
-  [PLACEHOLDER: Add screenshot of the Sequence Builder interface]
+  <img src="https://github.com/user-attachments/assets/39d5405d-57e0-4275-8ea0-f2d924ac8129" alt="Randomizer Builder" width=500>
   <br>
   <small>The Sequence Builder interface where users can drag and drop actions to create custom sequences</small>
 </p>
@@ -85,7 +85,7 @@ Save time by downloading our [pre-made and playtested sequences](https://github.
 
 <!-- SCREENSHOT PLACEHOLDER: Settings Screen -->
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/5ddae49f-e2b2-45a5-8568-1c360cfbec42" alt="Randomizer Settings" width=500>
+  <img src="https://github.com/user-attachments/assets/7a4c7446-450e-4e26-8789-89c330a8f28f" alt="Randomizer Settings" width=500>
   <br>
   <small>Configure timing intervals, focus detection, and other preferences in the Settings panel</small>
 </p>
