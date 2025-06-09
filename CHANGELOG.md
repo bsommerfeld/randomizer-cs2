@@ -4,6 +4,8 @@
 
 - Added setting to switch whether CS2 has to be in focus in order that the Randomizer works
 - Added GitHub Repository Details to top corner of HomeView
+- Added Releases View
+- Added Machine Learning Settings for future updates
 - Timers for each action in the Randomizer Logbook
 
 ### Changed
