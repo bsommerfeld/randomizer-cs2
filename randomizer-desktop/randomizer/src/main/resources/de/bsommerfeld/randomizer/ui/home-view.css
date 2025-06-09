@@ -253,15 +253,9 @@
     -fx-border-color: transparent;
 }
 
-.releases-list-content {
-    -fx-spacing: 4;
-    -fx-padding: 8;
-}
-
-/* Release Entry Styling */
 .release-entry {
-    -fx-spacing: 8;
-    -fx-padding: 14 16;
+    -fx-spacing: 6; /* Reduziert von 8 auf 6 */
+    -fx-padding: 14 12; /* Reduziert von 14 16 auf 14 12 */
     -fx-background-color: #F8F8FC;
     -fx-background-radius: 8;
     -fx-border-color: transparent;
@@ -269,21 +263,15 @@
     -fx-border-radius: 8;
     -fx-min-height: 44;
     -fx-pref-height: 44;
+    -fx-max-width: 264; /* Fügen Sie diese Zeile hinzu */
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 4, 0, 0, 1);
     -fx-alignment: center-left;
     -fx-transition: all 0.2s ease-in-out;
 }
 
-.release-entry:hover {
-    -fx-background-color: #EEEEFF;
-    -fx-border-color: #D0D0FF;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 6, 0, 0, 2);
-    -fx-translate-y: -1;
-}
-
 .release-entry-selected {
-    -fx-spacing: 10;
-    -fx-padding: 14 16;
+    -fx-spacing: 6; /* Reduziert von 10 auf 6 */
+    -fx-padding: 14 12; /* Reduziert von 14 16 auf 14 12 */
     -fx-background-color: #E6E5FF;
     -fx-background-radius: 8;
     -fx-border-color: #443DFF;
@@ -291,6 +279,7 @@
     -fx-border-radius: 8;
     -fx-min-height: 44;
     -fx-pref-height: 44;
+    -fx-max-width: 264; /* Fügen Sie diese Zeile hinzu */
     -fx-effect: dropshadow(gaussian, rgba(68, 61, 255, 0.2), 8, 0, 0, 2);
     -fx-alignment: center-left;
 }
@@ -300,16 +289,18 @@
     -fx-font-size: 15;
     -fx-font-weight: bold;
     -fx-text-fill: #040316;
-    -fx-min-width: 48;
-    -fx-pref-width: 48;
+    -fx-min-width: 44; /* Reduziert von 48 auf 44 */
+    -fx-pref-width: 44; /* Reduziert von 48 auf 44 */
+    -fx-max-width: 44; /* Hinzugefügt */
 }
 
 .release-date-label {
     -fx-font-family: 'Segoe UI', SansSerif;
     -fx-font-size: 14;
     -fx-text-fill: #7E78ED;
-    -fx-min-width: 142;
-    -fx-pref-width: 142;
+    -fx-min-width: 130; /* Reduziert von 142 auf 130 */
+    -fx-pref-width: 130; /* Reduziert von 142 auf 130 */
+    -fx-max-width: 130; /* Hinzugefügt */
 }
 
 .release-status-indicator {
@@ -317,9 +308,16 @@
     -fx-font-size: 16;
     -fx-text-fill: #443DFF;
     -fx-alignment: center;
-    -fx-min-width: 24;
-    -fx-pref-width: 24;
+    -fx-min-width: 20; /* Reduziert von 24 auf 20 */
+    -fx-pref-width: 20; /* Reduziert von 24 auf 20 */
+    -fx-max-width: 20; /* Hinzugefügt */
     -fx-translate-y: -1;
+}
+
+.releases-list-content {
+    -fx-spacing: 4;
+    -fx-padding: 8;
+    -fx-max-width: 264; /* Hinzugefügt */
 }
 
 /* Right Column - fills remaining horizontal space */
@@ -394,11 +392,6 @@
     -fx-background-color: transparent;
     -fx-shape: null;
     -fx-opacity: 0;
-}
-
-/* Ensure proper spacing and alignment */
-.release-entry {
-    -fx-alignment: center-left;
 }
 
 .changelog-content {
