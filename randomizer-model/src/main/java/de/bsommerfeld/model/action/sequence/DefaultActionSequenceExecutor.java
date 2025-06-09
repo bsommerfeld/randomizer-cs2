@@ -113,6 +113,9 @@ public class DefaultActionSequenceExecutor implements ActionSequenceExecutor {
 
     log.info("Executor thread stopped");
     hasReleasedAnyKey = false;
+    lastWaitTime = 0;
+    lastCycle = 0;
+    lastFocusCheckTime = 0;
   }
 
   private void registerApplicationStateChangeListener() {
