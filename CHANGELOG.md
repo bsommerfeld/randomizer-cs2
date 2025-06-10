@@ -6,5 +6,7 @@
 
 ### Fixed
 
+- Fix for JDeploy
+
 ### Removed
 
