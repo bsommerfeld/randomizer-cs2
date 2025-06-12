@@ -1,66 +1,53 @@
 # <img src="https://github.com/user-attachments/assets/ab28eba7-4b88-47b4-be10-ac4487d66e23" alt="randomizer" width="24" height="24" style="vertical-align: middle;" />andomizer-CS2
 
-![NPM Downloads](https://img.shields.io/npm/d18m/randomizer-cs2?style=plastic)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/bsommerfeld/randomizer-cs2)
+[![Version](https://img.shields.io/badge/version-1.3.3-blue.svg)](https://github.com/bsommerfeld/randomizer-cs2/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Java](https://img.shields.io/badge/java-24-orange.svg)](https://www.oracle.com/java/technologies/javase/jdk24-archive-downloads.html)
+[![NPM Downloads](https://img.shields.io/npm/d18m/randomizer-cs2)](https://www.npmjs.com/package/randomizer-cs2)
+[![GitHub Stars](https://img.shields.io/github/stars/bsommerfeld/randomizer-cs2?style=social)](https://github.com/bsommerfeld/randomizer-cs2/stargazers)
 
----
+## 📋 Table of Contents
 
-## 🎮 About
+- [Overview](#-overview)
+- [Features](#-features)
+- [Screenshots](#-screenshots)
+- [Installation](#-installation)
+- [Usage Guide](#-usage-guide)
+- [Creating Custom Sequences](#-creating-custom-sequences)
+- [Development](#-development)
+- [Contributing](#-contributing)
+- [Team](#-team)
+- [License](#-license)
+- [FAQ](#-faq)
 
-Randomizer-CS2 is a powerful JavaFX application that allows you to create custom sequences of random actions to trigger them
-randomly in Counter-Strike 2. Make your friends in the game jump, shoot, reload, or drop their weapons at unfavorable
-moments – all without injecting into the game itself. Perfect for streamers, content creators, or anyone looking to add an element of chaos to their CS2 gameplay!
+## 🎮 Overview
 
-### ✨ Key Features
+**Randomizer-CS2** is a powerful JavaFX application that adds an element of unpredictability to Counter-Strike 2
+gameplay. It allows you to create and trigger random action sequences without modifying the game itself.
 
-* **Custom Action Sequences**: Create, save, and manage your own sequences of game actions
-* **Random Triggering**: Actions are triggered randomly based on your configured time intervals
-* **Sequence Builder**: Intuitive drag-and-drop interface for creating action sequences
-* **Interrupt Control**: Easily stop actions stopping the Randomizer or closing CS2
-* **Game Focus Detection**: Automatically pauses when CS2 is not in focus
-* **Non-Intrusive**: Works without game injection or modification (no VAC ban risk)
-* **User-Friendly Interface**: Modern JavaFX UI with smooth animations
-* **Lightweight**: Minimal system resource usage
-* **Open Source**: Fully customizable and community-driven
+Whether you want to prank friends, create entertaining content, or add a challenge to your gameplay, Randomizer-CS2
+offers a user-friendly solution with no risk of VAC bans.
 
-<div style="background-color: #f8f8f8; padding: 10px; border-left: 3px solid #2196F3; margin: 10px 0;">
-<p style="color: #555;">
+> **The Story Behind Randomizer-CS2**
+>
+> This project began as a fun way to troll friends during spectated matches. We wanted to make players jump at the worst
+> moments, fire unexpectedly, or drop weapons mid-fight. Without access to a dedicated server, we created this software
+> solution that anyone could use to trigger random actions. What started as Randomizer-CSGO has evolved into the more
+> refined Randomizer-CS2.
 
-> The origin of Randomizer-CS2 stemmed from our desire to playfully troll each other while spectating matches. Imagine
-> forcing someone to jump at the worst moment, making them fire unexpectedly, or even dropping their weapon mid-fight!
-> Lacking the resources for a dedicated server, we opted for a software solution that everyone could use to trigger
-> these random actions. This marked the birth of Randomizer-CSGO, now known as Randomizer-CS2.
+## ✨ Features
 
-</p>
-</div>
+- **Custom Action Sequences**: Build, save, and manage personalized game action sequences
+- **Random Triggering System**: Actions execute at random intervals within your configured time range
+- **Intuitive Sequence Builder**: Drag-and-drop interface for easy sequence creation
+- **Game Focus Detection**: Automatically pauses when CS2 isn't the active window
+- **Safe to Use**: Works without game injection or modification (no VAC ban risk)
+- **Modern Interface**: Clean, responsive JavaFX UI with smooth animations
+- **Resource Efficient**: Minimal system resource usage
+- **Sequence Sharing**: Import/export capabilities for sharing custom sequences
+- **Regular Updates**: Ongoing development with community feedback integration
 
----
-
-## 🛠️ Get Started
-
-### Installation Guide
-
-1. **Download**: Get the latest release from our [releases page](https://github.com/bsommerfeld/randomizer-cs2/releases/)
-2. **Install**: Run the installer and follow the on-screen instructions
-3. **Launch**: Start Randomizer-CS2 from your desktop or start menu
-4. **Configure**: Set up your preferences in the settings menu
-5. **Create Sequences**: Build your first action sequence or import pre-made ones
-
-### Pre-made Sequences
-
-Save time by downloading our [pre-made and playtested sequences](https://github.com/bsommerfeld/randomizer-cs2/tree/master/.randomizer/sequences)!
-
-### System Requirements
-
-* **OS**: Windows 10/11
-* **Memory**: 100MB minimum
-* **Disk Space**: 50MB minimum
-* **Additional**: Internet connection for updates and GitHub integration
-
----
-
-## 📸 Preview
+## 📸 Screenshots
 
 <table>
   <tr>
@@ -68,14 +55,14 @@ Save time by downloading our [pre-made and playtested sequences](https://github.
       <p align="center">
         <img src="https://github.com/user-attachments/assets/761f46f2-bffb-4aab-9a75-e5a42f784578" alt="Randomizer Home Screen" width=500>
         <br>
-        <small>Home screen showing the main dashboard with quick access to all features</small>
+        <em>Home Dashboard</em>
       </p>
     </td>
     <td>
       <p align="center">
         <img src="https://github.com/user-attachments/assets/005f9d92-6791-411e-8d23-457f74fd909c" alt="Randomizer Builder" width=500>
         <br>
-        <small>The Sequence Builder interface where users can drag and drop actions to create custom sequences</small>
+        <em>Sequence Builder Interface</em>
       </p>
     </td>
   </tr>
@@ -84,102 +71,197 @@ Save time by downloading our [pre-made and playtested sequences](https://github.
       <p align="center">
         <img src="https://github.com/user-attachments/assets/9ba84d69-472f-4775-bdba-8529bd14028a" alt="Randomizer Settings" width=500>
         <br>
-        <small>Configure timing intervals, focus detection, and other preferences in the Settings panel</small>
+        <em>Settings Configuration Panel</em>
       </p>
     </td>
     <td>
       <p align="center">
-        <img src="https://github.com/user-attachments/assets/404e50f5-b5cb-40ea-ba77-5e0ab428b735" alt="Randomizer Settings" width=500>
+        <img src="https://github.com/user-attachments/assets/404e50f5-b5cb-40ea-ba77-5e0ab428b735" alt="Randomizer in Action" width=500>
         <br>
-        <small>See the Randomizer live in action</small>
+        <em>Randomizer Live in Action</em>
       </p>
     </td>
   </tr>
 </table>
 
----
+## 🚀 Installation
 
-## 🎯 How It Works
+### System Requirements
 
-1. **Create Sequences**: Build custom sequences of actions using the drag-and-drop builder
-2. **Configure Timing**: Set minimum and maximum wait times between random triggers
-3. **Start Randomizer**: Activate the randomizer and launch CS2
-4. **Game Integration**: The application detects when CS2 is in focus
-5. **Random Execution**: Actions are triggered at random intervals within your configured time range
-6. **Automatic Pausing**: The randomizer automatically pauses when CS2 loses focus
+- **Operating System**: Windows 10/11
+- **Java**: JDK 24 or higher
+- **Memory**: 100MB minimum
+- **Disk Space**: 50MB minimum
+- **Additional**: Internet connection for updates and GitHub integration
 
----
+### Installation Steps
 
-## 🔧 Advanced Usage
+1. **Download**: Get the latest release from
+   our [releases page](https://github.com/bsommerfeld/randomizer-cs2/releases/)
+2. **Install**: Run the installer and follow the on-screen instructions
+3. **Launch**: Start Randomizer-CS2 from your desktop or start menu
+4. **Configure**: Set up your preferences in the settings menu
+5. **Create or Import**: Build your first action sequence or import pre-made ones
 
-### Custom Action Sequences
+### Pre-made Sequences
 
-Create your own action sequences with specific combinations of movements, weapon actions, and more:
+Save time by downloading
+our [pre-made and playtested sequences](https://github.com/bsommerfeld/randomizer-cs2/tree/master/.randomizer/sequences)!
 
-1. Click on "Builder" in the main menu
-2. Drag actions from the left panel to the sequence editor
-3. Arrange actions in your desired order
-4. Save your sequence with a descriptive name and description
+## 🎯 Usage Guide
 
-### Sharing Sequences
+### Basic Operation
 
-Share your custom sequences with friends:
+1. **Launch the Application**: Start Randomizer-CS2
+2. **Select a Sequence**: Choose from your saved sequences or create a new one
+3. **Configure Timing**: Set minimum and maximum wait times between random triggers
+4. **Start the Randomizer**: Click the "Start" button to activate
+5. **Launch CS2**: Open Counter-Strike 2
+6. **Play Normally**: The randomizer will trigger actions at random intervals
+7. **Stop Anytime**: Click "Stop" in Randomizer-CS2 or simply close CS2
 
-1. Locate your sequences folder (accessible via the "Open Sequences Folder" button)
-2. Copy the desired sequence files
-3. Share them with friends who can import them into their own Randomizer-CS2
+### Tips for Best Results
 
----
+- **Start with Simple Sequences**: Begin with basic actions before creating complex combinations
+- **Test in Casual Modes**: Try your sequences in casual game modes before using in competitive
+- **Adjust Timing**: Find the sweet spot between too frequent and too rare triggers
+- **Use Focus Detection**: Enable the automatic pause feature when tabbing out of CS2
+- **Share the Fun**: Record reactions and share with friends or on social media
+
+## 🔧 Creating Custom Sequences
+
+### Using the Sequence Builder
+
+1. **Access the Builder**: Click on "Builder" in the main menu
+2. **Browse Available Actions**: Explore the action palette on the bottom panel
+3. **Create Your Sequence**: Drag actions from the palette to the sequence editor
+4. **Arrange Actions**: Order them as desired (they'll execute in sequence when triggered)
+5. **Action Duration**: Change the duration of the action by clicking on it.
+6. **Save Your Creation**: Give it a name and description for easy reference
+
+### Available Actions
+
+- **Movement**: Jump, Duck, Move (various directions + mouse)
+- **Weapons**: Primary/Secondary weapon switch, Drop current weapon
+- **Combat**: Fire, Reload, Use knife
+- **Utility**: Use grenades, Deploy equipment
+- **Custom**: Create combinations of multiple actions
+
+### Sharing Your Sequences
+
+1. **Export**: Locate your sequences folder via the "Open Sequences Folder" button
+2. **Share Files**: Send the sequence files to friends
+3. **Import**: Recipients can place files in their sequences folder
+
+## 💻 Development
+
+### Project Structure
+
+Randomizer-CS2 consists of three main modules:
+
+- **randomizer-desktop**: The main application UI and controllers
+- **randomizer-model**: Core data models and business logic
+- **github-api-client**: Integration with GitHub for repository information
+
+### Building from Source
+
+1. **Prerequisites**:
+    - Java JDK 24 or higher
+    - Maven 3.6+
+    - Git
+
+2. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/bsommerfeld/randomizer-cs2.git
+   cd randomizer-cs2
+   ```
+
+3. **Build with Maven**:
+   ```bash
+   mvn clean install
+   ```
+
+4. **Run the Application**:
+   ```bash
+   java -jar randomizer-desktop/randomizer/target/randomizer.jar
+   ```
+
+### Technology Stack
+
+- **UI Framework**: JavaFX
+- **Build System**: Maven
+- **Dependency Injection**: Guice
+- **Logging**: SLF4J with Logback
+- **Persistence**: GSON
 
 ## 🤝 Contributing
 
 We welcome contributions from the community! Here's how you can help:
 
-1. **Report Bugs**: Open an issue if you find a bug, including steps to reproduce
-2. **Suggest Features**: Have an idea? Let us know by creating a feature request
-3. **Improve Documentation**: Help us make the documentation clearer and more comprehensive
-4. **Submit PRs**: Code contributions are always welcome - fork the repo and submit a pull request
-5. **Create Sequences**: Share your creative action sequences with the community
-6. **Share**: Tell others about Randomizer-CS2 and help grow our community
+### Ways to Contribute
 
-### Development Setup
+- **Report Bugs**: Open an issue if you find a bug
+- **Suggest Features**: Have an idea? Create a feature request
+- **Improve Documentation**: Help make our docs clearer
+- **Submit Code**: Fork the repo and submit a pull request
+- **Create Sequences**: Share your creative action sequences
+- **Spread the Word**: Tell others about Randomizer-CS2
 
-1. Clone the repository
-2. Install Java JDK 24 or higher
-3. Build with Maven: `mvn clean install`
-4. Run the application: `java -jar randomizer-desktop/randomizer/target/randomizer.jar`
+### Contribution Guidelines
 
----
-
-## ⭐ Support Us!
-
-If you find Randomizer-CS2 useful, please consider:
-
-* Starring the repository on GitHub
-* Sharing with friends and fellow gamers
-* Contributing to the codebase
-* Creating and sharing custom sequences
-* Providing feedback to help us improve
-
-<img src="https://github.com/user-attachments/assets/efffd234-5f9e-4f13-b8a3-539257139d92" width="250" height="auto" style="vertical-align: middle;">
-
----
+1. **Fork the Repository**: Create your own fork of the project
+2. **Create a Branch**: Make your changes in a new branch
+3. **Follow Coding Standards**: Maintain the existing code style
+4. **Write Tests**: Add tests for new features
+5. **Submit a Pull Request**: Open a PR with a clear description of your changes
 
 ## 👥 Team
 
-* **UX Design**: [bustolio](https://www.github.com/bustolio)
-* **Programming**: [bsommerfeld](https://www.github.com/bsommerfeld)
+- **Programming**: [Benjamin Sommerfeld (bsommerfeld)](https://github.com/bsommerfeld)
+- **UX Design**: [Kjell Witzurke (bustolio)](https://github.com/bustolio)
 
-Want to join our team? Reach out to us on GitHub or Discord!
-
----
+Want to join our team? Reach out to us on GitHub!
 
 ## 📄 License
 
 Randomizer-CS2 is licensed under the [MIT License](LICENSE).
 
+## ❓ FAQ
+
+### Is Randomizer-CS2 safe to use?
+
+Yes! Randomizer-CS2 doesn't inject code into CS2 or modify game files. It works by simulating keyboard and mouse inputs,
+which is completely safe and won't trigger VAC bans.
+
+### Can I use this in competitive matches?
+
+While technically possible, we recommend using Randomizer-CS2 in casual game modes or private matches to avoid
+negatively impacting competitive gameplay for others. Or queue as a 5-stack!
+
+### How do I create my own sequences?
+
+Use the built-in Sequence Builder to drag and drop actions into a custom sequence. See
+the [Creating Custom Sequences](#-creating-custom-sequences) section for detailed instructions.
+
+### Does this work with other games?
+
+Randomizer-CS2 is specifically designed for Counter-Strike 2, but the underlying technology could work with other games.
+Future versions might include support for additional games.
+
+### Where can I get help if I have issues?
+
+Open an issue on our [GitHub repository](https://github.com/bsommerfeld/randomizer-cs2/issues).
+
 ---
 
-## 🔄 Changelog
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/efffd234-5f9e-4f13-b8a3-539257139d92" width="250" height="auto">
+  <br>
+  <em>Made with ❤️ by the Randomizer-CS2 Team</em>
+</p>
 
-Check out our [releases page](https://github.com/bsommerfeld/randomizer-cs2/releases) for detailed changelog information.
+<p align="center">
+  <a href="https://github.com/bsommerfeld/randomizer-cs2/stargazers">⭐ Star us on GitHub</a> •
+  <a href="https://github.com/bsommerfeld/randomizer-cs2/releases">📥 Download Latest Release</a> •
+  <a href="https://github.com/bsommerfeld/randomizer-cs2/issues">🐛 Report Bug</a>
+</p>
