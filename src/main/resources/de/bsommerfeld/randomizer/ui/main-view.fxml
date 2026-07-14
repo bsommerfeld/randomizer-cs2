@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="de.bsommerfeld.randomizer.ui.MainController"
+            prefWidth="900" prefHeight="650">
+    <center>
+        <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
+            <Tab fx:id="defaultTab" text="Default-Keybinds">
+                <BorderPane>
+                    <top>
+                        <Label fx:id="defaultStatusLabel" maxWidth="Infinity" wrapText="true">
+                            <padding>
+                                <Insets top="10" right="12" bottom="10" left="12"/>
+                            </padding>
+                        </Label>
+                    </top>
+                    <center>
+                        <TextArea fx:id="defaultJsonArea" editable="false"
+                                  style="-fx-font-family: 'Consolas', 'Courier New', monospace;">
+                            <BorderPane.margin>
+                                <Insets right="12" left="12" bottom="4"/>
+                            </BorderPane.margin>
+                        </TextArea>
+                    </center>
+                </BorderPane>
+            </Tab>
+            <Tab fx:id="userTab" text="Custom Keybinds">
+                <BorderPane>
+                    <top>
+                        <Label fx:id="userStatusLabel" maxWidth="Infinity" wrapText="true">
+                            <padding>
+                                <Insets top="10" right="12" bottom="10" left="12"/>
+                            </padding>
+                        </Label>
+                    </top>
+                    <center>
+                        <TextArea fx:id="userJsonArea" editable="false"
+                                  style="-fx-font-family: 'Consolas', 'Courier New', monospace;">
+                            <BorderPane.margin>
+                                <Insets right="12" left="12" bottom="4"/>
+                            </BorderPane.margin>
+                        </TextArea>
+                    </center>
+                </BorderPane>
+            </Tab>
+            <Tab fx:id="gsiTab" text="Live (GSI)">
+                <BorderPane>
+                    <top>
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <padding>
+                                <Insets top="10" right="12" bottom="10" left="12"/>
+                            </padding>
+                            <Button fx:id="gsiToggleButton" text="GSI starten" onAction="#onGsiToggle"/>
+                            <Label fx:id="gsiStatusLabel" maxWidth="Infinity" wrapText="true" HBox.hgrow="ALWAYS"/>
+                        </HBox>
+                    </top>
+                    <center>
+                        <SplitPane dividerPositions="0.45">
+                            <BorderPane.margin>
+                                <Insets right="12" left="12" bottom="4"/>
+                            </BorderPane.margin>
+                            <TextArea fx:id="gsiEventsArea" editable="false" wrapText="false"
+                                      promptText="Events erscheinen hier, sobald CS2 Daten schickt…"
+                                      style="-fx-font-family: 'Consolas', 'Courier New', monospace;"/>
+                            <TextArea fx:id="gsiJsonArea" editable="false"
+                                      promptText="Aktueller Game State als JSON"
+                                      style="-fx-font-family: 'Consolas', 'Courier New', monospace;"/>
+                        </SplitPane>
+                    </center>
+                </BorderPane>
+            </Tab>
+        </TabPane>
+    </center>
+    <bottom>
+        <HBox fx:id="manualBox" spacing="8" alignment="CENTER_LEFT">
+            <padding>
+                <Insets top="10" right="12" bottom="12" left="12"/>
+            </padding>
+            <Button text="Neu laden" onAction="#onReload"/>
+            <TextField fx:id="pathField" promptText="Pfad zur .vcfg für den aktiven Tab" HBox.hgrow="ALWAYS"/>
+            <Button text="Durchsuchen…" onAction="#onBrowse"/>
+            <Button text="Laden" onAction="#onLoad" defaultButton="true"/>
+        </HBox>
+    </bottom>
+</BorderPane>
