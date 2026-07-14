@@ -34,14 +34,14 @@ class GsiServiceTest {
     }
 
     @Test
-    void deliversGameEventsAsLogLines() throws Exception {
+    void deliversGameEventsWithSummaryAndDetails() throws Exception {
         int port = freePort();
         CountDownLatch received = new CountDownLatch(1);
-        AtomicReference<String> firstLine = new AtomicReference<>();
+        AtomicReference<GsiService.GsiEvent> firstEvent = new AtomicReference<>();
 
         try (GsiService service = new GsiService(port)) {
-            service.onGameEventText(line -> {
-                firstLine.compareAndSet(null, line);
+            service.onGameEvent(event -> {
+                firstEvent.compareAndSet(null, event);
                 received.countDown();
             });
             assertTrue(service.start());
@@ -50,7 +50,10 @@ class GsiServiceTest {
             post(port, "{\"round\":{\"phase\":\"over\"}}");
 
             assertTrue(received.await(5, TimeUnit.SECONDS), "event callback should fire");
-            assertNotNull(firstLine.get());
+            GsiService.GsiEvent event = firstEvent.get();
+            assertNotNull(event);
+            assertTrue(event.summary().matches("\\d{2}:\\d{2}:\\d{2}  .+"), "summary should start with a timestamp");
+            assertTrue(event.details().contains("Event: "), "details should name the event type");
         }
     }
 

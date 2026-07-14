@@ -7,8 +7,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -71,16 +75,126 @@ public final class GsiService implements AutoCloseable {
         listener.onNewGameState(state -> handler.accept(toPrettyJson(state)));
     }
 
-    /** Registers a handler that receives every CS2 event as a formatted log line. */
-    public void onGameEventText(Consumer<String> handler) {
-        listener.onGameEvent(event -> handler.accept(formatEvent(event)));
+    /** A single CS2 event prepared for display: one-line summary plus multi-line details. */
+    public record GsiEvent(String summary, String details) {
     }
 
-    private static String formatEvent(CS2GameEvent event) {
-        String details = event.toString();
-        // Records yield "PlayerGotKill[...]"; otherwise show just the class name
-        String description = details.contains("[") ? details : event.getClass().getSimpleName();
-        return LocalTime.now().format(TIME) + "  " + description;
+    /** Registers a handler that receives every CS2 event as a {@link GsiEvent}. */
+    public void onGameEvent(Consumer<GsiEvent> handler) {
+        listener.onGameEvent(event -> handler.accept(toGsiEvent(event)));
+    }
+
+    private static GsiEvent toGsiEvent(CS2GameEvent event) {
+        String time = LocalTime.now().format(TIME);
+        String name = event.getClass().getSimpleName();
+        String summary = time + "  " + abbreviate(name + summarizeFields(event));
+        String details = "Zeit:  " + time + System.lineSeparator()
+                + "Event: " + name + System.lineSeparator()
+                + System.lineSeparator()
+                + formatFields(event);
+        return new GsiEvent(summary, details);
+    }
+
+    private static String abbreviate(String value) {
+        return value.length() <= 160 ? value : value.substring(0, 157) + "…";
+    }
+
+    /** Compact "key=value" pairs of all scalar event fields for the summary line. */
+    private static String summarizeFields(CS2GameEvent event) {
+        StringBuilder sb = new StringBuilder();
+        for (Field field : publicInstanceFields(event)) {
+            Object value = readField(field, event);
+            String text = String.valueOf(value);
+            // Node values render as JSON objects — too long for the summary line
+            if (!text.startsWith("{") && !text.startsWith("[")) {
+                sb.append(' ').append(field.getName()).append('=').append(text);
+            }
+        }
+        return sb.toString();
+    }
+
+    /** Lists every public event field; Node values (raw JSON) are pretty-printed. */
+    private static String formatFields(CS2GameEvent event) {
+        List<Field> fields = publicInstanceFields(event);
+        if (fields.isEmpty()) {
+            return "(keine weiteren Daten)";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Field field : fields) {
+            Object value = readField(field, event);
+            sb.append(field.getName()).append(':').append(System.lineSeparator())
+                    .append(formatValue(value).indent(2))
+                    .append(System.lineSeparator());
+        }
+        return sb.toString().stripTrailing();
+    }
+
+    private static List<Field> publicInstanceFields(CS2GameEvent event) {
+        List<Field> fields = new ArrayList<>();
+        for (Field field : event.getClass().getFields()) {
+            if (!Modifier.isStatic(field.getModifiers())) {
+                fields.add(field);
+            }
+        }
+        return fields;
+    }
+
+    private static Object readField(Field field, CS2GameEvent event) {
+        try {
+            return field.get(event);
+        } catch (ReflectiveOperationException e) {
+            return "<nicht lesbar>";
+        }
+    }
+
+    private static String formatValue(Object value) {
+        if (value == null) {
+            return "null";
+        }
+        String text = String.valueOf(value);
+        if (text.startsWith("{")) {
+            // Raw JSON (e.g. from Node.parsedData) — pretty-print it when possible
+            try {
+                return GSON.toJson(JsonParser.parseString(text));
+            } catch (RuntimeException ignored) {
+            }
+        }
+        if (text.contains("[")) {
+            // Node values render as "[SteamID: ..., State: [...]]" — indent the nesting
+            return indentBrackets(text);
+        }
+        return text;
+    }
+
+    private static String indentBrackets(String raw) {
+        StringBuilder sb = new StringBuilder();
+        int indent = 0;
+        for (int i = 0; i < raw.length(); i++) {
+            char c = raw.charAt(i);
+            switch (c) {
+                case '[' -> {
+                    if (i + 1 < raw.length() && raw.charAt(i + 1) == ']') {
+                        sb.append("[]");
+                        i++;
+                    } else {
+                        indent++;
+                        sb.append('[').append(System.lineSeparator()).append("  ".repeat(indent));
+                    }
+                }
+                case ']' -> {
+                    indent = Math.max(0, indent - 1);
+                    sb.append(System.lineSeparator()).append("  ".repeat(indent)).append(']');
+                }
+                case ',' -> {
+                    sb.append(',').append(System.lineSeparator()).append("  ".repeat(indent));
+                    if (i + 1 < raw.length() && raw.charAt(i + 1) == ' ') {
+                        i++;
+                    }
+                }
+                default -> sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 
     private static String toPrettyJson(GameState state) {

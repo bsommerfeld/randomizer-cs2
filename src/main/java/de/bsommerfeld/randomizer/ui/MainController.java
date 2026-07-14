@@ -8,6 +8,8 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
@@ -43,7 +45,9 @@ public class MainController {
     @FXML
     private TextArea gsiJsonArea;
     @FXML
-    private TextArea gsiEventsArea;
+    private ListView<GsiService.GsiEvent> gsiEventsList;
+    @FXML
+    private TextArea gsiEventDetailsArea;
     @FXML
     private HBox manualBox;
     @FXML
@@ -73,9 +77,21 @@ public class MainController {
         initGsi();
     }
 
+    private static final int MAX_EVENT_LOG_ENTRIES = 1000;
+
     private void initGsi() {
+        gsiEventsList.setCellFactory(list -> new ListCell<>() {
+            @Override
+            protected void updateItem(GsiService.GsiEvent item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.summary());
+            }
+        });
+        gsiEventsList.getSelectionModel().selectedItemProperty().addListener((obs, oldEvent, selected) ->
+                gsiEventDetailsArea.setText(selected == null ? "" : selected.details()));
+
         gsiService.onGameStateJson(json -> Platform.runLater(() -> updateGsiJson(json)));
-        gsiService.onGameEventText(line -> Platform.runLater(() -> appendEventLine(line)));
+        gsiService.onGameEvent(event -> Platform.runLater(() -> appendEvent(event)));
         gsiStatusLabel.setText("GSI nicht gestartet — mit \"GSI starten\" beginnen, dann sendet CS2 seine Events hierher.");
     }
 
@@ -114,11 +130,11 @@ public class MainController {
         });
     }
 
-    private void appendEventLine(String line) {
-        gsiEventsArea.appendText(line + System.lineSeparator());
-        // Cap the log so the TextArea does not grow unbounded during long sessions
-        if (gsiEventsArea.getLength() > 200_000) {
-            gsiEventsArea.deleteText(0, 50_000);
+    private void appendEvent(GsiService.GsiEvent event) {
+        gsiEventsList.getItems().add(event);
+        // Cap the log so the list does not grow unbounded during long sessions
+        if (gsiEventsList.getItems().size() > MAX_EVENT_LOG_ENTRIES) {
+            gsiEventsList.getItems().removeFirst();
         }
     }
 
