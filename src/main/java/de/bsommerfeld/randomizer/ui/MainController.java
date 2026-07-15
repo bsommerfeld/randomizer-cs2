@@ -3,6 +3,7 @@ package de.bsommerfeld.randomizer.ui;
 import de.bsommerfeld.randomizer.config.ConfigKind;
 import de.bsommerfeld.randomizer.config.Cs2ConfigService;
 import de.bsommerfeld.randomizer.config.Cs2ConfigService.LoadedConfig;
+import de.bsommerfeld.randomizer.gsi.GsiEvent;
 import de.bsommerfeld.randomizer.gsi.GsiService;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -31,6 +32,8 @@ public class MainController {
     @FXML
     private Tab gsiTab;
     @FXML
+    private Tab overviewTab;
+    @FXML
     private Label defaultStatusLabel;
     @FXML
     private Label userStatusLabel;
@@ -45,7 +48,7 @@ public class MainController {
     @FXML
     private TextArea gsiJsonArea;
     @FXML
-    private ListView<GsiService.GsiEvent> gsiEventsList;
+    private ListView<GsiEvent> gsiEventsList;
     @FXML
     private TextArea gsiEventDetailsArea;
     @FXML
@@ -70,7 +73,7 @@ public class MainController {
         }
         // The manual path picker only applies to the two config tabs
         tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
-            boolean configTab = newTab != gsiTab;
+            boolean configTab = newTab != gsiTab && newTab != overviewTab;
             manualBox.setVisible(configTab);
             manualBox.setManaged(configTab);
         });
@@ -82,7 +85,7 @@ public class MainController {
     private void initGsi() {
         gsiEventsList.setCellFactory(list -> new ListCell<>() {
             @Override
-            protected void updateItem(GsiService.GsiEvent item, boolean empty) {
+            protected void updateItem(GsiEvent item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? null : item.summary());
             }
@@ -92,7 +95,7 @@ public class MainController {
 
         gsiService.onGameStateJson(json -> Platform.runLater(() -> updateGsiJson(json)));
         gsiService.onGameEvent(event -> Platform.runLater(() -> appendEvent(event)));
-        gsiStatusLabel.setText("GSI nicht gestartet — mit \"GSI starten\" beginnen, dann sendet CS2 seine Events hierher.");
+        gsiStatusLabel.setText("GSI nicht gestartet - mit \"GSI starten\" beginnen, dann sendet CS2 seine Events hierher.");
     }
 
     @FXML
@@ -104,14 +107,14 @@ public class MainController {
             return;
         }
         if (!gsiService.start()) {
-            gsiStatusLabel.setText("GSI-Server konnte nicht gestartet werden — ist Port "
+            gsiStatusLabel.setText("GSI-Server konnte nicht gestartet werden - ist Port "
                     + gsiService.getPort() + " schon belegt?");
             return;
         }
         gsiToggleButton.setText("GSI stoppen");
         if (gsiService.generateConfigFile()) {
             gsiStatusLabel.setText("Warte auf Daten von CS2 (Port " + gsiService.getPort()
-                    + ") — gamestate_integration_randomizer.cfg wurde erzeugt, ggf. CS2 neu starten.");
+                    + ") - gamestate_integration_randomizer.cfg wurde erzeugt, ggf. CS2 neu starten.");
         } else {
             gsiStatusLabel.setText("GSI-Server läuft (Port " + gsiService.getPort()
                     + "), aber die gamestate_integration-Config konnte nicht erzeugt werden.");
@@ -130,7 +133,7 @@ public class MainController {
         });
     }
 
-    private void appendEvent(GsiService.GsiEvent event) {
+    private void appendEvent(GsiEvent event) {
         gsiEventsList.getItems().add(event);
         // Cap the log so the list does not grow unbounded during long sessions
         if (gsiEventsList.getItems().size() > MAX_EVENT_LOG_ENTRIES) {
@@ -155,7 +158,7 @@ public class MainController {
 
     private void showNotFound(ConfigKind kind) {
         statusLabel(kind).setText(
-                "Config nicht gefunden — bitte " + kind.fileName() + " unten manuell auswählen.");
+                "Config nicht gefunden - bitte " + kind.fileName() + " unten manuell auswählen.");
         jsonArea(kind).clear();
     }
 

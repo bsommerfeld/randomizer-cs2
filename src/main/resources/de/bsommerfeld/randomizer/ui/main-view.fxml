@@ -85,6 +85,9 @@
                     </center>
                 </BorderPane>
             </Tab>
+            <Tab fx:id="overviewTab" text="Übersicht">
+                <fx:include source="overview-view.fxml"/>
+            </Tab>
         </TabPane>
     </center>
     <bottom>

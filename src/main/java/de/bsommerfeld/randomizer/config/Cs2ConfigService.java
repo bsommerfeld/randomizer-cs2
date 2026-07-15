@@ -76,7 +76,7 @@ public final class Cs2ConfigService {
 
     /**
      * Pretty JSON for display. Backslashes are deliberately left unescaped
-     * ({@code "\"} instead of {@code "\\"}) — more readable, but not strictly valid JSON.
+     * ({@code "\"} instead of {@code "\\"}) - more readable, but not strictly valid JSON.
      */
     private static String toDisplayJson(VdfObject config) {
         return GSON.toJson(config.asMap()).replace("\\\\", "\\");

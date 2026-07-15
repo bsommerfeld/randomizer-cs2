@@ -4,11 +4,11 @@
 [![Java](https://img.shields.io/badge/java-25-orange.svg)](https://adoptium.net/)
 [![GitHub Stars](https://img.shields.io/github/stars/bsommerfeld/randomizer-cs2?style=social)](https://github.com/bsommerfeld/randomizer-cs2/stargazers)
 
-> ⚠️ **Rewrite in progress** — this branch is a complete from-scratch rewrite (v2.0.0). The old codebase has been removed.
+> ⚠️ **Rewrite in progress** - this branch is a complete from-scratch rewrite (v2.0.0). The old codebase has been removed.
 
 **Randomizer-CS2** is a desktop app for *Counter-Strike 2*. The rewrite currently covers the first building block:
 
-- Automatically locates your CS2 config (`user_keys_default.vcfg`) via the Windows registry and Steam's `libraryfolders.vdf` — works no matter where your Steam library lives.
+- Automatically locates your CS2 config (`user_keys_default.vcfg`) via the Windows registry and Steam's `libraryfolders.vdf` - works no matter where your Steam library lives.
 - Displays the config as pretty-printed JSON on startup.
 - Manual file picker as fallback (the chosen path is remembered).
 

@@ -1,0 +1,121 @@
+/* First stylesheet in the project - scoped to the "Übersicht" tab via overview-view.fxml. */
+
+/* Header bar */
+.header-bar {
+    -fx-background-color: #f0f0f0;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 0 0 1 0;
+}
+.map-label {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+.score-box {
+    -fx-padding: 0 8 0 8;
+}
+.score-big {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Consolas', 'Courier New', monospace;
+}
+.score-colon {
+    -fx-font-size: 20px;
+    -fx-text-fill: #888888;
+}
+.time-label {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Consolas', 'Courier New', monospace;
+    -fx-text-fill: #333333;
+}
+.time-label.time-bomb {
+    -fx-text-fill: #c0392b;
+}
+.bomb-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #c0392b;
+}
+
+/* Team accent colors */
+.team-ct {
+    -fx-text-fill: #2f6db5;
+}
+.team-t {
+    -fx-text-fill: #b5852f;
+}
+.team-title {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 0 2 2;
+}
+
+/* Scoreboard rows */
+.table-row-cell.dead {
+    -fx-opacity: 0.4;
+}
+.table-row-cell.self {
+    -fx-background-color: #eaf2fb;
+}
+
+/* Detail / player card */
+.detail-panel {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1;
+}
+.detail-panel > .viewport {
+    -fx-background-color: #ffffff;
+}
+.detail-body {
+    -fx-padding: 10;
+}
+.detail-name {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+.detail-subtitle {
+    -fx-text-fill: #777777;
+}
+.detail-title {
+    -fx-padding: 0 0 6 0;
+}
+.detail-section {
+    -fx-font-weight: bold;
+    -fx-text-fill: #555555;
+    -fx-padding: 8 0 2 0;
+    -fx-border-color: #e6e6e6;
+    -fx-border-width: 0 0 1 0;
+}
+.detail-key {
+    -fx-text-fill: #777777;
+}
+.detail-value {
+    -fx-font-family: 'Consolas', 'Courier New', monospace;
+}
+
+/* Health / armor progress bars */
+.hp-bar,
+.armor-bar {
+    -fx-pref-height: 14px;
+}
+.hp-bar > .bar {
+    -fx-background-color: #4caf50;
+    -fx-background-insets: 0;
+    -fx-background-radius: 2;
+    -fx-padding: 0;
+}
+.armor-bar > .bar {
+    -fx-background-color: #2f6db5;
+    -fx-background-insets: 0;
+    -fx-background-radius: 2;
+    -fx-padding: 0;
+}
+
+/* Fallback placeholder */
+.placeholder {
+    -fx-background-color: #fafafa;
+}
+.placeholder-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #444444;
+}

@@ -6,6 +6,7 @@ import de.bsommerfeld.randomizer.gsi.GsiService;
 import de.bsommerfeld.randomizer.steam.JnaWindowsRegistry;
 import de.bsommerfeld.randomizer.steam.SteamLocator;
 import de.bsommerfeld.randomizer.ui.MainController;
+import de.bsommerfeld.randomizer.ui.OverviewController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -25,7 +26,10 @@ public class RandomizerApp extends Application {
         gsiService = new GsiService();
 
         FXMLLoader loader = new FXMLLoader(RandomizerApp.class.getResource("ui/main-view.fxml"));
-        loader.setControllerFactory(controllerType -> new MainController(configService, gsiService));
+        loader.setControllerFactory(controllerType ->
+                controllerType == OverviewController.class
+                        ? new OverviewController(gsiService)
+                        : new MainController(configService, gsiService));
         Scene scene = new Scene(loader.load());
 
         stage.setTitle("Randomizer CS2");

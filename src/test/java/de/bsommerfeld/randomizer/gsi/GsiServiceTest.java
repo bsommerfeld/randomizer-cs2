@@ -1,5 +1,7 @@
 package de.bsommerfeld.randomizer.gsi;
 
+import com.cs2gsi.GameState;
+import com.cs2gsi.nodes.PlayerTeam;
 import org.junit.jupiter.api.Test;
 
 import java.net.ServerSocket;
@@ -11,6 +13,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -37,7 +40,7 @@ class GsiServiceTest {
     void deliversGameEventsWithSummaryAndDetails() throws Exception {
         int port = freePort();
         CountDownLatch received = new CountDownLatch(1);
-        AtomicReference<GsiService.GsiEvent> firstEvent = new AtomicReference<>();
+        AtomicReference<GsiEvent> firstEvent = new AtomicReference<>();
 
         try (GsiService service = new GsiService(port)) {
             service.onGameEvent(event -> {
@@ -50,10 +53,44 @@ class GsiServiceTest {
             post(port, "{\"round\":{\"phase\":\"over\"}}");
 
             assertTrue(received.await(5, TimeUnit.SECONDS), "event callback should fire");
-            GsiService.GsiEvent event = firstEvent.get();
+            GsiEvent event = firstEvent.get();
             assertNotNull(event);
             assertTrue(event.summary().matches("\\d{2}:\\d{2}:\\d{2}  .+"), "summary should start with a timestamp");
             assertTrue(event.details().contains("Event: "), "details should name the event type");
+        }
+    }
+
+    @Test
+    void exposesStructuredGameStateWithAllPlayers() throws Exception {
+        int port = freePort();
+        CountDownLatch received = new CountDownLatch(1);
+        AtomicReference<GameState> firstState = new AtomicReference<>();
+
+        try (GsiService service = new GsiService(port)) {
+            service.onGameState(state -> {
+                if (!state.allPlayers.isEmpty() && firstState.compareAndSet(null, state)) {
+                    received.countDown();
+                }
+            });
+            assertTrue(service.start());
+
+            String payload = """
+                    {"map":{"name":"de_dust2","mode":"competitive","team_ct":{"score":7},"team_t":{"score":5}},
+                     "allplayers":{
+                       "76561190000000001":{"name":"Alice","team":"CT","match_stats":{"kills":10,"score":25},"state":{"health":100,"money":1200}},
+                       "76561190000000002":{"name":"Bob","team":"T","match_stats":{"kills":8,"score":18},"state":{"health":50,"money":800}}
+                     }}
+                    """;
+            post(port, payload);
+
+            assertTrue(received.await(5, TimeUnit.SECONDS), "structured game-state callback should fire");
+            GameState state = firstState.get();
+            assertNotNull(state);
+            assertEquals(2, state.allPlayers.size(), "both players should be parsed");
+            assertEquals(PlayerTeam.CT, state.allPlayers.get("76561190000000001").team);
+            assertEquals(PlayerTeam.T, state.allPlayers.get("76561190000000002").team);
+            assertEquals(7, state.map.ctStatistics.score, "CT team score");
+            assertEquals(5, state.map.tStatistics.score, "T team score");
         }
     }
 
