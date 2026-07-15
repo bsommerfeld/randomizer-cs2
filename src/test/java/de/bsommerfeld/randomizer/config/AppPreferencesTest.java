@@ -20,50 +20,49 @@ class AppPreferencesTest {
     void returnsEmptyWithoutStoredValue() {
         AppPreferences preferences = new AppPreferences(tempDir);
 
-        assertTrue(preferences.getConfigPathOverride(ConfigKind.DEFAULT).isEmpty());
-        assertTrue(preferences.getConfigPathOverride(ConfigKind.USER).isEmpty());
+        assertTrue(preferences.getPathOverride("cs2.config.path").isEmpty());
     }
 
     @Test
-    void roundTripsConfigPath() throws IOException {
+    void roundTripsPath() throws IOException {
         Path configPath = tempDir.resolve("user_keys_default.vcfg");
 
-        new AppPreferences(tempDir).setConfigPathOverride(ConfigKind.DEFAULT, configPath);
+        new AppPreferences(tempDir).setPathOverride("cs2.config.path", configPath);
 
         assertEquals(Optional.of(configPath),
-                new AppPreferences(tempDir).getConfigPathOverride(ConfigKind.DEFAULT));
+                new AppPreferences(tempDir).getPathOverride("cs2.config.path"));
         assertTrue(Files.isRegularFile(tempDir.resolve("app.properties")));
     }
 
     @Test
-    void storesBothKindsIndependently() throws IOException {
+    void storesKeysIndependently() throws IOException {
         AppPreferences preferences = new AppPreferences(tempDir);
         Path defaultConfig = tempDir.resolve("user_keys_default.vcfg");
         Path userConfig = tempDir.resolve("cs2_user_keys.vcfg");
 
-        preferences.setConfigPathOverride(ConfigKind.DEFAULT, defaultConfig);
-        preferences.setConfigPathOverride(ConfigKind.USER, userConfig);
+        preferences.setPathOverride("cs2.config.path", defaultConfig);
+        preferences.setPathOverride("cs2.userconfig.path", userConfig);
 
-        assertEquals(Optional.of(defaultConfig), preferences.getConfigPathOverride(ConfigKind.DEFAULT));
-        assertEquals(Optional.of(userConfig), preferences.getConfigPathOverride(ConfigKind.USER));
+        assertEquals(Optional.of(defaultConfig), preferences.getPathOverride("cs2.config.path"));
+        assertEquals(Optional.of(userConfig), preferences.getPathOverride("cs2.userconfig.path"));
     }
 
     @Test
     void overwritesExistingValue() throws IOException {
         AppPreferences preferences = new AppPreferences(tempDir);
-        preferences.setConfigPathOverride(ConfigKind.DEFAULT, tempDir.resolve("old.vcfg"));
+        preferences.setPathOverride("cs2.config.path", tempDir.resolve("old.vcfg"));
 
-        preferences.setConfigPathOverride(ConfigKind.DEFAULT, tempDir.resolve("new.vcfg"));
+        preferences.setPathOverride("cs2.config.path", tempDir.resolve("new.vcfg"));
 
         assertEquals(Optional.of(tempDir.resolve("new.vcfg")),
-                preferences.getConfigPathOverride(ConfigKind.DEFAULT));
+                preferences.getPathOverride("cs2.config.path"));
     }
 
     @Test
     void createsMissingBaseDirectoryOnSave() throws IOException {
         Path baseDir = tempDir.resolve("nested/randomizer-cs2");
 
-        new AppPreferences(baseDir).setConfigPathOverride(ConfigKind.DEFAULT, tempDir.resolve("config.vcfg"));
+        new AppPreferences(baseDir).setPathOverride("cs2.config.path", tempDir.resolve("config.vcfg"));
 
         assertTrue(Files.isRegularFile(baseDir.resolve("app.properties")));
     }

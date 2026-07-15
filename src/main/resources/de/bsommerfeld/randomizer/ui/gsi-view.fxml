@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="de.bsommerfeld.randomizer.ui.gsi.GsiTabController">
+    <top>
+        <HBox spacing="8" alignment="CENTER_LEFT">
+            <padding>
+                <Insets top="10" right="12" bottom="10" left="12"/>
+            </padding>
+            <Button fx:id="toggleButton" text="GSI starten" onAction="#onToggle"/>
+            <Label fx:id="statusLabel" maxWidth="Infinity" wrapText="true" HBox.hgrow="ALWAYS"/>
+        </HBox>
+    </top>
+    <center>
+        <SplitPane dividerPositions="0.45">
+            <BorderPane.margin>
+                <Insets right="12" left="12" bottom="12"/>
+            </BorderPane.margin>
+            <SplitPane orientation="VERTICAL" dividerPositions="0.6">
+                <ListView fx:id="eventsList"
+                          style="-fx-font-family: 'Consolas', 'Courier New', monospace;"/>
+                <TextArea fx:id="eventDetailsArea" editable="false"
+                          promptText="Event anklicken, um Details zu sehen"
+                          style="-fx-font-family: 'Consolas', 'Courier New', monospace;"/>
+            </SplitPane>
+            <TextArea fx:id="jsonArea" editable="false"
+                      promptText="Aktueller Game State als JSON"
+                      style="-fx-font-family: 'Consolas', 'Courier New', monospace;"/>
+        </SplitPane>
+    </center>
+</BorderPane>

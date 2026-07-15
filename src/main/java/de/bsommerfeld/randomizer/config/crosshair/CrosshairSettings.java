@@ -1,4 +1,4 @@
-package de.bsommerfeld.randomizer.config;
+package de.bsommerfeld.randomizer.config.crosshair;
 
 import java.util.Map;
 

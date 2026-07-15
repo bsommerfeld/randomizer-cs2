@@ -1,14 +1,12 @@
-package de.bsommerfeld.randomizer.ui;
+package de.bsommerfeld.randomizer.ui.crosshair;
 
-import de.bsommerfeld.randomizer.config.CrosshairSettings;
+import de.bsommerfeld.randomizer.config.crosshair.CrosshairSettings;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 /**
- * Draws a crosshair from parsed {@link CrosshairSettings} onto a canvas. The size/thickness/gap
- * pixel formulas are adapted from the CS2 crosshair generator
- * <a href="https://github.com/omar-anwari/CS-Crosshair-Gen">omar-anwari/CS-Crosshair-Gen</a>, so the
- * proportions match CS2 closely. At {@code scale == 1} the reference draws 1080p-native pixels, so
+ * Draws a crosshair from parsed {@link CrosshairSettings} onto a canvas.
+ * At {@code scale == 1} the reference draws 1080p-native pixels, so
  * on a 1080p monitor the preview is 1:1 with the game; pass {@code resolutionHeight / 1080} to match
  * other resolutions. Dynamic styles are drawn static.
  */

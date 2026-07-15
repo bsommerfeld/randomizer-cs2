@@ -12,10 +12,11 @@ import java.util.Properties;
 /**
  * Persists app settings as a properties file at
  * {@code %LOCALAPPDATA%\randomizer-cs2\app.properties} (fallback: user.home).
+ *
+ * <p>Stores generic {@code key -> path} overrides; which keys exist is decided by the
+ * {@link ConfigSource} implementations, so new configs need no change here.
  */
 public final class AppPreferences {
-
-    private static final String CROSSHAIR_PATH_KEY = "cs2.convars.path";
 
     private final Path propertiesFile;
 
@@ -35,24 +36,8 @@ public final class AppPreferences {
         return base.resolve("randomizer-cs2");
     }
 
-    public Optional<Path> getConfigPathOverride(ConfigKind kind) {
-        return getPathOverride(kind.preferenceKey());
-    }
-
-    public void setConfigPathOverride(ConfigKind kind, Path path) throws IOException {
-        setPathOverride(kind.preferenceKey(), path);
-    }
-
-    /** Remembered path to {@code cs2_user_convars.vcfg} (the crosshair settings). */
-    public Optional<Path> getCrosshairPathOverride() {
-        return getPathOverride(CROSSHAIR_PATH_KEY);
-    }
-
-    public void setCrosshairPathOverride(Path path) throws IOException {
-        setPathOverride(CROSSHAIR_PATH_KEY, path);
-    }
-
-    private Optional<Path> getPathOverride(String key) {
+    /** The remembered path stored under {@code key}, or empty if none (or unparseable). */
+    public Optional<Path> getPathOverride(String key) {
         String value = load().getProperty(key);
         if (value == null || value.isBlank()) {
             return Optional.empty();
@@ -64,7 +49,8 @@ public final class AppPreferences {
         }
     }
 
-    private void setPathOverride(String key, Path path) throws IOException {
+    /** Remembers {@code path} under {@code key} for future startups. */
+    public void setPathOverride(String key, Path path) throws IOException {
         Properties properties = load();
         properties.setProperty(key, path.toString());
         Files.createDirectories(propertiesFile.getParent());

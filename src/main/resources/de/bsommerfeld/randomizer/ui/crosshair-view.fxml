@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="de.bsommerfeld.randomizer.ui.CrosshairController"
+            fx:controller="de.bsommerfeld.randomizer.ui.crosshair.CrosshairController"
             stylesheets="@overview.css">
     <top>
         <HBox alignment="CENTER_LEFT" spacing="8">
