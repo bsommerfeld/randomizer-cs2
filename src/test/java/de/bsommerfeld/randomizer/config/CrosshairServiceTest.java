@@ -30,14 +30,38 @@ class CrosshairServiceTest {
                         "cl_crosshairstyle" "4"
                         "cl_crosshairsize" "0.5"
                         "cl_crosshaircolor" "5"
+                        "cl_fixedcrosshairgap" "3"
                         "sensitivity" "1.5"
                     }
                 }
                 """);
 
-        assertEquals(3, convars.size(), "only cl_crosshair* entries should be collected");
+        assertEquals(4, convars.size(), "every crosshair-related convar should be collected");
+        assertTrue(convars.containsKey("cl_fixedcrosshairgap"), "differently-prefixed crosshair convars too");
         assertFalse(convars.containsKey("sensitivity"), "unrelated convars must be ignored");
         assertEquals("0.5", convars.get("cl_crosshairsize"));
+    }
+
+    @Test
+    void parsesNumericBooleanFlags() {
+        Map<String, String> convars = extract("""
+                "convars"
+                {
+                    "cl_crosshairusealpha" "1"
+                    "cl_crosshairdot" "0"
+                    "cl_crosshair_drawoutline" "0"
+                    "cl_crosshairalpha" "200"
+                    "cl_fixedcrosshairgap" "3"
+                }
+                """);
+
+        CrosshairSettings settings = CrosshairSettings.fromConvars(convars);
+
+        assertTrue(settings.useAlpha, "'1' should parse as true");
+        assertFalse(settings.dot, "'0' should parse as false");
+        assertFalse(settings.drawOutline);
+        assertEquals(200, settings.alpha);
+        assertEquals(3.0, settings.fixedGap, 1e-6);
     }
 
     @Test

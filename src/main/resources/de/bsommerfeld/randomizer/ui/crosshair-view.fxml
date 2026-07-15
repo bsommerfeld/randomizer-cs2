@@ -32,7 +32,7 @@
                         <Insets top="4" right="12" bottom="12" left="12"/>
                     </padding>
                     <StackPane>
-                        <ImageView fx:id="backgroundImage" fitWidth="720" fitHeight="405" preserveRatio="true"/>
+                        <ImageView fx:id="backgroundImage" fitWidth="720" fitHeight="405" preserveRatio="false"/>
                         <Canvas fx:id="crosshairCanvas" width="720" height="405"/>
                     </StackPane>
                     <HBox alignment="CENTER" spacing="14">

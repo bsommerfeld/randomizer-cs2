@@ -19,7 +19,7 @@ import java.util.Optional;
  */
 public final class CrosshairService {
 
-    /** The convar file name — the only file valid for the manual picker. */
+    /** The convar file name - the only file valid for the manual picker. */
     public static final String FILE_NAME = "cs2_user_convars.vcfg";
 
     private final AppPreferences preferences;
@@ -68,12 +68,16 @@ public final class CrosshairService {
         }
     }
 
-    /** Recursively collects every {@code cl_crosshair*} string entry, regardless of nesting. */
+    /**
+     * Recursively collects every crosshair-related string entry, regardless of nesting. Matches on
+     * {@code "crosshair"} anywhere in the key so differently-prefixed convars are caught too, e.g.
+     * {@code cl_fixedcrosshairgap}.
+     */
     static void collectCrosshairConvars(VdfObject node, Map<String, String> out) {
         node.entries().forEach((key, value) -> {
             if (value instanceof VdfObject child) {
                 collectCrosshairConvars(child, out);
-            } else if (value instanceof String text && key.startsWith("cl_crosshair")) {
+            } else if (value instanceof String text && key.contains("crosshair")) {
                 out.put(key, text);
             }
         });

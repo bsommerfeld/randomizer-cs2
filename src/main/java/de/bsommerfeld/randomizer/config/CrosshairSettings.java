@@ -4,7 +4,7 @@ import java.util.Map;
 
 /**
  * The crosshair-relevant {@code cl_crosshair*} convars from {@code cs2_user_convars.vcfg}, parsed
- * into typed values with CS2 defaults for anything missing. Pure data — no UI dependency; the
+ * into typed values with CS2 defaults for anything missing. Pure data - no UI dependency; the
  * renderer turns these into pixels.
  */
 public final class CrosshairSettings {
@@ -13,6 +13,7 @@ public final class CrosshairSettings {
     public final double size;
     public final double thickness;
     public final double gap;
+    public final double fixedGap;
     public final boolean dot;
     public final boolean tStyle;
     public final boolean drawOutline;
@@ -24,13 +25,14 @@ public final class CrosshairSettings {
     public final int alpha;
     public final boolean useAlpha;
 
-    public CrosshairSettings(int style, double size, double thickness, double gap, boolean dot,
-                             boolean tStyle, boolean drawOutline, double outlineThickness, int colorIndex,
-                             int red, int green, int blue, int alpha, boolean useAlpha) {
+    public CrosshairSettings(int style, double size, double thickness, double gap, double fixedGap,
+                             boolean dot, boolean tStyle, boolean drawOutline, double outlineThickness,
+                             int colorIndex, int red, int green, int blue, int alpha, boolean useAlpha) {
         this.style = style;
         this.size = size;
         this.thickness = thickness;
         this.gap = gap;
+        this.fixedGap = fixedGap;
         this.dot = dot;
         this.tStyle = tStyle;
         this.drawOutline = drawOutline;
@@ -50,6 +52,7 @@ public final class CrosshairSettings {
                 doubleOf(convars, "cl_crosshairsize", 5),
                 doubleOf(convars, "cl_crosshairthickness", 0.5),
                 doubleOf(convars, "cl_crosshairgap", 0),
+                doubleOf(convars, "cl_fixedcrosshairgap", 3),
                 boolOf(convars, "cl_crosshairdot", false),
                 boolOf(convars, "cl_crosshair_t", false),
                 boolOf(convars, "cl_crosshair_drawoutline", false),

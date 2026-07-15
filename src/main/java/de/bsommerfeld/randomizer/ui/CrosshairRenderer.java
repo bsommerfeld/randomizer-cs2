@@ -5,28 +5,25 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 /**
- * Draws a crosshair from parsed {@link CrosshairSettings} onto a canvas. This is a visual
- * approximation of CS2's classic (static) crosshair — the scale factors below map CS2's convar units
- * to pixels closely enough for a preview, not pixel-perfectly. Dynamic styles are drawn static.
+ * Draws a crosshair from parsed {@link CrosshairSettings} onto a canvas. The size/thickness/gap
+ * pixel formulas are adapted from the CS2 crosshair generator
+ * <a href="https://github.com/omar-anwari/CS-Crosshair-Gen">omar-anwari/CS-Crosshair-Gen</a>, so the
+ * proportions match CS2 closely. At {@code scale == 1} the reference draws 1080p-native pixels, so
+ * on a 1080p monitor the preview is 1:1 with the game; pass {@code resolutionHeight / 1080} to match
+ * other resolutions. Dynamic styles are drawn static.
  */
 final class CrosshairRenderer {
-
-    private static final double LENGTH_PER_UNIT = 6;   // cl_crosshairsize -> line length
-    private static final double THICKNESS_PER_UNIT = 2; // cl_crosshairthickness -> line width
-    private static final double BASE_GAP = 4;           // gap at cl_crosshairgap 0
-    private static final double GAP_PER_UNIT = 1.5;     // cl_crosshairgap -> extra gap
-    private static final double OUTLINE_PER_UNIT = 2;   // cl_crosshair_outlinethickness -> outline px
 
     private CrosshairRenderer() {
     }
 
-    /** Draws the crosshair centered at ({@code cx}, {@code cy}). */
-    static void draw(GraphicsContext g, double cx, double cy, CrosshairSettings s) {
-        double length = Math.max(0, s.size * LENGTH_PER_UNIT);
-        double thickness = Math.max(1, s.thickness * THICKNESS_PER_UNIT);
-        double gap = Math.max(0, BASE_GAP + s.gap * GAP_PER_UNIT);
+    /** Draws the crosshair centered at ({@code cx}, {@code cy}); {@code scale} is resolution/1080. */
+    static void draw(GraphicsContext g, double cx, double cy, CrosshairSettings s, double scale) {
+        double length = Math.floor((s.size + 0.2222) / 0.4445) * scale;
+        double thickness = Math.max(1, Math.floor((s.thickness + 0.2222) / 0.4444) * scale);
+        double gap = gapUnits(s) * scale;
         double outline = s.drawOutline && s.outlineThickness > 0
-                ? Math.max(1, s.outlineThickness * OUTLINE_PER_UNIT)
+                ? Math.max(1, Math.floor(s.outlineThickness * scale))
                 : 0;
         Color color = color(s);
 
@@ -44,6 +41,20 @@ final class CrosshairRenderer {
         }
     }
 
+    /**
+     * Gap in convar units (before scaling), following the reference generator: classic-static adds a
+     * base of 4, the classic/dynamic styles add 5; {@code cl_crosshairgap} drives all of them.
+     */
+    private static double gapUnits(CrosshairSettings s) {
+        double gap = s.gap;
+        if (s.style == 2 || s.style == 3) { // classic / classic dynamic
+            double base = gap < 0 ? -Math.floor(-gap) : Math.floor(gap);
+            return base + 5;
+        }
+        double base = gap < -4 ? -Math.floor(-gap) : Math.floor(gap); // classic static / default
+        return base + 4;
+    }
+
     private static void bar(GraphicsContext g, double x, double y, double w, double h, Color color, double outline) {
         if (w <= 0 || h <= 0) {
             return;
@@ -56,7 +67,7 @@ final class CrosshairRenderer {
         g.fillRect(x, y, w, h);
     }
 
-    /** Index 5 uses the custom RGB convars; the presets (0–4) are approximate. */
+    /** Presets 0–4 match the reference generator's palette; index 5 uses the custom RGB convars. */
     private static Color color(CrosshairSettings s) {
         double alpha = s.useAlpha ? clamp(s.alpha) / 255.0 : 1.0;
         if (s.colorIndex == 5) {
