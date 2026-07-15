@@ -88,6 +88,9 @@
             <Tab fx:id="overviewTab" text="Übersicht">
                 <fx:include source="overview-view.fxml"/>
             </Tab>
+            <Tab fx:id="crosshairTab" text="Fadenkreuz">
+                <fx:include source="crosshair-view.fxml"/>
+            </Tab>
         </TabPane>
     </center>
     <bottom>

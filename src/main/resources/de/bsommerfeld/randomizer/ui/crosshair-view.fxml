@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="de.bsommerfeld.randomizer.ui.CrosshairController"
+            stylesheets="@overview.css">
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="8">
+            <padding>
+                <Insets top="10" right="12" bottom="10" left="12"/>
+            </padding>
+            <Button text="Neu einlesen" onAction="#onReload"/>
+            <Button text="Datei wählen…" onAction="#onChoose"/>
+            <Label fx:id="statusLabel" maxWidth="Infinity" wrapText="true" HBox.hgrow="ALWAYS"/>
+        </HBox>
+    </top>
+    <center>
+        <BorderPane>
+            <center>
+                <VBox alignment="CENTER" spacing="8">
+                    <padding>
+                        <Insets top="4" right="12" bottom="12" left="12"/>
+                    </padding>
+                    <StackPane>
+                        <ImageView fx:id="backgroundImage" fitWidth="720" fitHeight="405" preserveRatio="true"/>
+                        <Canvas fx:id="crosshairCanvas" width="720" height="405"/>
+                    </StackPane>
+                    <HBox alignment="CENTER" spacing="14">
+                        <Button text="◀" onAction="#onPrevMap"/>
+                        <Label fx:id="mapNameLabel" styleClass="map-label"/>
+                        <Button text="▶" onAction="#onNextMap"/>
+                    </HBox>
+                </VBox>
+            </center>
+            <right>
+                <VBox spacing="6" prefWidth="320" minWidth="260">
+                    <padding>
+                        <Insets top="4" right="12" bottom="12" left="4"/>
+                    </padding>
+                    <Label text="Fadenkreuz-Werte" styleClass="team-title"/>
+                    <ScrollPane fitToWidth="true" styleClass="detail-panel" VBox.vgrow="ALWAYS">
+                        <VBox fx:id="valuesBox" spacing="2" styleClass="detail-body"/>
+                    </ScrollPane>
+                </VBox>
+            </right>
+        </BorderPane>
+    </center>
+</BorderPane>

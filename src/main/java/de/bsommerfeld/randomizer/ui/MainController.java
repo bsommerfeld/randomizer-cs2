@@ -34,6 +34,8 @@ public class MainController {
     @FXML
     private Tab overviewTab;
     @FXML
+    private Tab crosshairTab;
+    @FXML
     private Label defaultStatusLabel;
     @FXML
     private Label userStatusLabel;
@@ -73,7 +75,7 @@ public class MainController {
         }
         // The manual path picker only applies to the two config tabs
         tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
-            boolean configTab = newTab != gsiTab && newTab != overviewTab;
+            boolean configTab = newTab != gsiTab && newTab != overviewTab && newTab != crosshairTab;
             manualBox.setVisible(configTab);
             manualBox.setManaged(configTab);
         });

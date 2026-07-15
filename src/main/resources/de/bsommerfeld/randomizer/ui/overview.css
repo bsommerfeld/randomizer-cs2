@@ -92,6 +92,10 @@
 .detail-value {
     -fx-font-family: 'Consolas', 'Courier New', monospace;
 }
+.crosshair-value {
+    -fx-font-family: 'Consolas', 'Courier New', monospace;
+    -fx-font-size: 12px;
+}
 
 /* Health / armor progress bars */
 .hp-bar,

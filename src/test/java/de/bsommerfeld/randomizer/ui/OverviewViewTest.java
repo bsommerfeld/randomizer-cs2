@@ -1,6 +1,7 @@
 package de.bsommerfeld.randomizer.ui;
 
 import de.bsommerfeld.randomizer.config.AppPreferences;
+import de.bsommerfeld.randomizer.config.CrosshairService;
 import de.bsommerfeld.randomizer.config.Cs2ConfigService;
 import de.bsommerfeld.randomizer.gsi.GsiService;
 import de.bsommerfeld.randomizer.steam.JnaWindowsRegistry;
@@ -79,15 +80,23 @@ class OverviewViewTest {
 
         Platform.runLater(() -> {
             try {
-                Cs2ConfigService configService = new Cs2ConfigService(
-                        new AppPreferences(), new SteamLocator(new JnaWindowsRegistry()));
+                AppPreferences preferences = new AppPreferences();
+                SteamLocator steamLocator = new SteamLocator(new JnaWindowsRegistry());
+                Cs2ConfigService configService = new Cs2ConfigService(preferences, steamLocator);
+                CrosshairService crosshairService = new CrosshairService(preferences, steamLocator);
                 GsiService gsiService = new GsiService();
                 FXMLLoader loader =
                         new FXMLLoader(MainController.class.getResource("main-view.fxml"));
-                // Same branching factory as RandomizerApp, so the fx:include resolves its own controller.
-                loader.setControllerFactory(type -> type == OverviewController.class
-                        ? new OverviewController(gsiService)
-                        : new MainController(configService, gsiService));
+                // Same branching factory as RandomizerApp, so each fx:include resolves its controller.
+                loader.setControllerFactory(type -> {
+                    if (type == OverviewController.class) {
+                        return new OverviewController(gsiService);
+                    }
+                    if (type == CrosshairController.class) {
+                        return new CrosshairController(crosshairService);
+                    }
+                    return new MainController(configService, gsiService);
+                });
                 loader.load();
             } catch (Throwable t) {
                 error.set(t);

@@ -26,6 +26,7 @@ public final class SteamLocator {
     private static final String CS2_CONFIG_RELATIVE = "steamapps/common/Counter-Strike Global Offensive/game/csgo/cfg/user_keys_default.vcfg";
     private static final String CS2_APP_MANIFEST = "steamapps/appmanifest_730.acf";
     private static final String CS2_USER_KEYS_RELATIVE = "730/remote/cs2_user_keys.vcfg";
+    private static final String CS2_USER_CONVARS_RELATIVE = "730/remote/cs2_user_convars.vcfg";
 
     private final WindowsRegistry registry;
 
@@ -43,10 +44,19 @@ public final class SteamLocator {
      * or empty; never throws. With multiple Steam accounts the most recently modified file wins.
      */
     public Optional<Path> findUserKeysConfig() {
-        return findSteamRoot().flatMap(SteamLocator::findUserKeysInUserdata);
+        return findSteamRoot().flatMap(root -> findInUserdata(root, CS2_USER_KEYS_RELATIVE));
     }
 
-    private static Optional<Path> findUserKeysInUserdata(Path steamRoot) {
+    /**
+     * Returns the user's convars ({@code userdata/<SteamID>/730/remote/cs2_user_convars.vcfg}),
+     * which holds the crosshair settings, or empty; never throws. With multiple Steam accounts the
+     * most recently modified file wins.
+     */
+    public Optional<Path> findUserConvarsConfig() {
+        return findSteamRoot().flatMap(root -> findInUserdata(root, CS2_USER_CONVARS_RELATIVE));
+    }
+
+    private static Optional<Path> findInUserdata(Path steamRoot, String relative) {
         Path userdata = steamRoot.resolve("userdata");
         if (!Files.isDirectory(userdata)) {
             return Optional.empty();
@@ -57,7 +67,7 @@ public final class SteamLocator {
                 if (!isNumeric(userDir.getFileName().toString())) {
                     continue;
                 }
-                Path config = userDir.resolve(CS2_USER_KEYS_RELATIVE);
+                Path config = userDir.resolve(relative);
                 if (Files.isRegularFile(config)) {
                     candidates.add(config);
                 }

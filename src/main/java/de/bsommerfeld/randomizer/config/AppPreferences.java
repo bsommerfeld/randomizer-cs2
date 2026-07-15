@@ -15,6 +15,8 @@ import java.util.Properties;
  */
 public final class AppPreferences {
 
+    private static final String CROSSHAIR_PATH_KEY = "cs2.convars.path";
+
     private final Path propertiesFile;
 
     public AppPreferences() {
@@ -34,7 +36,24 @@ public final class AppPreferences {
     }
 
     public Optional<Path> getConfigPathOverride(ConfigKind kind) {
-        String value = load().getProperty(kind.preferenceKey());
+        return getPathOverride(kind.preferenceKey());
+    }
+
+    public void setConfigPathOverride(ConfigKind kind, Path path) throws IOException {
+        setPathOverride(kind.preferenceKey(), path);
+    }
+
+    /** Remembered path to {@code cs2_user_convars.vcfg} (the crosshair settings). */
+    public Optional<Path> getCrosshairPathOverride() {
+        return getPathOverride(CROSSHAIR_PATH_KEY);
+    }
+
+    public void setCrosshairPathOverride(Path path) throws IOException {
+        setPathOverride(CROSSHAIR_PATH_KEY, path);
+    }
+
+    private Optional<Path> getPathOverride(String key) {
+        String value = load().getProperty(key);
         if (value == null || value.isBlank()) {
             return Optional.empty();
         }
@@ -45,9 +64,9 @@ public final class AppPreferences {
         }
     }
 
-    public void setConfigPathOverride(ConfigKind kind, Path path) throws IOException {
+    private void setPathOverride(String key, Path path) throws IOException {
         Properties properties = load();
-        properties.setProperty(kind.preferenceKey(), path.toString());
+        properties.setProperty(key, path.toString());
         Files.createDirectories(propertiesFile.getParent());
         try (OutputStream out = Files.newOutputStream(propertiesFile)) {
             properties.store(out, "Randomizer CS2");
