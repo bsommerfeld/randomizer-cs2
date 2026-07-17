@@ -2,10 +2,15 @@ package de.bsommerfeld.randomizer.ui.overview;
 
 import de.bsommerfeld.randomizer.config.AppPreferences;
 import de.bsommerfeld.randomizer.config.ConfigRepository;
+import de.bsommerfeld.randomizer.config.crosshair.CrosshairBackup;
 import de.bsommerfeld.randomizer.config.crosshair.CrosshairConfigParser;
 import de.bsommerfeld.randomizer.config.crosshair.CrosshairSource;
+import de.bsommerfeld.randomizer.config.crosshair.CrosshairStandard;
 import de.bsommerfeld.randomizer.config.keybinds.ConfigKind;
 import de.bsommerfeld.randomizer.config.keybinds.KeybindConfigParser;
+import de.bsommerfeld.randomizer.exec.Cs2Window;
+import de.bsommerfeld.randomizer.exec.ExecApplier;
+import de.bsommerfeld.randomizer.exec.ExecConfig;
 import de.bsommerfeld.randomizer.gsi.GsiService;
 import de.bsommerfeld.randomizer.steam.JnaWindowsRegistry;
 import de.bsommerfeld.randomizer.steam.SteamLocator;
@@ -17,8 +22,10 @@ import javafx.scene.control.TableView;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.net.ServerSocket;
+import java.nio.file.Path;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -41,6 +48,9 @@ class OverviewViewTest {
 
     private static final String OVERVIEW_VIEW = "/de/bsommerfeld/randomizer/ui/overview-view.fxml";
     private static final String MAIN_VIEW = "/de/bsommerfeld/randomizer/ui/main-view.fxml";
+
+    @TempDir
+    Path tempDir;
 
     @BeforeAll
     static void initToolkit() {
@@ -92,11 +102,17 @@ class OverviewViewTest {
                 GsiService gsiService = new GsiService();
                 FXMLLoader loader = new FXMLLoader(OverviewViewTest.class.getResource(MAIN_VIEW));
                 // The same registry RandomizerApp uses, so every fx:include resolves its controller.
+                CrosshairStandard crosshairStandard = new CrosshairStandard(
+                        new CrosshairBackup(tempDir.resolve("backup"), new CrosshairConfigParser()));
                 loader.setControllerFactory(ControllerFactory.create(
                         new ConfigRepository<>(ConfigKind.DEFAULT, preferences, steamLocator, keybindParser),
                         new ConfigRepository<>(ConfigKind.USER, preferences, steamLocator, keybindParser),
                         new ConfigRepository<>(CrosshairSource.INSTANCE, preferences, steamLocator,
                                 new CrosshairConfigParser()),
+                        crosshairStandard,
+                        new ExecApplier(new ExecConfig(java.util.Optional::empty),
+                                vk -> Cs2Window.PressResult.WINDOW_NOT_FOUND, () -> "l"),
+                        new AppPreferences(tempDir),
                         gsiService));
                 loader.load();
             } catch (Throwable t) {

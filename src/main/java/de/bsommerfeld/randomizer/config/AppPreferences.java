@@ -13,27 +13,21 @@ import java.util.Properties;
  * Persists app settings as a properties file at
  * {@code %LOCALAPPDATA%\randomizer-cs2\app.properties} (fallback: user.home).
  *
- * <p>Stores generic {@code key -> path} overrides; which keys exist is decided by the
- * {@link ConfigSource} implementations, so new configs need no change here.
+ * <p>Stores generic {@code key -> path} overrides (which keys exist is decided by the
+ * {@link ConfigSource} implementations, so new configs need no change here) plus scalar settings
+ * such as the exec-trigger key. The file is re-read on every access, so external edits apply
+ * without an app restart.
  */
 public final class AppPreferences {
 
     private final Path propertiesFile;
 
     public AppPreferences() {
-        this(defaultBaseDir());
+        this(AppDirectories.base());
     }
 
     public AppPreferences(Path baseDir) {
         this.propertiesFile = baseDir.resolve("app.properties");
-    }
-
-    private static Path defaultBaseDir() {
-        String localAppData = System.getenv("LOCALAPPDATA");
-        Path base = localAppData == null || localAppData.isBlank()
-                ? Path.of(System.getProperty("user.home"))
-                : Path.of(localAppData);
-        return base.resolve("randomizer-cs2");
     }
 
     /** The remembered path stored under {@code key}, or empty if none (or unparseable). */
@@ -46,6 +40,22 @@ public final class AppPreferences {
             return Optional.of(Path.of(value));
         } catch (InvalidPathException e) {
             return Optional.empty();
+        }
+    }
+
+    /** The string stored under {@code key}, or {@code fallback} if missing or blank. */
+    public String getString(String key, String fallback) {
+        String value = load().getProperty(key);
+        return value == null || value.isBlank() ? fallback : value.trim();
+    }
+
+    /** Stores {@code value} under {@code key}. */
+    public void setString(String key, String value) throws IOException {
+        Properties properties = load();
+        properties.setProperty(key, value);
+        Files.createDirectories(propertiesFile.getParent());
+        try (OutputStream out = Files.newOutputStream(propertiesFile)) {
+            properties.store(out, "Randomizer CS2");
         }
     }
 

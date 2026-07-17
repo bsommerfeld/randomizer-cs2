@@ -17,7 +17,7 @@ public final class KeybindConfigParser implements ConfigParser<KeybindConfig> {
     @Override
     public KeybindConfig parse(Path file) throws IOException {
         VdfObject config = VdfParser.parse(file);
-        return new KeybindConfig(file, toDisplayJson(config));
+        return new KeybindConfig(file, config, toDisplayJson(config));
     }
 
     /**

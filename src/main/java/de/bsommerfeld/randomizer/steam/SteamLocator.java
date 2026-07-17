@@ -24,6 +24,7 @@ import java.util.Set;
 public final class SteamLocator {
 
     private static final String CS2_CONFIG_RELATIVE = "steamapps/common/Counter-Strike Global Offensive/game/csgo/cfg/user_keys_default.vcfg";
+    private static final String CS2_CFG_FOLDER_RELATIVE = "steamapps/common/Counter-Strike Global Offensive/game/csgo/cfg";
     private static final String CS2_APP_MANIFEST = "steamapps/appmanifest_730.acf";
     private static final String CS2_USER_KEYS_RELATIVE = "730/remote/cs2_user_keys.vcfg";
     private static final String CS2_USER_CONVARS_RELATIVE = "730/remote/cs2_user_convars.vcfg";
@@ -54,6 +55,35 @@ public final class SteamLocator {
      */
     public Optional<Path> findUserConvarsConfig() {
         return findSteamRoot().flatMap(root -> findInUserdata(root, CS2_USER_CONVARS_RELATIVE));
+    }
+
+    /**
+     * Returns CS2's console-config folder under the game install
+     * ({@code steamapps/common/.../game/csgo/cfg}, where {@code exec}-able .cfg files live),
+     * or empty; never throws.
+     */
+    public Optional<Path> findCs2CfgFolder() {
+        return findSteamRoot().flatMap(this::findCfgFolderInLibraries);
+    }
+
+    private Optional<Path> findCfgFolderInLibraries(Path steamRoot) {
+        List<Path> libraries = findLibraries(steamRoot);
+        // Prefer the library where CS2 is actually installed according to its app manifest
+        for (Path library : libraries) {
+            if (Files.isRegularFile(library.resolve(CS2_APP_MANIFEST))) {
+                Path cfgFolder = library.resolve(CS2_CFG_FOLDER_RELATIVE);
+                if (Files.isDirectory(cfgFolder)) {
+                    return Optional.of(cfgFolder);
+                }
+            }
+        }
+        for (Path library : libraries) {
+            Path cfgFolder = library.resolve(CS2_CFG_FOLDER_RELATIVE);
+            if (Files.isDirectory(cfgFolder)) {
+                return Optional.of(cfgFolder);
+            }
+        }
+        return Optional.empty();
     }
 
     private static Optional<Path> findInUserdata(Path steamRoot, String relative) {

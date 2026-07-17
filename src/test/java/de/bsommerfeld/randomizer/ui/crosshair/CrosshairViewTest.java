@@ -3,8 +3,13 @@ package de.bsommerfeld.randomizer.ui.crosshair;
 import de.bsommerfeld.randomizer.config.AppPreferences;
 import de.bsommerfeld.randomizer.config.ConfigRepository;
 import de.bsommerfeld.randomizer.config.crosshair.Crosshair;
+import de.bsommerfeld.randomizer.config.crosshair.CrosshairBackup;
 import de.bsommerfeld.randomizer.config.crosshair.CrosshairConfigParser;
 import de.bsommerfeld.randomizer.config.crosshair.CrosshairSource;
+import de.bsommerfeld.randomizer.config.crosshair.CrosshairStandard;
+import de.bsommerfeld.randomizer.exec.Cs2Window;
+import de.bsommerfeld.randomizer.exec.ExecApplier;
+import de.bsommerfeld.randomizer.exec.ExecConfig;
 import de.bsommerfeld.randomizer.steam.JnaWindowsRegistry;
 import de.bsommerfeld.randomizer.steam.SteamLocator;
 import javafx.application.Platform;
@@ -12,7 +17,9 @@ import javafx.fxml.FXMLLoader;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,6 +35,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 class CrosshairViewTest {
 
     private static final String VIEW = "/de/bsommerfeld/randomizer/ui/crosshair-view.fxml";
+
+    @TempDir
+    Path tempDir;
 
     @BeforeAll
     static void initToolkit() {
@@ -52,8 +62,13 @@ class CrosshairViewTest {
                 ConfigRepository<Crosshair> repository = new ConfigRepository<>(
                         CrosshairSource.INSTANCE, new AppPreferences(),
                         new SteamLocator(new JnaWindowsRegistry()), new CrosshairConfigParser());
+                CrosshairStandard standard = new CrosshairStandard(
+                        new CrosshairBackup(tempDir.resolve("backup"), new CrosshairConfigParser()));
                 FXMLLoader loader = new FXMLLoader(CrosshairViewTest.class.getResource(VIEW));
-                loader.setControllerFactory(type -> new CrosshairController(repository));
+                loader.setControllerFactory(type -> new CrosshairController(repository, standard,
+                        new ExecApplier(new ExecConfig(java.util.Optional::empty),
+                                vk -> Cs2Window.PressResult.WINDOW_NOT_FOUND, () -> "l"),
+                        new AppPreferences(tempDir)));
                 loader.load();
             } catch (Throwable t) {
                 error.set(t);

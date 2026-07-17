@@ -133,6 +133,27 @@ class SteamLocatorTest {
         assertTrue(locator.findUserKeysDefaultConfig().isEmpty());
     }
 
+    @Test
+    void findsCs2CfgFolderUnderGameInstall() throws IOException {
+        Path steamRoot = createSteamRoot();
+        createCs2Config(steamRoot); // creates the cfg folder with a file inside
+
+        SteamLocator locator = new SteamLocator(hkcuRegistry(steamRoot));
+
+        assertEquals(Optional.of(steamRoot.resolve(
+                        "steamapps/common/Counter-Strike Global Offensive/game/csgo/cfg")),
+                locator.findCs2CfgFolder());
+    }
+
+    @Test
+    void returnsEmptyWhenCfgFolderDoesNotExist() throws IOException {
+        Path steamRoot = createSteamRoot();
+
+        SteamLocator locator = new SteamLocator(hkcuRegistry(steamRoot));
+
+        assertTrue(locator.findCs2CfgFolder().isEmpty());
+    }
+
     private Path createUserKeysConfig(Path steamRoot, String steamId, String content) throws IOException {
         Path config = steamRoot.resolve("userdata").resolve(steamId).resolve("730/remote/cs2_user_keys.vcfg");
         Files.createDirectories(config.getParent());

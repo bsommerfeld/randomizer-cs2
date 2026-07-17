@@ -59,6 +59,32 @@ class AppPreferencesTest {
     }
 
     @Test
+    void returnsFallbackWithoutStoredString() {
+        assertEquals("l", new AppPreferences(tempDir).getString("cs2.exec.key", "l"));
+    }
+
+    @Test
+    void readsStoredString() throws IOException {
+        Files.writeString(tempDir.resolve("app.properties"), "cs2.exec.key=f10");
+
+        assertEquals("f10", new AppPreferences(tempDir).getString("cs2.exec.key", "l"));
+    }
+
+    @Test
+    void roundTripsString() throws IOException {
+        new AppPreferences(tempDir).setString("cs2.exec.key", "f9");
+
+        assertEquals("f9", new AppPreferences(tempDir).getString("cs2.exec.key", "l"));
+    }
+
+    @Test
+    void returnsFallbackForBlankValue() throws IOException {
+        Files.writeString(tempDir.resolve("app.properties"), "cs2.exec.key=   ");
+
+        assertEquals("l", new AppPreferences(tempDir).getString("cs2.exec.key", "l"));
+    }
+
+    @Test
     void createsMissingBaseDirectoryOnSave() throws IOException {
         Path baseDir = tempDir.resolve("nested/randomizer-cs2");
 
