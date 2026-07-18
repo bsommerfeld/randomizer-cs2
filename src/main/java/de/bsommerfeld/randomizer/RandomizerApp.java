@@ -2,9 +2,12 @@ package de.bsommerfeld.randomizer;
 
 import de.bsommerfeld.randomizer.config.AppPreferences;
 import de.bsommerfeld.randomizer.config.ConfigRepository;
+import de.bsommerfeld.randomizer.config.ConfigSaver;
+import de.bsommerfeld.randomizer.config.ConfigVerifier;
 import de.bsommerfeld.randomizer.config.crosshair.Crosshair;
 import de.bsommerfeld.randomizer.config.crosshair.CrosshairBackup;
 import de.bsommerfeld.randomizer.config.crosshair.CrosshairConfigParser;
+import de.bsommerfeld.randomizer.config.crosshair.CrosshairRandomizer;
 import de.bsommerfeld.randomizer.config.crosshair.CrosshairSource;
 import de.bsommerfeld.randomizer.config.crosshair.CrosshairStandard;
 import de.bsommerfeld.randomizer.config.keybinds.ConfigKind;
@@ -49,7 +52,8 @@ public class RandomizerApp extends Application {
         FXMLLoader loader = new FXMLLoader(RandomizerApp.class.getResource("ui/main-view.fxml"));
         loader.setControllerFactory(ControllerFactory.create(
                 defaultConfig, userConfig, crosshairConfig, crosshairStandard, execApplier,
-                preferences, gsiService));
+                preferences, new CrosshairRandomizer(), new ConfigSaver(), new ConfigVerifier(),
+                gsiService));
         Scene scene = new Scene(loader.load());
 
         stage.setTitle("Randomizer CS2");

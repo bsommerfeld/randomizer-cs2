@@ -2,9 +2,12 @@ package de.bsommerfeld.randomizer.ui.crosshair;
 
 import de.bsommerfeld.randomizer.config.AppPreferences;
 import de.bsommerfeld.randomizer.config.ConfigRepository;
+import de.bsommerfeld.randomizer.config.ConfigSaver;
+import de.bsommerfeld.randomizer.config.ConfigVerifier;
 import de.bsommerfeld.randomizer.config.crosshair.Crosshair;
 import de.bsommerfeld.randomizer.config.crosshair.CrosshairBackup;
 import de.bsommerfeld.randomizer.config.crosshair.CrosshairConfigParser;
+import de.bsommerfeld.randomizer.config.crosshair.CrosshairRandomizer;
 import de.bsommerfeld.randomizer.config.crosshair.CrosshairSource;
 import de.bsommerfeld.randomizer.config.crosshair.CrosshairStandard;
 import de.bsommerfeld.randomizer.exec.Cs2Window;
@@ -68,7 +71,8 @@ class CrosshairViewTest {
                 loader.setControllerFactory(type -> new CrosshairController(repository, standard,
                         new ExecApplier(new ExecConfig(java.util.Optional::empty),
                                 vk -> Cs2Window.PressResult.WINDOW_NOT_FOUND, () -> "l"),
-                        new AppPreferences(tempDir)));
+                        new AppPreferences(tempDir), new CrosshairRandomizer(), new ConfigSaver(),
+                        new ConfigVerifier()));
                 loader.load();
             } catch (Throwable t) {
                 error.set(t);
