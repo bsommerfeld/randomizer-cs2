@@ -12,29 +12,32 @@
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="de.bsommerfeld.randomizer.ui.gsi.GsiTabController">
     <top>
-        <HBox spacing="8" alignment="CENTER_LEFT">
+        <HBox spacing="12" alignment="CENTER_LEFT">
             <padding>
-                <Insets top="10" right="12" bottom="10" left="12"/>
+                <Insets top="16" right="20" bottom="12" left="20"/>
             </padding>
-            <Button fx:id="toggleButton" text="GSI starten" onAction="#onToggle"/>
-            <Label fx:id="statusLabel" maxWidth="Infinity" wrapText="true" HBox.hgrow="ALWAYS"/>
+            <Button fx:id="toggleButton" text="Start GSI" onAction="#onToggle" styleClass="primary"/>
+            <Label fx:id="statusLabel" maxWidth="Infinity" wrapText="true" HBox.hgrow="ALWAYS"
+                   styleClass="status"/>
         </HBox>
     </top>
     <center>
         <SplitPane dividerPositions="0.45">
             <BorderPane.margin>
-                <Insets right="12" left="12" bottom="12"/>
+                <Insets right="20" left="20" bottom="20"/>
             </BorderPane.margin>
-            <SplitPane orientation="VERTICAL" dividerPositions="0.6">
-                <ListView fx:id="eventsList"
-                          style="-fx-font-family: 'Consolas', 'Courier New', monospace;"/>
-                <TextArea fx:id="eventDetailsArea" editable="false"
-                          promptText="Event anklicken, um Details zu sehen"
-                          style="-fx-font-family: 'Consolas', 'Courier New', monospace;"/>
+            <!-- Min sizes, so no divider can drag a pane shut. -->
+            <SplitPane orientation="VERTICAL" dividerPositions="0.6" minWidth="240">
+                <ListView fx:id="eventsList" styleClass="mono" minHeight="100">
+                    <placeholder>
+                        <Label text="No events yet." styleClass="placeholder-label"/>
+                    </placeholder>
+                </ListView>
+                <TextArea fx:id="eventDetailsArea" editable="false" styleClass="mono" minHeight="80"
+                          promptText="Click an event to see its details"/>
             </SplitPane>
-            <TextArea fx:id="jsonArea" editable="false"
-                      promptText="Aktueller Game State als JSON"
-                      style="-fx-font-family: 'Consolas', 'Courier New', monospace;"/>
+            <TextArea fx:id="jsonArea" editable="false" styleClass="mono" minWidth="240"
+                      promptText="Current game state as JSON"/>
         </SplitPane>
     </center>
 </BorderPane>

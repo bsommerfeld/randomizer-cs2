@@ -1,30 +1,31 @@
 package de.bsommerfeld.randomizer.ui.overview;
 
-import com.cs2gsi.GameState;
-import com.cs2gsi.nodes.GameMode;
+import com.cs2gsi.nodes.Bomb;
+import com.cs2gsi.nodes.BombState;
 import com.cs2gsi.nodes.PlayerActivity;
 import com.cs2gsi.nodes.PlayerTeam;
 import com.cs2gsi.nodes.Weapon;
 import com.cs2gsi.nodes.WeaponState;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
-/**
- * Renders game-state values as display text (German UI wording). Sentinel-aware: the GSI library
- * returns -1 for absent numeric fields.
- */
+/** Game-state values as display text. The GSI library reports -1 for a number CS2 did not send. */
 final class GameTexts {
+
+    /** Stands in for every value CS2 did not send. */
+    static final String ABSENT = "-";
 
     private GameTexts() {
     }
 
-    /** Sentinel-aware integer: the library returns -1 for absent numeric fields. */
     static String num(int value) {
-        return value < 0 ? "–" : String.valueOf(value);
+        return value < 0 ? ABSENT : String.valueOf(value);
     }
 
     static String money(int value) {
-        return value < 0 ? "–" : "$" + value;
+        return value < 0 ? ABSENT : "$" + value;
     }
 
     static String score(int value) {
@@ -32,7 +33,7 @@ final class GameTexts {
     }
 
     static String yesNo(boolean value) {
-        return value ? "ja" : "nein";
+        return value ? "yes" : "no";
     }
 
     /** "m:ss", rounded up so the display never skips ahead of the game clock. */
@@ -41,95 +42,91 @@ final class GameTexts {
         return total / 60 + ":" + String.format(Locale.US, "%02d", total % 60);
     }
 
-    /** "weapon_ak47" → "Ak47", "weapon_usp_silencer" → "Usp Silencer". */
-    static String weaponName(Weapon weapon) {
-        if (weapon == null || weapon.name.isBlank()) {
-            return "-";
-        }
-        String name = weapon.name.startsWith("weapon_") ? weapon.name.substring("weapon_".length()) : weapon.name;
-        String[] words = name.split("_");
-        StringBuilder sb = new StringBuilder();
-        for (String word : words) {
-            if (word.isEmpty()) {
-                continue;
-            }
-            if (sb.length() > 0) {
-                sb.append(' ');
-            }
-            sb.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1));
-        }
-        return sb.toString();
+    /** The timer label: "1:42", or "Bomb  0:31" once the bomb countdown has taken over. */
+    static String countdown(RoundTimer.Remaining remaining) {
+        return (remaining.bomb() ? "Bomb  " : "") + clock(remaining.seconds());
     }
 
-    /** One line per weapon: slot, name, ammo and state - only what CS2 actually sent. */
-    static String weaponLine(Weapon weapon) {
-        StringBuilder sb = new StringBuilder();
-        if (weapon.slot >= 0) {
-            sb.append("Slot ").append(weapon.slot).append("  ·  ");
+    /**
+     * The name the game shows ("AK-47", "USP-S"), which the GSI library knows for every weapon it
+     * lists. One it does not list yet shows its payload name.
+     */
+    static String weaponName(Weapon weapon) {
+        if (weapon == null || weapon.name.isBlank()) {
+            return ABSENT;
         }
-        sb.append(weaponName(weapon));
+        return weapon.info.displayName.isBlank() ? weapon.name : weapon.info.displayName;
+    }
+
+    /**
+     * One line per weapon: slot, name, ammo and state. The slot is the key that draws the weapon, which
+     * the GSI library knows by name, so a weapon it does not list has none. The rest is only what CS2 sent.
+     */
+    static String weaponLine(Weapon weapon) {
+        List<String> parts = new ArrayList<>();
+        if (weapon.info.slot > 0) {
+            parts.add("Slot " + weapon.info.slot);
+        }
+        parts.add(weaponName(weapon));
         if (weapon.ammoClip >= 0) {
-            sb.append("  ·  ").append(weapon.ammoClip);
-            if (weapon.ammoReserve >= 0) {
-                sb.append(" / ").append(weapon.ammoReserve);
-            }
+            parts.add(ammo(weapon));
         }
         if (weapon.state != WeaponState.Undefined) {
-            sb.append("  ·  ").append(weapon.state);
+            parts.add(weaponState(weapon.state));
         }
-        return sb.toString();
+        return String.join("  ·  ", parts);
+    }
+
+    private static String weaponState(WeaponState state) {
+        return switch (state) {
+            case Active -> "in hand";
+            case Holstered -> "holstered";
+            case Reloading -> "reloading";
+            case Undefined -> ABSENT;
+        };
+    }
+
+    /** "17 / 40", or just the clip when CS2 sent no reserve, as for grenades. */
+    private static String ammo(Weapon weapon) {
+        return weapon.ammoReserve >= 0 ? weapon.ammoClip + " / " + weapon.ammoReserve : String.valueOf(weapon.ammoClip);
     }
 
     static String team(PlayerTeam team) {
         return switch (team) {
             case CT -> "Counter-Terrorists";
             case T -> "Terrorists";
-            case Spectator -> "Zuschauer";
-            case Undefined -> "-";
+            case Spectator -> "Spectator";
+            case Undefined -> ABSENT;
         };
     }
 
     static String activity(PlayerActivity activity) {
         return switch (activity) {
-            case Playing -> "spielt";
-            case Menu -> "im Menü";
-            case TextInput -> "tippt";
-            case Undefined -> "-";
+            case Playing -> "playing";
+            case Menu -> "in menu";
+            case TextInput -> "typing";
+            case Undefined -> ABSENT;
         };
     }
 
-    /** Bomb status line incl. countdown if CS2 sent one; empty when there is nothing to show. */
-    static String bomb(GameState state) {
-        String base = switch (state.round.bombState) {
-            case Carried -> "Bombe: getragen";
-            case Dropped -> "Bombe: fallen gelassen";
-            case Planting -> "Bombe: wird gelegt";
-            case Planted -> "Bombe: gelegt";
-            case Defusing -> "Bombe: wird entschärft";
-            case Defused -> "Bombe: entschärft";
-            case Exploded -> "Bombe: explodiert";
-            case Undefined -> "";
-        };
-        if (base.isEmpty()) {
-            return "";
-        }
-        if (state.bomb.isValid() && state.bomb.countdown >= 0) {
-            base += String.format(Locale.US, "  (%.1fs)", state.bomb.countdown);
-        }
-        return base;
+    /** The bomb's status with its countdown if CS2 sent one, empty when there is nothing to show. */
+    static String bomb(BombState bombState, Bomb bomb) {
+        String status = bombStatus(bombState);
+        boolean hasCountdown = bomb.isValid() && bomb.countdown >= 0;
+        return status.isEmpty() || !hasCountdown
+                ? status
+                : status + String.format(Locale.US, "  (%.1fs)", bomb.countdown);
     }
 
-    static String mode(GameMode mode) {
-        return switch (mode) {
-            case Competitive -> "Competitive";
-            case Scrimcomp2v2 -> "Wingman";
-            case Scrimcomp5v5 -> "Weapons Expert";
-            case Casual -> "Casual";
-            case Deathmatch -> "Deathmatch";
-            case Custom -> "Custom";
-            case Skirmish -> "Skirmish";
-            case Cooperative -> "Co-op";
-            case Training -> "Training";
+    private static String bombStatus(BombState bombState) {
+        return switch (bombState) {
+            case Carried -> "Bomb: carried";
+            case Dropped -> "Bomb: dropped";
+            case Planting -> "Bomb: being planted";
+            case Planted -> "Bomb: planted";
+            case Defusing -> "Bomb: being defused";
+            case Defused -> "Bomb: defused";
+            case Exploded -> "Bomb: exploded";
             case Undefined -> "";
         };
     }

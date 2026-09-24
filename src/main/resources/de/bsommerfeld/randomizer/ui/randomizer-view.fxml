@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="de.bsommerfeld.randomizer.ui.randomizer.RandomizerTabController">
+    <top>
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <padding>
+                <Insets top="16" right="20" bottom="12" left="20"/>
+            </padding>
+            <Button fx:id="toggleButton" text="Start randomizer" onAction="#onToggle" styleClass="primary"/>
+            <Label fx:id="statusLabel" maxWidth="Infinity" wrapText="true" HBox.hgrow="ALWAYS"
+                   styleClass="status"/>
+        </HBox>
+    </top>
+    <center>
+        <SplitPane dividerPositions="0.4">
+            <BorderPane.margin>
+                <Insets right="20" left="20" bottom="20"/>
+            </BorderPane.margin>
+            <!-- The divider stops where the interval row would get cut (that row's min width is its
+                 pref width), and a bigger window widens the log, not the settings. -->
+            <VBox styleClass="detail-panel" SplitPane.resizableWithParent="false">
+                <VBox styleClass="detail-body,settings-body" VBox.vgrow="ALWAYS">
+                    <Label text="Wait between two actions" styleClass="detail-section"/>
+                    <HBox spacing="8" alignment="CENTER_LEFT" minWidth="-Infinity">
+                        <Spinner fx:id="minSpinner" prefWidth="80"/>
+                        <Label text="to"/>
+                        <Spinner fx:id="maxSpinner" prefWidth="80"/>
+                        <Label text="seconds"/>
+                    </HBox>
+                    <Label text="Actions" styleClass="detail-section"/>
+                    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+                        <VBox fx:id="actionsBox" spacing="6"/>
+                    </ScrollPane>
+                </VBox>
+            </VBox>
+            <ListView fx:id="logList" styleClass="mono" minWidth="240">
+                <placeholder>
+                    <Label text="No action played yet." styleClass="placeholder-label"/>
+                </placeholder>
+            </ListView>
+        </SplitPane>
+    </center>
+</BorderPane>

@@ -1,21 +1,25 @@
 package de.bsommerfeld.randomizer.gsi;
 
+import com.cs2gsi.GSIConfigResult;
 import com.cs2gsi.GameState;
 import com.cs2gsi.GameStateListener;
+import com.cs2gsi.events.CS2GameEvent;
+import com.cs2gsi.events.provider.ProviderTimestampChanged;
+import com.cs2gsi.events.provider.ProviderUpdated;
 import de.bsommerfeld.randomizer.gsi.event.EventFormatter;
 import de.bsommerfeld.randomizer.gsi.json.Json;
-import de.bsommerfeld.randomizer.gsi.state.GameStateChangeTracker;
 
+import java.time.Clock;
+import java.time.Duration;
+import java.time.InstantSource;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
- * Facade over the CS2 GSI library (<a href="https://github.com/bustolio/CS2-GSI">bustolio/CS2-GSI</a>):
- * owns the local HTTP listener lifecycle and exposes the incoming game states and events to the
- * application. Serializing, diffing and event formatting live in dedicated collaborators
- * ({@link Json}, {@link GameStateChangeTracker}, {@link EventFormatter}); this class only wires
- * them to the listener.
+ * The app's side of the CS2 GSI library (<a href="https://github.com/bustolio/CS2-GSI">bustolio/CS2-GSI</a>).
+ * Starts and stops its local HTTP listener and hands the incoming game states and events on.
  *
- * <p>Note: callbacks run on the library's listener thread, not on the JavaFX Application Thread.
+ * <p>Every handler runs on the library's listener thread, not on the JavaFX thread.
  */
 public final class GsiService implements AutoCloseable {
 
@@ -26,19 +30,21 @@ public final class GsiService implements AutoCloseable {
 
     private final GameStateListener listener;
     private final EventFormatter eventFormatter;
+    private final InstantSource clock;
 
     public GsiService() {
         this(DEFAULT_PORT);
     }
 
     public GsiService(int port) {
-        this(new GameStateListener(port), new EventFormatter());
+        this(port, Clock.systemUTC());
     }
 
-    /** Full control over the collaborators - mainly for tests and custom event rendering. */
-    public GsiService(GameStateListener listener, EventFormatter eventFormatter) {
-        this.listener = listener;
-        this.eventFormatter = eventFormatter;
+    /** The listener stamps every game state with {@code clock} and {@link #silence()} reads it, so both tell the same time. */
+    GsiService(int port, InstantSource clock) {
+        this.listener = new GameStateListener(port, clock);
+        this.eventFormatter = new EventFormatter();
+        this.clock = clock;
     }
 
     /** Starts the listener; false if e.g. the port is already in use. */
@@ -60,12 +66,12 @@ public final class GsiService implements AutoCloseable {
     }
 
     /**
-     * Writes gamestate_integration_randomizer.cfg into the CS2 cfg folder (the library locates CS2
-     * on its own); false if that fails. CS2 has to be restarted once afterwards so it picks up the
-     * file.
+     * Writes the GSI config into the CS2 cfg folder (the library locates CS2 on its own) and reports
+     * what that did to the file. CS2 reads it on startup only, so CREATED and UPDATED mean the game
+     * needs one restart. A file that already has the right content is left alone.
      */
-    public boolean generateConfigFile() {
-        return listener.generateGSIConfigFile(GSI_CONFIG_NAME);
+    public GSIConfigResult installConfigFile() {
+        return listener.installGSIConfigFile(GSI_CONFIG_NAME);
     }
 
     /** Registers a handler that receives the pretty JSON of every game-state update. */
@@ -73,33 +79,37 @@ public final class GsiService implements AutoCloseable {
         listener.onNewGameState(state -> handler.accept(Json.prettify(state.toString())));
     }
 
-    /**
-     * Registers a handler that receives, as pretty JSON, only the values that changed since the
-     * previous game state. The handler is not called for the first state (nothing to compare
-     * against) nor when nothing changed; see {@link GameStateChangeTracker} for the exact semantics.
-     */
-    public void onGameStateChanges(Consumer<String> handler) {
-        GameStateChangeTracker tracker = new GameStateChangeTracker();
-        listener.onNewGameState(state -> {
-            String changes = tracker.track(state.toString());
-            if (changes != null) {
-                handler.accept(changes);
-            }
-        });
-    }
-
-    /**
-     * Registers a handler that receives the structured {@link GameState} of every update - the
-     * parsed node tree ({@code player}, {@code map}, {@code round}, {@code allPlayers}, …) rather
-     * than a JSON string. Intended for views that read fields directly, e.g. the live overview.
-     */
+    /** Registers a handler that receives every game-state update as the parsed {@link GameState}. */
     public void onGameState(Consumer<GameState> handler) {
         listener.onNewGameState(handler::accept);
     }
 
-    /** Registers a handler that receives every CS2 event as a {@link GsiEvent}. */
+    /** The latest state CS2 sent, an empty one before the first. Stopping the listener does not clear it. */
+    public GameState currentGameState() {
+        return listener.getCurrentGameState();
+    }
+
+    /**
+     * How long ago CS2 sent its last game state, empty before the first one. A heartbeat that repeats
+     * the state counts, so with the game up this stays below the heartbeat of the config file, 10 s in
+     * the generated one.
+     */
+    public Optional<Duration> silence() {
+        return listener.getLastGameStateTime().map(last -> Duration.between(last, clock.instant()));
+    }
+
+    /** Registers a handler that receives every CS2 event as a {@link GsiEvent}, except the provider heartbeat. */
     public void onGameEvent(Consumer<GsiEvent> handler) {
-        listener.onGameEvent(event -> handler.accept(eventFormatter.format(event)));
+        listener.onGameEvent(event -> {
+            if (!isProviderHeartbeat(event)) {
+                handler.accept(eventFormatter.format(event));
+            }
+        });
+    }
+
+    /** CS2 stamps every payload with a new provider timestamp, so these two fire on each update and carry no news. */
+    private static boolean isProviderHeartbeat(CS2GameEvent event) {
+        return event instanceof ProviderUpdated || event instanceof ProviderTimestampChanged;
     }
 
     @Override

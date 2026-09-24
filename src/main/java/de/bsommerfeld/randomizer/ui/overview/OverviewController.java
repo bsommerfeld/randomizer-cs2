@@ -9,27 +9,25 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
+import java.util.Optional;
+
 /**
- * Drives the live "Übersicht" tab: a team-grouped scoreboard of all players plus a detail panel for
- * the selected one, fed by the structured {@link GameState} stream from {@link GsiService}. The
- * pieces are atomic collaborators: {@link RoundTimer} (countdown logic), {@link ScoreboardTable}
- * (table setup), {@link PlayerDetailView} (detail card) and {@link GameTexts} (formatting).
+ * The live overview tab. Shows a scoreboard per team and the details of the selected player.
  *
- * <p>CS2 only fills {@code allPlayers} in spectator/observer mode; in a normal match that block is
- * empty and this view falls back to a hint plus the local player's own card.
- *
- * <p>All GSI callbacks arrive on the listener thread and are marshalled onto the JavaFX thread via
- * {@link Platform#runLater} before touching any control.
+ * <p>CS2 fills {@code allPlayers} only for spectators and observers. In a normal match it is empty,
+ * and the tab shows a hint and the local player's own card instead.
  */
 public final class OverviewController {
 
     @FXML private Label mapLabel;
+    @FXML private Label modeLabel;
     @FXML private Label timeLabel;
     @FXML private Label ctScoreLabel;
     @FXML private Label tScoreLabel;
@@ -42,14 +40,14 @@ public final class OverviewController {
 
     @FXML private Pane placeholderBox;
     @FXML private Label placeholderLabel;
+    @FXML private Node ownPlayerCard;
     @FXML private VBox ownPlayerContent;
 
     private final GsiService gsiService;
     private final RoundTimer roundTimer = new RoundTimer();
 
-    /** Steam ID of the row whose details are shown, so selection survives item replacement. */
+    /** Kept by Steam ID, so the selection survives each game state replacing the rows. */
     private String selectedSteamId;
-    /** Steam ID of the local player, used to highlight their scoreboard row. */
     private String localSteamId;
 
     public OverviewController(GsiService gsiService) {
@@ -63,13 +61,15 @@ public final class OverviewController {
         coupleSelection(ctTable, tTable);
         coupleSelection(tTable, ctTable);
         showDetail(null);
+        startCountdownTicker();
+        gsiService.onGameState(state -> Platform.runLater(() -> render(state)));
+    }
 
-        // Tick the phase countdown locally so it counts down smoothly between GSI updates.
-        Timeline ticker = new Timeline(new KeyFrame(Duration.millis(250), e -> updateTimeLabel()));
+    /** Ticks locally, so the countdown keeps moving between two game states. */
+    private void startCountdownTicker() {
+        Timeline ticker = new Timeline(new KeyFrame(Duration.millis(250), e -> renderCountdown()));
         ticker.setCycleCount(Animation.INDEFINITE);
         ticker.play();
-
-        gsiService.onGameState(state -> Platform.runLater(() -> render(state)));
     }
 
     // ---- rendering -------------------------------------------------------------------------
@@ -78,70 +78,72 @@ public final class OverviewController {
         if (state == null) {
             return;
         }
+        roundTimer.update(state.round.phase, state.round.bombState, state.map.mode);
         renderHeader(state);
-
+        renderCountdown();
         if (state.allPlayers.isEmpty()) {
-            renderPlaceholder(state);
-            return;
+            renderOwnPlayer(state);
+        } else {
+            renderScoreboard(state);
         }
-        localSteamId = state.player.steamId;
-        setScoreboardVisible(true);
+    }
 
+    private void renderHeader(GameState state) {
+        mapLabel.setText(state.map.name.isBlank() ? GameTexts.ABSENT : state.map.name);
+        modeLabel.setText(state.map.mode.displayName);
+        ctScoreLabel.setText(GameTexts.score(state.map.ctStatistics.score));
+        tScoreLabel.setText(GameTexts.score(state.map.tStatistics.score));
+
+        String bomb = GameTexts.bomb(state.round.bombState, state.bomb);
+        bombLabel.setText(bomb);
+        setShown(bombLabel, !bomb.isEmpty());
+    }
+
+    private void renderCountdown() {
+        Optional<RoundTimer.Remaining> remaining = roundTimer.remaining();
+        setShown(timeLabel, remaining.isPresent());
+        remaining.ifPresent(countdown -> {
+            timeLabel.setText(GameTexts.countdown(countdown));
+            timeLabel.getStyleClass().remove("time-bomb");
+            if (countdown.bomb()) {
+                timeLabel.getStyleClass().add("time-bomb");
+            }
+        });
+    }
+
+    private void renderScoreboard(GameState state) {
+        localSteamId = state.player.steamId;
+        showScoreboard(true);
         ctTable.getItems().setAll(ScoreboardTable.playersOf(state, PlayerTeam.CT));
         tTable.getItems().setAll(ScoreboardTable.playersOf(state, PlayerTeam.T));
         reselect(ctTable);
         reselect(tTable);
     }
 
-    private void renderHeader(GameState state) {
-        String map = state.map.name.isBlank() ? "-" : state.map.name;
-        String mode = GameTexts.mode(state.map.mode);
-        mapLabel.setText(mode.isEmpty() ? map : map + "  ·  " + mode);
-        ctScoreLabel.setText(GameTexts.score(state.map.ctStatistics.score));
-        tScoreLabel.setText(GameTexts.score(state.map.tStatistics.score));
-
-        String bomb = GameTexts.bomb(state);
-        bombLabel.setText(bomb);
-        bombLabel.setVisible(!bomb.isEmpty());
-        bombLabel.setManaged(!bomb.isEmpty());
-
-        roundTimer.update(state.round.phase, state.round.bombState, state.map.mode);
-        updateTimeLabel();
-    }
-
-    private void updateTimeLabel() {
-        roundTimer.remaining().ifPresentOrElse(remaining -> {
-            timeLabel.setText((remaining.bomb() ? "Bombe  " : "") + GameTexts.clock(remaining.seconds()));
-            timeLabel.getStyleClass().remove("time-bomb");
-            if (remaining.bomb()) {
-                timeLabel.getStyleClass().add("time-bomb");
-            }
-            timeLabel.setVisible(true);
-            timeLabel.setManaged(true);
-        }, () -> {
-            timeLabel.setVisible(false);
-            timeLabel.setManaged(false);
-        });
-    }
-
-    private void renderPlaceholder(GameState state) {
-        setScoreboardVisible(false);
+    /** CS2 sent no player list, so only the local player is known. */
+    private void renderOwnPlayer(GameState state) {
+        showScoreboard(false);
         placeholderLabel.setText(
-                "Kein Scoreboard verfügbar - CS2 sendet die Spielerliste nur im Spectator-/Observer-Modus "
-                        + "(GOTV, Demo oder Beobachter). Es wird stattdessen der eigene Spieler angezeigt.");
+                "CS2 sends the scoreboard only to spectators (GOTV, demo, observer). "
+                        + "Here you see your own player.");
         PlayerDetailView.render(state.player, ownPlayerContent);
+        setShown(ownPlayerCard, true);
     }
 
-    private void setScoreboardVisible(boolean scoreboard) {
-        scoreboardBox.setVisible(scoreboard);
-        scoreboardBox.setManaged(scoreboard);
-        placeholderBox.setVisible(!scoreboard);
-        placeholderBox.setManaged(!scoreboard);
+    private void showScoreboard(boolean scoreboard) {
+        setShown(scoreboardBox, scoreboard);
+        setShown(placeholderBox, !scoreboard);
+    }
+
+    /** Hidden nodes also give up their space in the layout. */
+    private static void setShown(Node node, boolean shown) {
+        node.setVisible(shown);
+        node.setManaged(shown);
     }
 
     // ---- selection ---------------------------------------------------------------------------
 
-    /** When a row in {@code table} is picked, clear the other table and show the details. */
+    /** A row picked in {@code table} clears the selection in {@code other} and shows its details. */
     private void coupleSelection(TableView<Player> table, TableView<Player> other) {
         table.getSelectionModel().selectedItemProperty().addListener((obs, old, selected) -> {
             if (selected != null) {
@@ -165,7 +167,7 @@ public final class OverviewController {
 
     private void showDetail(Player player) {
         if (player == null) {
-            detailContent.getChildren().setAll(new Label("Spieler auswählen, um Details zu sehen."));
+            detailContent.getChildren().setAll(new Label("Select a player to see their details."));
             return;
         }
         selectedSteamId = player.steamId;

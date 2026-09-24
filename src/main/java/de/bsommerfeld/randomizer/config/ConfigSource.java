@@ -1,24 +1,15 @@
 package de.bsommerfeld.randomizer.config;
 
-import de.bsommerfeld.randomizer.steam.SteamLocator;
-
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
- * Describes one loadable CS2 config file: where its remembered path is stored, which file name is
- * valid for it and how it is auto-detected. New configs are added by implementing this interface -
- * the loading pipeline ({@link ConfigRepository}) and the preference store stay untouched
- * (open/closed principle).
+ * One loadable CS2 config file.
+ *
+ * @param preferenceKey key under which a manually chosen path is remembered in {@link AppPreferences}
+ * @param fileName      the only file name that is valid for this config
+ * @param autoDetect    locates the file without a remembered path, never throws
  */
-public interface ConfigSource {
-
-    /** Key under which a manually chosen path is remembered in {@link AppPreferences}. */
-    String preferenceKey();
-
-    /** The only file name that is valid for this config. */
-    String fileName();
-
-    /** Locates the file automatically (registry, Steam libraries, userdata scan); never throws. */
-    Optional<Path> autoDetect(SteamLocator steamLocator);
+public record ConfigSource(String preferenceKey, String fileName, Supplier<Optional<Path>> autoDetect) {
 }

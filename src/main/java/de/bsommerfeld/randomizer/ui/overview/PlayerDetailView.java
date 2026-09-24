@@ -1,82 +1,119 @@
 package de.bsommerfeld.randomizer.ui.overview;
 
+import com.cs2gsi.nodes.MatchStats;
 import com.cs2gsi.nodes.Player;
+import com.cs2gsi.nodes.PlayerActivity;
 import com.cs2gsi.nodes.PlayerState;
 import com.cs2gsi.nodes.Weapon;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 /**
- * Builds the detail card for one player (title, HP/armor bars, money, round and match stats,
- * weapons) into a target pane. Only values CS2 actually sent are shown - CS2 (Source 2) often
- * omits fields and the library reports -1.
+ * Builds the detail card for one player into a target pane. CS2 often leaves fields out, and the
+ * library reports -1 for them. The card shows only what CS2 sent.
  */
 final class PlayerDetailView {
+
+    private static final double KEY_COLUMN_WIDTH = 130;
 
     private PlayerDetailView() {
     }
 
     static void render(Player player, Pane target) {
-        target.getChildren().clear();
-        if (player == null || !player.isValid()) {
-            target.getChildren().add(new Label("Keine Daten."));
-            return;
-        }
-        String subtitle = GameTexts.team(player.team) + "  ·  " + GameTexts.activity(player.activity);
-        target.getChildren().add(title(player.name.isBlank() ? "Spieler" : player.name, subtitle));
-
-        target.getChildren().add(bar("HP", player.state.health));
-        target.getChildren().add(bar("Armor", player.state.armor));
-        PlayerState state = player.state;
-        target.getChildren().add(kv("Helm", GameTexts.yesNo(state.hasHelmet)));
-        target.getChildren().add(kv("Defuse-Kit", GameTexts.yesNo(state.hasDefuseKit)));
-        addMoney(target, "Geld", state.money);
-        if (state.flashAmount > 0) {
-            target.getChildren().add(kv("Geblendet", state.flashAmount + "/255"));
-        }
-        if (state.burningAmount > 0) {
-            target.getChildren().add(kv("Brennt", state.burningAmount + "/255"));
-        }
-
-        // Round stats only if CS2 actually sent them - showing "–" everywhere just looks broken.
-        if (state.roundKills >= 0 || state.roundHSKills >= 0
-                || state.roundTotalDamage >= 0 || state.equipmentValue >= 0) {
-            target.getChildren().add(section("Diese Runde"));
-            addNum(target, "Kills", state.roundKills);
-            addNum(target, "davon Headshots", state.roundHSKills);
-            addNum(target, "Schaden", state.roundTotalDamage);
-            addMoney(target, "Equipment-Wert", state.equipmentValue);
-        }
-
-        target.getChildren().add(section("Match"));
-        target.getChildren().add(kv("K / A / D", GameTexts.num(player.matchStats.kills) + " / "
-                + GameTexts.num(player.matchStats.assists) + " / " + GameTexts.num(player.matchStats.deaths)));
-        addNum(target, "MVPs", player.matchStats.mvps);
-        addNum(target, "Score", player.matchStats.score);
-
-        target.getChildren().add(section("Waffen"));
-        if (player.weapons.isEmpty()) {
-            target.getChildren().add(new Label("-"));
-        } else {
-            for (Weapon weapon : player.weapons) {
-                target.getChildren().add(new Label(GameTexts.weaponLine(weapon)));
-            }
-        }
+        boolean known = player != null && player.isValid();
+        target.getChildren().setAll(known ? card(player) : List.of(new Label("No data.")));
     }
 
-    private static VBox title(String name, String subtitle) {
-        Label nameLabel = new Label(name);
-        nameLabel.getStyleClass().add("detail-name");
-        Label subLabel = new Label(subtitle);
-        subLabel.getStyleClass().add("detail-subtitle");
-        VBox box = new VBox(nameLabel, subLabel);
+    private static List<Node> card(Player player) {
+        List<Node> rows = new ArrayList<>();
+        rows.add(title(player));
+        rows.addAll(vitals(player.state));
+        rows.addAll(roundStats(player.state));
+        rows.addAll(matchStats(player.matchStats));
+        rows.addAll(weapons(player.weapons));
+        return rows;
+    }
+
+    private static VBox title(Player player) {
+        Label name = new Label(player.name.isBlank() ? "Player" : player.name);
+        name.getStyleClass().add("detail-name");
+        Label subtitle = new Label(subtitle(player));
+        subtitle.getStyleClass().add("detail-subtitle");
+        VBox box = new VBox(name, subtitle);
         box.getStyleClass().add("detail-title");
         return box;
+    }
+
+    /** CS2 sends the activity only for the local player. For everyone else the team stands alone. */
+    private static String subtitle(Player player) {
+        return player.activity == PlayerActivity.Undefined
+                ? GameTexts.team(player.team)
+                : GameTexts.team(player.team) + ", " + GameTexts.activity(player.activity);
+    }
+
+    private static List<Node> vitals(PlayerState state) {
+        List<Node> rows = new ArrayList<>();
+        rows.add(bar("HP", state.health, "hp-bar"));
+        rows.add(bar("Armor", state.armor, "armor-bar"));
+        rows.add(kv("Helmet", GameTexts.yesNo(state.hasHelmet)));
+        rows.add(kv("Defuse kit", GameTexts.yesNo(state.hasDefuseKit)));
+        money("Money", state.money).ifPresent(rows::add);
+        if (state.flashAmount > 0) {
+            rows.add(kv("Flashed", state.flashAmount + "/255"));
+        }
+        if (state.burningAmount > 0) {
+            rows.add(kv("Burning", state.burningAmount + "/255"));
+        }
+        return rows;
+    }
+
+    /** Empty when CS2 sent none of the round values. A section full of blanks looks broken. */
+    private static List<Node> roundStats(PlayerState state) {
+        List<Node> rows = new ArrayList<>();
+        num("Kills", state.roundKills).ifPresent(rows::add);
+        num("of them headshots", state.roundHSKills).ifPresent(rows::add);
+        num("Damage", state.roundTotalDamage).ifPresent(rows::add);
+        money("Equipment value", state.equipmentValue).ifPresent(rows::add);
+        if (!rows.isEmpty()) {
+            rows.addFirst(section("This round"));
+        }
+        return rows;
+    }
+
+    private static List<Node> matchStats(MatchStats stats) {
+        List<Node> rows = new ArrayList<>();
+        rows.add(section("Match"));
+        rows.add(kv("K / A / D", GameTexts.num(stats.kills) + " / "
+                + GameTexts.num(stats.assists) + " / " + GameTexts.num(stats.deaths)));
+        num("MVPs", stats.mvps).ifPresent(rows::add);
+        num("Score", stats.score).ifPresent(rows::add);
+        return rows;
+    }
+
+    private static List<Node> weapons(List<Weapon> weapons) {
+        List<Node> rows = new ArrayList<>();
+        rows.add(section("Weapons"));
+        if (weapons.isEmpty()) {
+            rows.add(new Label(GameTexts.ABSENT));
+        }
+        weapons.forEach(weapon -> rows.add(weaponLine(weapon)));
+        return rows;
+    }
+
+    private static Label weaponLine(Weapon weapon) {
+        Label line = new Label(GameTexts.weaponLine(weapon));
+        line.setWrapText(true);
+        return line;
     }
 
     private static Label section(String text) {
@@ -85,49 +122,48 @@ final class PlayerDetailView {
         return label;
     }
 
-    /** Adds a numeric row only when CS2 actually supplied the value (library returns -1 if absent). */
-    private static void addNum(Pane target, String key, int value) {
-        if (value >= 0) {
-            target.getChildren().add(kv(key, String.valueOf(value)));
-        }
+    /** A numeric row, or empty when CS2 did not send the value. */
+    private static Optional<Node> num(String key, int value) {
+        return value < 0 ? Optional.empty() : Optional.of(kv(key, String.valueOf(value)));
     }
 
-    /** Adds a money row only when the value is present. */
-    private static void addMoney(Pane target, String key, int value) {
-        if (value >= 0) {
-            target.getChildren().add(kv(key, GameTexts.money(value)));
-        }
+    private static Optional<Node> money(String key, int value) {
+        return value < 0 ? Optional.empty() : Optional.of(kv(key, GameTexts.money(value)));
     }
 
     private static HBox kv(String key, String value) {
-        Label k = new Label(key);
-        k.getStyleClass().add("detail-key");
-        k.setMinWidth(130);
-        Label v = new Label(value);
-        v.getStyleClass().add("detail-value");
-        HBox row = new HBox(k, v);
+        return row(keyLabel(key), valueLabel(value));
+    }
+
+    /** A 0 to 100 value as a bar and its number. {@code styleClass} picks the bar's color. */
+    private static HBox bar(String key, int value, String styleClass) {
+        if (value < 0) {
+            return row(keyLabel(key), new Label(GameTexts.ABSENT));
+        }
+        ProgressBar progress = new ProgressBar(Math.min(1.0, value / 100.0));
+        progress.getStyleClass().add(styleClass);
+        progress.setPrefWidth(100);
+        Label amount = valueLabel(String.valueOf(value));
+        amount.setMinWidth(Region.USE_PREF_SIZE); // in a narrow card the bar shrinks, never the number
+        return row(keyLabel(key), progress, amount);
+    }
+
+    private static HBox row(Node... cells) {
+        HBox row = new HBox(6, cells);
         row.setAlignment(Pos.CENTER_LEFT);
         return row;
     }
 
-    private static HBox bar(String key, int value) {
-        Label k = new Label(key);
-        k.getStyleClass().add("detail-key");
-        k.setMinWidth(130);
-        HBox row = new HBox(k);
-        row.setAlignment(Pos.CENTER_LEFT);
-        row.setSpacing(6);
-        if (value < 0) {
-            row.getChildren().add(new Label("-"));
-            return row;
-        }
-        ProgressBar progress = new ProgressBar(Math.min(1.0, value / 100.0));
-        progress.getStyleClass().add(key.equals("Armor") ? "armor-bar" : "hp-bar");
-        progress.setPrefWidth(140);
-        Label amount = new Label(String.valueOf(value));
-        amount.getStyleClass().add("detail-value");
-        HBox.setHgrow(progress, Priority.NEVER);
-        row.getChildren().addAll(progress, amount);
-        return row;
+    private static Label keyLabel(String key) {
+        Label label = new Label(key);
+        label.getStyleClass().add("detail-key");
+        label.setMinWidth(KEY_COLUMN_WIDTH);
+        return label;
+    }
+
+    private static Label valueLabel(String value) {
+        Label label = new Label(value);
+        label.getStyleClass().add("detail-value");
+        return label;
     }
 }

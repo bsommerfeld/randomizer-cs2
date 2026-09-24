@@ -11,7 +11,7 @@ public final class FileChoosers {
     /** A chooser whose filter only offers files named exactly {@code fileName}. */
     public static FileChooser exactName(String fileName) {
         FileChooser chooser = new FileChooser();
-        chooser.setTitle(fileName + " auswählen");
+        chooser.setTitle("Select " + fileName);
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(fileName, fileName));
         return chooser;
     }

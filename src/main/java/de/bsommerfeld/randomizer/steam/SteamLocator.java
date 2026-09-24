@@ -4,17 +4,17 @@ import de.bsommerfeld.randomizer.vdf.VdfObject;
 import de.bsommerfeld.randomizer.vdf.VdfParser;
 
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Locates the CS2 configs: reads the Steam install path from the Windows registry,
@@ -24,10 +24,8 @@ import java.util.Set;
 public final class SteamLocator {
 
     private static final String CS2_CONFIG_RELATIVE = "steamapps/common/Counter-Strike Global Offensive/game/csgo/cfg/user_keys_default.vcfg";
-    private static final String CS2_CFG_FOLDER_RELATIVE = "steamapps/common/Counter-Strike Global Offensive/game/csgo/cfg";
     private static final String CS2_APP_MANIFEST = "steamapps/appmanifest_730.acf";
     private static final String CS2_USER_KEYS_RELATIVE = "730/remote/cs2_user_keys.vcfg";
-    private static final String CS2_USER_CONVARS_RELATIVE = "730/remote/cs2_user_convars.vcfg";
 
     private final WindowsRegistry registry;
 
@@ -37,7 +35,7 @@ public final class SteamLocator {
 
     /** Returns the path to user_keys_default.vcfg or empty; never throws. */
     public Optional<Path> findUserKeysDefaultConfig() {
-        return findSteamRoot().flatMap(this::findConfigInLibraries);
+        return findSteamRoot().flatMap(SteamLocator::defaultConfigInLibraries);
     }
 
     /**
@@ -45,67 +43,52 @@ public final class SteamLocator {
      * or empty; never throws. With multiple Steam accounts the most recently modified file wins.
      */
     public Optional<Path> findUserKeysConfig() {
-        return findSteamRoot().flatMap(root -> findInUserdata(root, CS2_USER_KEYS_RELATIVE));
+        return findSteamRoot()
+                .map(root -> userKeysConfigs(root.resolve("userdata")))
+                .flatMap(configs -> configs.stream().max(Comparator.comparing(SteamLocator::lastModified)));
     }
 
-    /**
-     * Returns the user's convars ({@code userdata/<SteamID>/730/remote/cs2_user_convars.vcfg}),
-     * which holds the crosshair settings, or empty; never throws. With multiple Steam accounts the
-     * most recently modified file wins.
-     */
-    public Optional<Path> findUserConvarsConfig() {
-        return findSteamRoot().flatMap(root -> findInUserdata(root, CS2_USER_CONVARS_RELATIVE));
+    private Optional<Path> findSteamRoot() {
+        return registry.readString(WindowsRegistry.Hive.CURRENT_USER, "Software\\Valve\\Steam", "SteamPath")
+                .or(() -> registry.readString(
+                        WindowsRegistry.Hive.LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\Valve\\Steam", "InstallPath"))
+                .map(String::trim)
+                .filter(value -> !value.isEmpty())
+                .flatMap(SteamLocator::toPath)
+                .filter(Files::isDirectory);
     }
 
-    /**
-     * Returns CS2's console-config folder under the game install
-     * ({@code steamapps/common/.../game/csgo/cfg}, where {@code exec}-able .cfg files live),
-     * or empty; never throws.
-     */
-    public Optional<Path> findCs2CfgFolder() {
-        return findSteamRoot().flatMap(this::findCfgFolderInLibraries);
-    }
-
-    private Optional<Path> findCfgFolderInLibraries(Path steamRoot) {
+    /** Prefers the library where CS2 is installed according to its app manifest, then any library. */
+    private static Optional<Path> defaultConfigInLibraries(Path steamRoot) {
         List<Path> libraries = findLibraries(steamRoot);
-        // Prefer the library where CS2 is actually installed according to its app manifest
-        for (Path library : libraries) {
-            if (Files.isRegularFile(library.resolve(CS2_APP_MANIFEST))) {
-                Path cfgFolder = library.resolve(CS2_CFG_FOLDER_RELATIVE);
-                if (Files.isDirectory(cfgFolder)) {
-                    return Optional.of(cfgFolder);
-                }
-            }
-        }
-        for (Path library : libraries) {
-            Path cfgFolder = library.resolve(CS2_CFG_FOLDER_RELATIVE);
-            if (Files.isDirectory(cfgFolder)) {
-                return Optional.of(cfgFolder);
-            }
-        }
-        return Optional.empty();
+        return firstDefaultConfig(libraries.stream().filter(SteamLocator::hasCs2Manifest))
+                .or(() -> firstDefaultConfig(libraries.stream()));
     }
 
-    private static Optional<Path> findInUserdata(Path steamRoot, String relative) {
-        Path userdata = steamRoot.resolve("userdata");
+    private static Optional<Path> firstDefaultConfig(Stream<Path> libraries) {
+        return libraries.map(library -> library.resolve(CS2_CONFIG_RELATIVE))
+                .filter(Files::isRegularFile)
+                .findFirst();
+    }
+
+    private static boolean hasCs2Manifest(Path library) {
+        return Files.isRegularFile(library.resolve(CS2_APP_MANIFEST));
+    }
+
+    /** The keybind file of every account folder ({@code userdata/<numeric id>}) that has one. */
+    private static List<Path> userKeysConfigs(Path userdata) {
         if (!Files.isDirectory(userdata)) {
-            return Optional.empty();
+            return List.of();
         }
-        List<Path> candidates = new ArrayList<>();
-        try (DirectoryStream<Path> userDirs = Files.newDirectoryStream(userdata)) {
-            for (Path userDir : userDirs) {
-                if (!isNumeric(userDir.getFileName().toString())) {
-                    continue;
-                }
-                Path config = userDir.resolve(relative);
-                if (Files.isRegularFile(config)) {
-                    candidates.add(config);
-                }
-            }
-        } catch (IOException e) {
-            return Optional.empty();
+        try (Stream<Path> accounts = Files.list(userdata)) {
+            return accounts
+                    .filter(account -> isNumeric(account.getFileName().toString()))
+                    .map(account -> account.resolve(CS2_USER_KEYS_RELATIVE))
+                    .filter(Files::isRegularFile)
+                    .toList();
+        } catch (IOException | UncheckedIOException e) {
+            return List.of();
         }
-        return candidates.stream().max(Comparator.comparing(SteamLocator::lastModified));
     }
 
     private static FileTime lastModified(Path file) {
@@ -116,82 +99,54 @@ public final class SteamLocator {
         }
     }
 
-    private Optional<Path> findSteamRoot() {
-        return registry.readString(WindowsRegistry.Hive.CURRENT_USER, "Software\\Valve\\Steam", "SteamPath")
-                .or(() -> registry.readString(
-                        WindowsRegistry.Hive.LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\Valve\\Steam", "InstallPath"))
-                .map(String::trim)
-                .filter(value -> !value.isEmpty())
-                .flatMap(SteamLocator::toDirectory);
-    }
-
-    private Optional<Path> findConfigInLibraries(Path steamRoot) {
-        List<Path> libraries = findLibraries(steamRoot);
-        // Prefer the library where CS2 is actually installed according to its app manifest
-        for (Path library : libraries) {
-            if (Files.isRegularFile(library.resolve(CS2_APP_MANIFEST))) {
-                Path config = library.resolve(CS2_CONFIG_RELATIVE);
-                if (Files.isRegularFile(config)) {
-                    return Optional.of(config);
-                }
-            }
-        }
-        for (Path library : libraries) {
-            Path config = library.resolve(CS2_CONFIG_RELATIVE);
-            if (Files.isRegularFile(config)) {
-                return Optional.of(config);
-            }
-        }
-        return Optional.empty();
-    }
-
-    private List<Path> findLibraries(Path steamRoot) {
+    /** The Steam root plus every library {@code libraryfolders.vdf} lists, without duplicates. */
+    private static List<Path> findLibraries(Path steamRoot) {
         Set<Path> libraries = new LinkedHashSet<>();
         libraries.add(steamRoot);
-        Path libraryFoldersVdf = steamRoot.resolve("steamapps/libraryfolders.vdf");
-        if (Files.isRegularFile(libraryFoldersVdf)) {
-            try {
-                collectLibraries(VdfParser.parse(libraryFoldersVdf), libraries);
-            } catch (IOException | RuntimeException e) {
-                // Unreadable or broken libraryfolders.vdf: continue with the Steam root only
-            }
-        }
+        libraries.addAll(librariesListedIn(steamRoot.resolve("steamapps/libraryfolders.vdf")));
         return List.copyOf(libraries);
     }
 
-    private static void collectLibraries(VdfObject document, Set<Path> libraries) {
-        // The top-level key is "libraryfolders" (modern) or "LibraryFolders" (legacy)
-        for (Object value : document.entries().values()) {
-            if (!(value instanceof VdfObject folders)) {
-                continue;
-            }
-            folders.entries().forEach((key, entry) -> {
-                if (!isNumeric(key)) {
-                    return;
-                }
-                String path = switch (entry) {
-                    case String direct -> direct; // legacy: "1" "D:\\SteamLibrary"
-                    case VdfObject folder -> folder.getString("path").orElse(null); // modern: "1" { "path" ... }
-                    default -> null;
-                };
-                if (path != null) {
-                    try {
-                        libraries.add(Path.of(path));
-                    } catch (InvalidPathException ignored) {
-                    }
-                }
-            });
+    /** A missing, unreadable or broken file lists nothing; the Steam root still counts. */
+    private static List<Path> librariesListedIn(Path libraryFoldersVdf) {
+        if (!Files.isRegularFile(libraryFoldersVdf)) {
+            return List.of();
         }
+        try {
+            return libraryPaths(VdfParser.parse(libraryFoldersVdf));
+        } catch (IOException | RuntimeException e) {
+            return List.of();
+        }
+    }
+
+    private static List<Path> libraryPaths(VdfObject document) {
+        // The top-level key is "libraryfolders" (modern) or "LibraryFolders" (legacy)
+        return document.entries().values().stream()
+                .filter(VdfObject.class::isInstance)
+                .map(VdfObject.class::cast)
+                .flatMap(folders -> folders.entries().entrySet().stream())
+                .filter(entry -> isNumeric(entry.getKey()))
+                .flatMap(entry -> libraryPath(entry.getValue()).stream())
+                .toList();
+    }
+
+    /** The folder one numbered entry names, in either format Steam has used. */
+    private static Optional<Path> libraryPath(Object entry) {
+        String path = switch (entry) {
+            case String direct -> direct; // legacy: "1" "D:\\SteamLibrary"
+            case VdfObject folder -> folder.getString("path").orElse(null); // modern: "1" { "path" ... }
+            default -> null;
+        };
+        return Optional.ofNullable(path).flatMap(SteamLocator::toPath);
     }
 
     private static boolean isNumeric(String value) {
         return !value.isEmpty() && value.chars().allMatch(Character::isDigit);
     }
 
-    private static Optional<Path> toDirectory(String value) {
+    private static Optional<Path> toPath(String value) {
         try {
-            Path path = Path.of(value);
-            return Files.isDirectory(path) ? Optional.of(path) : Optional.empty();
+            return Optional.of(Path.of(value));
         } catch (InvalidPathException e) {
             return Optional.empty();
         }

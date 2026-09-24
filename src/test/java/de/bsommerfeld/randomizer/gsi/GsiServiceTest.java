@@ -2,6 +2,7 @@ package de.bsommerfeld.randomizer.gsi;
 
 import com.cs2gsi.GameState;
 import com.cs2gsi.nodes.PlayerTeam;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.net.ServerSocket;
@@ -9,6 +10,11 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -17,6 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Runs the real listener on a free local port and posts real payloads at it. Tagged so the socket
+ * tests can be left out: {@code mvn test -DexcludedGroups=integration}.
+ */
+@Tag("integration")
 class GsiServiceTest {
 
     private static int freePort() throws Exception {
@@ -57,6 +68,49 @@ class GsiServiceTest {
             assertNotNull(event);
             assertTrue(event.summary().matches("\\d{2}:\\d{2}:\\d{2}  .+"), "summary should start with a timestamp");
             assertTrue(event.details().contains("Event: "), "details should name the event type");
+        }
+    }
+
+    @Test
+    void leavesOutTheProviderHeartbeat() throws Exception {
+        int port = freePort();
+        CountDownLatch roundEvent = new CountDownLatch(1);
+        List<String> summaries = new CopyOnWriteArrayList<>();
+
+        try (GsiService service = new GsiService(port)) {
+            service.onGameEvent(event -> {
+                summaries.add(event.summary());
+                if (event.summary().contains("Round")) {
+                    roundEvent.countDown();
+                }
+            });
+            assertTrue(service.start());
+
+            post(port, "{\"provider\":{\"name\":\"cs2\",\"timestamp\":1},\"round\":{\"phase\":\"live\"}}");
+            post(port, "{\"provider\":{\"name\":\"cs2\",\"timestamp\":2},\"round\":{\"phase\":\"over\"}}");
+
+            // The library broadcasts provider events before round events, so they would be here by now
+            assertTrue(roundEvent.await(5, TimeUnit.SECONDS), "round event should fire");
+            assertTrue(summaries.stream().noneMatch(s -> s.contains("ProviderUpdated") || s.contains("ProviderTimestampChanged")),
+                    "heartbeat events should be filtered: " + summaries);
+        }
+    }
+
+    @Test
+    void silenceIsTheTimeSinceTheLastGameStateARepeatedOneIncluded() throws Exception {
+        int port = freePort();
+        AtomicReference<Instant> now = new AtomicReference<>(Instant.parse("2026-09-21T12:00:00Z"));
+
+        try (GsiService service = new GsiService(port, now::get)) {
+            assertTrue(service.start());
+            assertEquals(Optional.empty(), service.silence(), "nothing came in yet");
+
+            post(port, "{\"round\":{\"phase\":\"live\"}}");
+            now.set(now.get().plusSeconds(12));
+            assertEquals(Optional.of(Duration.ofSeconds(12)), service.silence());
+
+            post(port, "{\"round\":{\"phase\":\"live\"}}"); // the same state again, which is what a heartbeat sends
+            assertEquals(Optional.of(Duration.ZERO), service.silence());
         }
     }
 

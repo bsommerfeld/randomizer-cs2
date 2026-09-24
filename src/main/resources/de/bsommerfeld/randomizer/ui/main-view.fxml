@@ -1,28 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HeaderBar?>
+<?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="de.bsommerfeld.randomizer.ui.MainController"
             prefWidth="900" prefHeight="650">
+    <top>
+        <VBox>
+            <!-- 31 px is the native Windows title bar (caption 23 + frame 4 + border 4). JavaFX defaults to 29. -->
+            <HeaderBar styleClass="header-bar" minHeight="31">
+                <left>
+                    <Label text="Randomizer CS2" styleClass="window-title"/>
+                </left>
+            </HeaderBar>
+            <Label fx:id="cs2Banner" managed="false" visible="false" wrapText="true"
+                   maxWidth="Infinity" styleClass="cs2-banner"
+                   text="CS2 is not running. Start the game, then GSI can be switched on."/>
+        </VBox>
+    </top>
     <center>
         <TabPane tabClosingPolicy="UNAVAILABLE">
-            <Tab text="Default-Keybinds">
-                <fx:include fx:id="defaultConfigView" source="config-view.fxml"/>
-            </Tab>
-            <Tab text="Custom Keybinds">
-                <fx:include fx:id="userConfigView" source="config-view.fxml"/>
+            <Tab text="Randomizer">
+                <fx:include fx:id="randomizerView" source="randomizer-view.fxml"/>
             </Tab>
             <Tab text="Live (GSI)">
-                <fx:include source="gsi-view.fxml"/>
+                <fx:include fx:id="gsiView" source="gsi-view.fxml"/>
             </Tab>
-            <Tab text="Übersicht">
+            <Tab text="Overview">
                 <fx:include source="overview-view.fxml"/>
             </Tab>
-            <Tab text="Fadenkreuz">
-                <fx:include source="crosshair-view.fxml"/>
+            <Tab text="Configs">
+                <TabPane tabClosingPolicy="UNAVAILABLE" styleClass="sub-tabs">
+                    <Tab text="Merged" onSelectionChanged="#onMergedSelected">
+                        <fx:include fx:id="mergedConfigView" source="merged-config-view.fxml"/>
+                    </Tab>
+                    <Tab text="Default keybinds">
+                        <fx:include fx:id="defaultConfigView" source="config-view.fxml"/>
+                    </Tab>
+                    <Tab text="Custom keybinds">
+                        <fx:include fx:id="userConfigView" source="config-view.fxml"/>
+                    </Tab>
+                </TabPane>
             </Tab>
         </TabPane>
     </center>

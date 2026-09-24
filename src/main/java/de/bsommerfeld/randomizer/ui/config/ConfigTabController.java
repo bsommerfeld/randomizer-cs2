@@ -3,22 +3,22 @@ package de.bsommerfeld.randomizer.ui.config;
 import de.bsommerfeld.randomizer.config.ConfigRepository;
 import de.bsommerfeld.randomizer.config.keybinds.KeybindConfig;
 import de.bsommerfeld.randomizer.ui.FileChoosers;
+import de.bsommerfeld.randomizer.vdf.VdfParseException;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Optional;
 
 /**
- * Drives one keybind-config tab: shows the config as pretty JSON plus a manual picker for the one
- * file name its {@link ConfigRepository} accepts. The same FXML is instantiated once per
- * {@link de.bsommerfeld.randomizer.config.keybinds.ConfigKind}; which config it shows is decided
- * solely by the repository handed to {@link #init}.
+ * One keybind-config tab. Shows the config as JSON and lets the user pick the file by hand. There
+ * is one instance per keybind file, and the repository handed to {@link #init} decides which.
  */
 public final class ConfigTabController {
 
@@ -26,29 +26,42 @@ public final class ConfigTabController {
     @FXML private TextArea jsonArea;
     @FXML private TextField pathField;
 
-    private ConfigRepository<KeybindConfig> repository;
+    private ConfigRepository repository;
+    private KeybindConfig current;
 
-    /** Binds this tab to its config; called by the main controller after the FXML is loaded. */
-    public void init(ConfigRepository<KeybindConfig> repository) {
+    /**
+     * Binds this tab to its config. The main controller calls it after the FXML is loaded.
+     *
+     * <p>Not a constructor argument, because the FXML loader asks for a controller by class only.
+     * Telling the two tabs apart at construction would mean counting instances in FXML order, which
+     * breaks as soon as someone reorders the tabs.
+     */
+    public void init(ConfigRepository repository) {
         this.repository = repository;
-        show(repository.loadOnStartup());
+        repository.loadOnStartup().ifPresentOrElse(this::show, this::showMissing);
     }
 
-    private void show(Optional<KeybindConfig> loaded) {
-        loaded.ifPresentOrElse(config -> {
-            statusLabel.setText("Config: " + config.source());
-            jsonArea.setText(config.prettyJson());
-        }, () -> {
-            statusLabel.setText("Config nicht gefunden - bitte "
-                    + repository.source().fileName() + " unten manuell auswählen.");
-            jsonArea.clear();
-        });
+    /** The config this tab shows right now, or empty if none could be loaded. */
+    public Optional<KeybindConfig> current() {
+        return Optional.ofNullable(current);
     }
 
-    /** Re-runs automatic detection; any remembered path is ignored. */
+    private void show(KeybindConfig config) {
+        current = config;
+        statusLabel.setText("Config: " + config.source());
+        jsonArea.setText(config.prettyJson());
+    }
+
+    private void showMissing() {
+        current = null;
+        statusLabel.setText("Config not found. Please select " + repository.source().fileName() + " manually below.");
+        jsonArea.clear();
+    }
+
+    /** Runs auto-detection again and ignores any remembered path. */
     @FXML
     private void onReload() {
-        show(repository.redetect());
+        repository.redetect().ifPresentOrElse(this::show, this::showMissing);
     }
 
     @FXML
@@ -62,31 +75,39 @@ public final class ConfigTabController {
 
     @FXML
     private void onLoad() {
-        String fileName = repository.source().fileName();
         String text = pathField.getText() == null ? "" : pathField.getText().trim();
-        if (text.isEmpty()) {
-            statusLabel.setText("Bitte einen Pfad angeben.");
+        Optional<String> problem = problemWith(text, repository.source().fileName());
+        if (problem.isPresent()) {
+            statusLabel.setText(problem.get());
             return;
         }
-        Path path;
         try {
-            path = Path.of(text);
+            show(repository.loadAndRemember(Path.of(text)));
+        } catch (IOException | VdfParseException e) {
+            statusLabel.setText("Could not load: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Why the typed {@code path} cannot be loaded into a tab that only takes {@code fileName},
+     * as the message to show, or empty when it names an existing file of that name.
+     */
+    static Optional<String> problemWith(String path, String fileName) {
+        if (path.isEmpty()) {
+            return Optional.of("Please enter a path.");
+        }
+        Path file;
+        try {
+            file = Path.of(path);
         } catch (InvalidPathException e) {
-            statusLabel.setText("Ungültiger Pfad: " + text);
-            return;
+            return Optional.of("Invalid path: " + path);
         }
-        if (!Files.isRegularFile(path)) {
-            statusLabel.setText("Datei nicht gefunden: " + path);
-            return;
+        if (!Files.isRegularFile(file)) {
+            return Optional.of("File not found: " + file);
         }
-        if (!path.getFileName().toString().equalsIgnoreCase(fileName)) {
-            statusLabel.setText("Für diesen Tab ist nur " + fileName + " erlaubt.");
-            return;
+        if (!file.getFileName().toString().equalsIgnoreCase(fileName)) {
+            return Optional.of("This tab only takes " + fileName + ".");
         }
-        try {
-            show(Optional.of(repository.loadAndRemember(path)));
-        } catch (Exception e) {
-            statusLabel.setText("Fehler beim Laden: " + e.getMessage());
-        }
+        return Optional.empty();
     }
 }

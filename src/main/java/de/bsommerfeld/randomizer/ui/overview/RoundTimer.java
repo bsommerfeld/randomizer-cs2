@@ -8,24 +8,16 @@ import java.util.Optional;
 import java.util.function.LongSupplier;
 
 /**
- * Derives the round/bomb countdown from game-state transitions. CS2 does not send
- * {@code phase_ends_in} in normal matches, so the timer is state-machine based: the round going
- * live starts a 1:55 countdown (Wingman: 1:30), a bomb plant starts a 40s countdown (it takes
- * over, as the round is still live), and the timer stops as soon as the round is no longer live
- * (bomb exploded/defused, round over, back in freezetime).
+ * Counts the round and the bomb down from game-state changes, because CS2 does not send
+ * {@code phase_ends_in} in a normal match. The round going live starts the round time. A bomb
+ * plant switches to the bomb timer. The timer stops once the round is no longer live.
  *
- * <p>Pure logic, no UI - the clock is injectable for tests.
+ * <p>Both times are the GSI library's defaults per mode. A mode without them, like Deathmatch, gets
+ * no timer. Casual hostage maps run 120 s, the timer shows the 135 s of the defusal maps there.
  */
 final class RoundTimer {
 
-    /** Standard competitive round time (1:55). */
-    private static final long COMPETITIVE_ROUND_SECONDS = 115;
-    /** Wingman (2v2) round time (1:30). */
-    private static final long WINGMAN_ROUND_SECONDS = 90;
-    /** C4 detonation time. */
-    private static final long BOMB_SECONDS = 40;
-
-    /** A running countdown: seconds left, and whether it counts down the bomb rather than the round. */
+    /** Seconds left, and whether they count down the bomb rather than the round. */
     record Remaining(double seconds, boolean bomb) {
     }
 
@@ -45,16 +37,16 @@ final class RoundTimer {
         this.clock = clock;
     }
 
-    /** Feeds the next game state's round phase, bomb state and game mode into the state machine. */
     void update(Phase roundPhase, BombState bombState, GameMode mode) {
-        if (bombState == BombState.Planted && prevBomb != BombState.Planted) {
-            start(BOMB_SECONDS, true); // bomb just planted → detonation countdown
-        } else if (roundPhase == Phase.Live && prevPhase != Phase.Live) {
-            long roundSeconds = mode == GameMode.Scrimcomp2v2 ? WINGMAN_ROUND_SECONDS : COMPETITIVE_ROUND_SECONDS;
-            start(roundSeconds, false); // round just went live
+        boolean bombJustPlanted = bombState == BombState.Planted && prevBomb != BombState.Planted;
+        boolean roundJustWentLive = roundPhase == Phase.Live && prevPhase != Phase.Live;
+        if (bombJustPlanted) {
+            start(mode.bombSeconds, true);
+        } else if (roundJustWentLive) {
+            start(mode.roundSeconds, false);
         }
         if (roundPhase != Phase.Live) {
-            deadlineMillis = -1; // round no longer live → stop
+            stop();
         }
         prevPhase = roundPhase;
         prevBomb = bombState;
@@ -69,8 +61,13 @@ final class RoundTimer {
         return Optional.of(new Remaining(seconds, bombTimer));
     }
 
-    private void start(long seconds, boolean bomb) {
-        deadlineMillis = clock.getAsLong() + seconds * 1000L;
+    /** 0 is the library's "no fixed time", then no timer runs. */
+    private void start(int seconds, boolean bomb) {
+        deadlineMillis = seconds > 0 ? clock.getAsLong() + seconds * 1000L : -1;
         bombTimer = bomb;
+    }
+
+    private void stop() {
+        deadlineMillis = -1;
     }
 }

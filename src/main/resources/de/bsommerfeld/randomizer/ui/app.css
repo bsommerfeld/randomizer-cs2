@@ -1,0 +1,531 @@
+/*
+ * The one stylesheet of the app, attached to the scene in RandomizerApp.
+ *
+ * Rule of the palette: saturated color always means game state (blue = CT, amber = T,
+ * red = bomb / CS2 missing, green = health). Selection, focus and the default button are neutral.
+ */
+
+.root {
+    -rz-ground: #1f242b;
+    -rz-surface: #272d36;
+    -rz-well: #191d23;
+    -rz-line: #3a424f;
+    -rz-line-soft: #2b313a;
+    -rz-select: #3a4454;
+    -rz-text: #e6e9ee;
+    -rz-muted: #98a2b1;
+    -rz-ct: #6ea8e6;
+    -rz-t: #e0b052;
+    -rz-alert: #e2574c;
+    -rz-hp: #6fbf73;
+
+    /* Modena derives every control from these, so the whole toolkit turns dark here. */
+    -fx-base: -rz-surface;
+    -fx-background: -rz-ground;
+    -fx-control-inner-background: -rz-well;
+    -fx-control-inner-background-alt: -rz-well;
+    -fx-light-text-color: -rz-text;
+    -fx-accent: -rz-select;
+    -fx-selection-bar: -rz-select;
+    -fx-selection-bar-non-focused: -rz-select;
+    -fx-cell-hover-color: -rz-surface;
+    -fx-focus-color: #c9d1dc;
+    -fx-faint-focus-color: transparent;
+
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 13px;
+}
+
+.mono {
+    -fx-font-family: "Consolas";
+    -fx-font-size: 12px;
+}
+
+.status {
+    -fx-text-fill: -rz-muted;
+}
+
+/*
+ * Header bar: the app draws its own title bar (StageStyle.EXTENDED), so Windows cannot turn it
+ * white on blur. It keeps its color without focus, only the title dims like the window buttons do.
+ * RandomizerApp sets :window-focused on the root while the stage has focus.
+ */
+.header-bar {
+    -fx-background-color: -rz-well;
+}
+.window-title {
+    -fx-text-fill: -rz-muted;
+    -fx-padding: 0 0 0 12;
+}
+.root:window-focused .window-title {
+    -fx-text-fill: -rz-text;
+}
+
+/* CS2-not-running strip: quiet surface, the red edge carries the alarm. */
+.cs2-banner {
+    -fx-background-color: -rz-alert, -rz-surface;
+    -fx-background-insets: 0, 0 0 0 3;
+    -fx-text-fill: -rz-text;
+    -fx-padding: 9 20 9 20;
+}
+
+/* ---- Tabs: flat labels, the selected one underlined ---------------------------------------- */
+
+.tab-pane > .tab-header-area {
+    -fx-padding: 4 6 0 6;
+}
+.tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color: -rz-line, -rz-ground;
+    -fx-background-insets: 0, 0 0 1 0;
+}
+.tab-pane > .tab-header-area > .headers-region > .tab {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 9 14 10 14;
+}
+.tab-pane > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: -rz-text, -rz-ground;
+    -fx-background-insets: 0 14 0 14, 0 0 2 0;
+}
+.tab .tab-label {
+    -fx-text-fill: -rz-muted;
+}
+.tab:hover .tab-label,
+.tab:selected .tab-label {
+    -fx-text-fill: -rz-text;
+}
+.tab-pane .tab .focus-indicator {
+    -fx-border-color: transparent;
+}
+.tab-pane:focus-visible > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+    -fx-border-color: -fx-focus-color;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-border-insets: -3 -6 -3 -6;
+}
+
+/* Tabs inside a tab (configs): pills instead of underlines, so the two levels read apart. */
+.sub-tabs > .tab-header-area {
+    -fx-padding: 16 20 0 20;
+}
+.sub-tabs > .tab-header-area > .tab-header-background {
+    -fx-background-color: transparent;
+}
+.sub-tabs > .tab-header-area > .headers-region > .tab {
+    -fx-background-radius: 6;
+    -fx-padding: 5 12 5 12;
+}
+.sub-tabs > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: -rz-surface;
+    -fx-background-insets: 0;
+}
+
+/* ---- Buttons ------------------------------------------------------------------------------ */
+
+.button {
+    -fx-background-color: -rz-line, -rz-surface;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 6, 5;
+    -fx-padding: 6 14 6 14;
+    -fx-text-fill: -rz-text;
+}
+.button:hover {
+    -fx-background-color: -rz-line, derive(-rz-surface, 12%);
+}
+.button:armed {
+    -fx-background-color: -rz-line, -rz-well;
+}
+/* .primary looks like the default button without taking the Enter key, for a tab's main action. */
+.button:default,
+.button.primary {
+    -fx-background-color: -rz-text;
+    -fx-background-insets: 0;
+    -fx-text-fill: -rz-ground;
+}
+.button:default:hover,
+.button.primary:hover {
+    -fx-background-color: derive(-rz-text, -10%);
+}
+.button.primary:armed {
+    -fx-background-color: derive(-rz-text, -20%);
+}
+.button:focus-visible {
+    -fx-background-color: -fx-focus-color, -rz-ground, -rz-surface;
+    -fx-background-insets: -2, 0, 1;
+    -fx-background-radius: 8, 6, 5;
+}
+.button:default:focus-visible,
+.button.primary:focus-visible {
+    -fx-background-color: -fx-focus-color, -rz-ground, -rz-text;
+}
+
+/* ---- Dialogs: flat, the header is just the first, heavier line ----------------------------- */
+
+.dialog-pane {
+    -fx-background-color: -rz-ground;
+    -fx-padding: 0;
+}
+.dialog-pane > .header-panel {
+    -fx-background-color: -rz-ground;
+    -fx-padding: 20 20 0 20;
+}
+.dialog-pane > .header-panel > .label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -rz-text;
+}
+.dialog-pane > .content.label {
+    -fx-text-fill: -rz-text;
+    -fx-padding: 12 20 4 20;
+    -fx-pref-width: 440;
+}
+.dialog-pane > .button-bar > .container {
+    -fx-padding: 12 20 20 20;
+}
+
+/* ---- Text inputs -------------------------------------------------------------------------- */
+
+.text-field,
+.text-area {
+    -fx-background-color: -rz-line, -rz-well;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 6, 5;
+    -fx-text-fill: -rz-text;
+    -fx-prompt-text-fill: -rz-muted;
+    -fx-highlight-fill: -rz-select;
+    -fx-highlight-text-fill: -rz-text;
+}
+.text-field {
+    -fx-padding: 6 9 6 9;
+}
+.text-field:focused,
+.text-area:focused {
+    -fx-background-color: -fx-focus-color, -rz-well;
+}
+.text-area .content {
+    -fx-background-color: transparent;
+    -fx-padding: 8 10 8 10;
+}
+.text-area > .scroll-pane,
+.text-area > .scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+/*
+ * Spinners: one field like a text field, the arrows are quiet chevrons inside it. Modena draws the
+ * text field and both arrows as three separate boxes, the rounded text field rule above then left
+ * Modena's square corners showing behind it.
+ */
+.spinner {
+    -fx-background-color: -rz-line, -rz-well;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 6, 5;
+}
+.spinner:focus-visible {
+    -fx-background-color: -fx-focus-color, -rz-well;
+}
+.spinner > .text-field {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 6 0 6 9;
+}
+.spinner > .increment-arrow-button,
+.spinner > .decrement-arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+.spinner > .increment-arrow-button {
+    -fx-padding: 6 9 1 6;
+}
+.spinner > .decrement-arrow-button {
+    -fx-padding: 1 9 6 6;
+}
+.spinner > .increment-arrow-button > .increment-arrow,
+.spinner > .decrement-arrow-button > .decrement-arrow {
+    -fx-background-color: -rz-muted;
+    -fx-padding: 2.5 4 2.5 4;
+}
+.spinner > .increment-arrow-button > .increment-arrow {
+    -fx-shape: "M 0 4 L 4 0 L 8 4 L 7 5 L 4 2 L 1 5 Z";
+}
+.spinner > .decrement-arrow-button > .decrement-arrow {
+    -fx-shape: "M 0 1 L 1 0 L 4 3 L 7 0 L 8 1 L 4 5 Z";
+}
+.spinner > .increment-arrow-button:hover > .increment-arrow,
+.spinner > .decrement-arrow-button:hover > .decrement-arrow {
+    -fx-background-color: -rz-text;
+}
+
+/* ---- Check boxes: the box is a small well, checked it fills like the default button ---------- */
+
+.check-box {
+    -fx-label-padding: 0 0 0 8;
+    -fx-graphic-text-gap: 8;
+}
+.check-box > .box {
+    -fx-background-color: -rz-line, -rz-well;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 4, 3;
+    -fx-padding: 3;
+}
+.check-box:hover > .box {
+    -fx-background-color: -rz-muted, -rz-well;
+}
+.check-box:selected > .box {
+    -fx-background-color: -rz-text;
+    -fx-background-insets: 0;
+    -fx-background-radius: 4;
+}
+.check-box:selected:hover > .box {
+    -fx-background-color: derive(-rz-text, -10%);
+}
+.check-box > .box > .mark {
+    -fx-background-color: transparent;
+    -fx-padding: 5 5 5 5;
+}
+.check-box:selected > .box > .mark {
+    -fx-background-color: -rz-ground;
+}
+.check-box:focus-visible > .box {
+    -fx-border-color: -fx-focus-color;
+    -fx-border-insets: -3;
+    -fx-border-radius: 6;
+}
+
+/* The key an action presses, drawn as a key cap behind the action's name. */
+.key-cap {
+    -fx-font-family: "Consolas";
+    -fx-font-size: 11px;
+    -fx-text-fill: -rz-muted;
+    -fx-background-color: -rz-line, -rz-well;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 4, 3;
+    -fx-padding: 1 6 1 6;
+}
+
+/* ---- Lists and tables --------------------------------------------------------------------- */
+
+.list-view {
+    -fx-background-color: -rz-line, -rz-well;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 6, 5;
+    -fx-padding: 3;
+}
+.list-view:focused {
+    -fx-background-color: -rz-line, -rz-well;
+}
+.list-view:focus-visible {
+    -fx-background-color: -fx-focus-color, -rz-well;
+}
+.list-cell {
+    -fx-padding: 4 8 4 8;
+    -fx-background-radius: 3;
+}
+
+.table-view {
+    -fx-control-inner-background: -rz-ground;
+    -fx-control-inner-background-alt: -rz-ground;
+    -fx-table-cell-border-color: -rz-line-soft;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+.table-view:focused {
+    -fx-background-color: transparent;
+}
+.table-view .column-header-background,
+.table-view > .virtual-flow > .corner {
+    -fx-background-color: transparent;
+}
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: -rz-line, -rz-ground;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-size: 30;
+}
+.table-view .column-header .label {
+    -fx-text-fill: -rz-muted;
+    -fx-font-weight: normal;
+    -fx-alignment: center-left;
+    -fx-padding: 0 10 0 10;
+}
+.table-row-cell {
+    -fx-cell-size: 32;
+}
+.table-row-cell:empty {
+    -fx-background-color: transparent;
+}
+.table-cell {
+    -fx-border-color: transparent;
+    -fx-padding: 0 10 0 10;
+}
+.table-view .placeholder .label {
+    -fx-text-fill: -rz-muted;
+}
+.table-row-cell.dead {
+    -fx-opacity: 0.4;
+}
+.table-row-cell.self {
+    -fx-background: -rz-surface;
+}
+.table-row-cell.self:selected {
+    -fx-background: -rz-select;
+}
+
+/* ---- Scroll bars: thumb only -------------------------------------------------------------- */
+
+.scroll-pane,
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+.scroll-bar {
+    -fx-background-color: transparent;
+}
+.scroll-bar:vertical {
+    -fx-pref-width: 10;
+}
+.scroll-bar:horizontal {
+    -fx-pref-height: 10;
+}
+.scroll-bar > .track,
+.scroll-bar > .track-background {
+    -fx-background-color: transparent;
+}
+.scroll-bar > .thumb {
+    -fx-background-color: -rz-line;
+    -fx-background-insets: 2;
+    -fx-background-radius: 5;
+}
+.scroll-bar > .thumb:hover,
+.scroll-bar > .thumb:pressed {
+    -fx-background-color: -rz-muted;
+}
+.scroll-bar > .increment-button,
+.scroll-bar > .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding: 0;
+}
+
+/* ---- Split panes: the divider is a plain gap ---------------------------------------------- */
+
+.split-pane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+.split-pane > .split-pane-divider {
+    -fx-background-color: transparent;
+}
+.split-pane:horizontal > .split-pane-divider {
+    -fx-padding: 0 4 0 4;
+}
+.split-pane:vertical > .split-pane-divider {
+    -fx-padding: 4 0 4 0;
+}
+.split-pane-divider > .horizontal-grabber,
+.split-pane-divider > .vertical-grabber {
+    -fx-background-color: transparent;
+}
+
+/* ---- Overview: score header --------------------------------------------------------------- */
+
+.map-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+.mode-label {
+    -fx-text-fill: -rz-muted;
+}
+/* Semibold, because thin strokes wash the team colors out at this size. */
+.score-big {
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 46px;
+}
+.score-colon {
+    -fx-font-size: 30px;
+    -fx-text-fill: -rz-muted;
+}
+.time-label {
+    -fx-font-size: 18px;
+    -fx-text-fill: -rz-text;
+}
+.time-label.time-bomb,
+.bomb-label {
+    -fx-text-fill: -rz-alert;
+}
+.team-ct {
+    -fx-text-fill: -rz-ct;
+}
+.team-t {
+    -fx-text-fill: -rz-t;
+}
+.team-title {
+    -fx-font-weight: bold;
+    -fx-padding: 6 0 0 10;
+}
+.placeholder-label {
+    -fx-text-fill: -rz-muted;
+}
+/* An empty log's hint is prose, not a log line, so it leaves the list's monospace font. */
+.mono .placeholder-label {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 13px;
+}
+
+/* ---- Overview: player card ---------------------------------------------------------------- */
+
+.detail-panel {
+    -fx-background-color: -rz-line, -rz-surface;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 8, 7;
+}
+.detail-body {
+    -fx-padding: 16;
+}
+/* Starts with a .detail-section, whose own top padding already makes the gap. */
+.settings-body {
+    -fx-padding: 4 16 16 16;
+}
+.detail-name {
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+}
+.detail-subtitle,
+.detail-key {
+    -fx-text-fill: -rz-muted;
+}
+.detail-title {
+    -fx-padding: 0 0 8 0;
+}
+.detail-section {
+    -fx-font-weight: bold;
+    -fx-padding: 12 0 4 0;
+}
+
+.progress-bar {
+    -fx-pref-height: 8;
+}
+.progress-bar > .track {
+    -fx-background-color: -rz-well;
+    -fx-background-insets: 0;
+    -fx-background-radius: 4;
+}
+.progress-bar > .bar {
+    -fx-background-insets: 0;
+    -fx-background-radius: 4;
+    -fx-padding: 4;
+}
+.hp-bar > .bar {
+    -fx-background-color: -rz-hp;
+}
+.armor-bar > .bar {
+    -fx-background-color: -rz-muted;
+}

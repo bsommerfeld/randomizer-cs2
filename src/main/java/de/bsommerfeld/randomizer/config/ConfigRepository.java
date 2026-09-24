@@ -1,6 +1,6 @@
 package de.bsommerfeld.randomizer.config;
 
-import de.bsommerfeld.randomizer.steam.SteamLocator;
+import de.bsommerfeld.randomizer.config.keybinds.KeybindConfig;
 import de.bsommerfeld.randomizer.vdf.VdfParseException;
 
 import java.io.IOException;
@@ -8,27 +8,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-/**
- * The one loading pipeline for every CS2 config: resolve the path (remembered path first, otherwise
- * auto-detection), parse the file via the {@link ConfigParser} and optionally remember a manually
- * chosen path. What is loaded (keybinds, crosshair, …) is entirely defined by the injected
- * {@link ConfigSource} and parser - adding a new config type does not change this class.
- *
- * @param <T> the parsed config model
- */
-public final class ConfigRepository<T> {
+/** Loads the keybind config its {@link ConfigSource} describes and remembers a path the user picked. */
+public final class ConfigRepository {
 
     private final ConfigSource source;
     private final AppPreferences preferences;
-    private final SteamLocator steamLocator;
-    private final ConfigParser<T> parser;
 
-    public ConfigRepository(ConfigSource source, AppPreferences preferences,
-                            SteamLocator steamLocator, ConfigParser<T> parser) {
+    public ConfigRepository(ConfigSource source, AppPreferences preferences) {
         this.source = source;
         this.preferences = preferences;
-        this.steamLocator = steamLocator;
-        this.parser = parser;
     }
 
     public ConfigSource source() {
@@ -36,38 +24,31 @@ public final class ConfigRepository<T> {
     }
 
     /**
-     * Loads on app startup: the remembered path first (if the file still exists), otherwise
-     * auto-detection. Errors degrade to empty.
+     * Loads from the remembered path if that file still exists, otherwise from auto-detection.
+     * Errors give empty.
      */
-    public Optional<T> loadOnStartup() {
-        Optional<Path> path = preferences.getPathOverride(source.preferenceKey())
+    public Optional<KeybindConfig> loadOnStartup() {
+        return preferences.getPathOverride(source.preferenceKey())
                 .filter(Files::isRegularFile)
-                .or(() -> source.autoDetect(steamLocator));
-        return loadQuietly(path);
+                .or(source.autoDetect())
+                .flatMap(this::loadQuietly);
     }
 
-    /** Re-runs detection from scratch, ignoring any remembered path. Errors degrade to empty. */
-    public Optional<T> redetect() {
-        return loadQuietly(source.autoDetect(steamLocator));
+    /** Loads from auto-detection and ignores any remembered path. Errors give empty. */
+    public Optional<KeybindConfig> redetect() {
+        return source.autoDetect().get().flatMap(this::loadQuietly);
     }
 
     /** Loads the file and remembers its path for future startups. */
-    public T loadAndRemember(Path file) throws IOException {
-        T config = load(file);
+    public KeybindConfig loadAndRemember(Path file) throws IOException {
+        KeybindConfig config = KeybindConfig.read(file);
         preferences.setPathOverride(source.preferenceKey(), file);
         return config;
     }
 
-    public T load(Path file) throws IOException {
-        return parser.parse(file);
-    }
-
-    private Optional<T> loadQuietly(Optional<Path> path) {
-        if (path.isEmpty()) {
-            return Optional.empty();
-        }
+    private Optional<KeybindConfig> loadQuietly(Path file) {
         try {
-            return Optional.of(load(path.get()));
+            return Optional.of(KeybindConfig.read(file));
         } catch (IOException | VdfParseException e) {
             return Optional.empty();
         }

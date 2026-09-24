@@ -9,12 +9,25 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AppPreferencesTest {
 
     @TempDir
     Path tempDir;
+
+    @Test
+    void livesUnderLocalAppData() {
+        assertEquals(Path.of("C:/Users/x/AppData/Local/randomizer-cs2"),
+                AppPreferences.baseDir("C:/Users/x/AppData/Local", "C:/Users/x"));
+    }
+
+    @Test
+    void fallsBackToUserHomeWithoutLocalAppData() {
+        assertEquals(Path.of("/home/x/randomizer-cs2"), AppPreferences.baseDir(null, "/home/x"));
+        assertEquals(Path.of("/home/x/randomizer-cs2"), AppPreferences.baseDir("  ", "/home/x"));
+    }
 
     @Test
     void returnsEmptyWithoutStoredValue() {
@@ -59,29 +72,28 @@ class AppPreferencesTest {
     }
 
     @Test
-    void returnsFallbackWithoutStoredString() {
-        assertEquals("l", new AppPreferences(tempDir).getString("cs2.exec.key", "l"));
+    void roundTripsAStringNextToThePaths() throws IOException {
+        AppPreferences preferences = new AppPreferences(tempDir);
+        preferences.setPathOverride("cs2.config.path", tempDir.resolve("config.vcfg"));
+
+        preferences.setString("randomizer.interval.min", "12");
+
+        assertEquals("12", preferences.getString("randomizer.interval.min", "5"));
+        assertEquals("5", preferences.getString("randomizer.interval.max", "5"), "missing reads as the fallback");
+        assertEquals(Optional.of(tempDir.resolve("config.vcfg")), preferences.getPathOverride("cs2.config.path"));
     }
 
     @Test
-    void readsStoredString() throws IOException {
-        Files.writeString(tempDir.resolve("app.properties"), "cs2.exec.key=f10");
+    void aBrokenFileReadsAsEmptyButIsNeverOverwritten() throws IOException {
+        Path file = tempDir.resolve("app.properties");
+        String broken = "cs2.userconfig.path=C:/keep/me.vcfg\ncs2.config.path=\\u00zz\n";
+        Files.writeString(file, broken);
+        AppPreferences preferences = new AppPreferences(tempDir);
 
-        assertEquals("f10", new AppPreferences(tempDir).getString("cs2.exec.key", "l"));
-    }
-
-    @Test
-    void roundTripsString() throws IOException {
-        new AppPreferences(tempDir).setString("cs2.exec.key", "f9");
-
-        assertEquals("f9", new AppPreferences(tempDir).getString("cs2.exec.key", "l"));
-    }
-
-    @Test
-    void returnsFallbackForBlankValue() throws IOException {
-        Files.writeString(tempDir.resolve("app.properties"), "cs2.exec.key=   ");
-
-        assertEquals("l", new AppPreferences(tempDir).getString("cs2.exec.key", "l"));
+        assertTrue(preferences.getPathOverride("cs2.userconfig.path").isEmpty(), "reading degrades to empty");
+        assertThrows(IOException.class,
+                () -> preferences.setPathOverride("cs2.config.path", tempDir.resolve("new.vcfg")));
+        assertEquals(broken, Files.readString(file), "a failed read must not wipe the other remembered paths");
     }
 
     @Test

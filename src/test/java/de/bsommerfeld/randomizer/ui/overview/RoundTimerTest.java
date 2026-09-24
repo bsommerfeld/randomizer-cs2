@@ -39,6 +39,22 @@ class RoundTimerTest {
     }
 
     @Test
+    void casualRoundStartsAtTwoFifteen() {
+        timer.update(Phase.Live, BombState.Undefined, GameMode.Casual);
+
+        assertEquals(135.0, timer.remaining().orElseThrow().seconds(), 1e-9);
+    }
+
+    @Test
+    void aModeWithoutRoundsGetsNoTimer() {
+        timer.update(Phase.Live, BombState.Undefined, GameMode.Deathmatch);
+        assertTrue(timer.remaining().isEmpty());
+
+        timer.update(Phase.Live, BombState.Planted, GameMode.Deathmatch);
+        assertTrue(timer.remaining().isEmpty(), "no bomb time either");
+    }
+
+    @Test
     void countdownFollowsTheClock() {
         timer.update(Phase.Live, BombState.Undefined, GameMode.Competitive);
 

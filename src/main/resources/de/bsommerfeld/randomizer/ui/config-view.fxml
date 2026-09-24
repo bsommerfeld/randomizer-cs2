@@ -11,29 +11,28 @@
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="de.bsommerfeld.randomizer.ui.config.ConfigTabController">
     <top>
-        <Label fx:id="statusLabel" maxWidth="Infinity" wrapText="true">
+        <Label fx:id="statusLabel" maxWidth="Infinity" wrapText="true" styleClass="status">
             <padding>
-                <Insets top="10" right="12" bottom="10" left="12"/>
+                <Insets top="16" right="20" bottom="12" left="20"/>
             </padding>
         </Label>
     </top>
     <center>
-        <TextArea fx:id="jsonArea" editable="false"
-                  style="-fx-font-family: 'Consolas', 'Courier New', monospace;">
+        <TextArea fx:id="jsonArea" editable="false" styleClass="mono">
             <BorderPane.margin>
-                <Insets right="12" left="12"/>
+                <Insets right="20" left="20"/>
             </BorderPane.margin>
         </TextArea>
     </center>
     <bottom>
         <HBox spacing="8" alignment="CENTER_LEFT">
             <padding>
-                <Insets top="10" right="12" bottom="12" left="12"/>
+                <Insets top="12" right="20" bottom="20" left="20"/>
             </padding>
-            <Button text="Neu laden" onAction="#onReload"/>
-            <TextField fx:id="pathField" promptText="Pfad zur .vcfg für diesen Tab" HBox.hgrow="ALWAYS"/>
-            <Button text="Durchsuchen…" onAction="#onBrowse"/>
-            <Button text="Laden" onAction="#onLoad" defaultButton="true"/>
+            <Button text="Reload" onAction="#onReload"/>
+            <TextField fx:id="pathField" promptText="Path to the .vcfg for this tab" HBox.hgrow="ALWAYS"/>
+            <Button text="Browse…" onAction="#onBrowse"/>
+            <Button text="Load" onAction="#onLoad" defaultButton="true"/>
         </HBox>
     </bottom>
 </BorderPane>

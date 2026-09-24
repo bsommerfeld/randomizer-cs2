@@ -6,38 +6,40 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="de.bsommerfeld.randomizer.ui.overview.OverviewController"
-            stylesheets="@overview.css">
+            fx:controller="de.bsommerfeld.randomizer.ui.overview.OverviewController">
     <top>
-        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="header-bar">
+        <!-- StackPane, so the score sits on the window's center axis whatever the side texts say. -->
+        <StackPane>
             <padding>
-                <Insets top="10" right="14" bottom="10" left="14"/>
+                <Insets top="16" right="20" bottom="12" left="20"/>
             </padding>
-            <Label fx:id="mapLabel" text="-" styleClass="map-label"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <VBox alignment="CENTER" spacing="2">
+            <VBox StackPane.alignment="CENTER_LEFT" alignment="CENTER_LEFT" spacing="2"
+                  maxWidth="-Infinity" maxHeight="-Infinity">
+                <Label fx:id="mapLabel" styleClass="map-label"/>
+                <Label fx:id="modeLabel" styleClass="mode-label"/>
+            </VBox>
+            <VBox alignment="CENTER" maxWidth="-Infinity" maxHeight="-Infinity">
                 <Label fx:id="timeLabel" styleClass="time-label" managed="false" visible="false"/>
-                <HBox alignment="CENTER" spacing="8" styleClass="score-box">
+                <HBox alignment="CENTER" spacing="10">
                     <Label fx:id="ctScoreLabel" text="0" styleClass="score-big,team-ct"/>
                     <Label text=":" styleClass="score-colon"/>
                     <Label fx:id="tScoreLabel" text="0" styleClass="score-big,team-t"/>
                 </HBox>
             </VBox>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="bombLabel" styleClass="bomb-label" managed="false" visible="false"/>
-        </HBox>
+            <Label fx:id="bombLabel" StackPane.alignment="CENTER_RIGHT" styleClass="bomb-label"
+                   managed="false" visible="false"/>
+        </StackPane>
     </top>
     <center>
         <StackPane>
             <!-- Scoreboard (spectator/observer): two team tables + detail panel -->
-            <HBox fx:id="scoreboardBox" spacing="10" managed="false" visible="false">
+            <HBox fx:id="scoreboardBox" spacing="16" managed="false" visible="false">
                 <padding>
-                    <Insets top="8" right="14" bottom="12" left="14"/>
+                    <Insets top="4" right="20" bottom="20" left="10"/>
                 </padding>
                 <VBox spacing="6" HBox.hgrow="ALWAYS">
                     <Label text="Counter-Terrorists" styleClass="team-title,team-ct"/>
@@ -50,13 +52,15 @@
                 </ScrollPane>
             </HBox>
             <!-- Fallback (normal match): hint + own player card -->
-            <VBox fx:id="placeholderBox" spacing="12" styleClass="placeholder">
+            <VBox fx:id="placeholderBox" spacing="14">
                 <padding>
-                    <Insets top="16" right="18" bottom="16" left="18"/>
+                    <Insets top="4" right="20" bottom="20" left="20"/>
                 </padding>
-                <Label fx:id="placeholderLabel" wrapText="true" text="Warte auf Daten von CS2 …"
+                <Label fx:id="placeholderLabel" wrapText="true" text="Waiting for data from CS2 …"
                        styleClass="placeholder-label"/>
-                <ScrollPane fitToWidth="true" styleClass="detail-panel,player-card" VBox.vgrow="ALWAYS">
+                <!-- Hidden until CS2 sent a player, an empty card only looks broken. -->
+                <ScrollPane fx:id="ownPlayerCard" fitToWidth="true" styleClass="detail-panel" VBox.vgrow="ALWAYS"
+                            managed="false" visible="false">
                     <VBox fx:id="ownPlayerContent" spacing="4" styleClass="detail-body"/>
                 </ScrollPane>
             </VBox>

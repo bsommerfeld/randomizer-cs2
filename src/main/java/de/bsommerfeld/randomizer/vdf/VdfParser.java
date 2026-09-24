@@ -1,5 +1,6 @@
 package de.bsommerfeld.randomizer.vdf;
 
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -9,7 +10,7 @@ import java.nio.file.Path;
  * Parser for Valve's text-based KeyValues format (VDF/VCFG/ACF).
  * Supports quoted and unquoted tokens, nested {@code { }} blocks and
  * {@code //} comments. Platform conditionals like {@code [$WIN32]} are
- * ignored. Duplicate keys: the last one wins.
+ * ignored. Of two equal keys the last one wins.
  *
  * <p>Escaping: inside quoted strings only {@code \\} is treated as an escape
  * sequence (yielding a single backslash); any other backslash stays literal.
@@ -36,72 +37,85 @@ public final class VdfParser {
         return new VdfParser(text).parseRoot();
     }
 
+    /** The whole document: pairs up to the end of the input, a closing brace has no block to close. */
     private VdfObject parseRoot() {
-        VdfObject root = new VdfObject();
-        parsePairs(root, true);
+        VdfObject root = parsePairs();
+        if (!atEnd()) {
+            throw new VdfParseException("Unexpected '}' at the top level (position " + pos + ")");
+        }
         return root;
     }
 
-    private void parsePairs(VdfObject target, boolean isRoot) {
-        while (true) {
-            skipIgnorable();
-            if (pos >= src.length()) {
-                if (!isRoot) {
-                    throw new VdfParseException("Unerwartetes Dateiende: schließendes '}' fehlt");
-                }
-                return;
-            }
-            char c = src.charAt(pos);
-            if (c == '}') {
-                if (isRoot) {
-                    throw new VdfParseException("Unerwartetes '}' auf oberster Ebene (Position " + pos + ")");
-                }
-                pos++;
-                return;
-            }
-            String key = readToken();
-            skipIgnorable();
-            if (pos >= src.length() || src.charAt(pos) == '}') {
-                throw new VdfParseException("Wert für Schlüssel \"" + key + "\" fehlt");
-            }
-            if (src.charAt(pos) == '{') {
-                pos++;
-                VdfObject child = new VdfObject();
-                parsePairs(child, false);
-                target.put(key, child);
-            } else {
-                target.put(key, readToken());
-            }
+    /** A nested block, entered right after its '{': pairs up to the '}' that must close it. */
+    private VdfObject parseBlock() {
+        VdfObject block = parsePairs();
+        if (atEnd()) {
+            throw new VdfParseException("Unexpected end of file: a closing '}' is missing");
         }
+        pos++; // the closing brace
+        return block;
+    }
+
+    /** Reads pairs until the input ends or a '}' comes up; the brace is left for the caller. */
+    private VdfObject parsePairs() {
+        VdfObject target = new VdfObject();
+        while (hasToken()) {
+            String key = readToken();
+            target.put(key, readValue(key));
+        }
+        return target;
+    }
+
+    /** Skips ahead and tells whether a token follows, as opposed to a '}' or the end of the input. */
+    private boolean hasToken() {
+        skipIgnorable();
+        return !atEnd() && src.charAt(pos) != '}';
+    }
+
+    /** The value after {@code key}: a nested block or a plain token. */
+    private Object readValue(String key) {
+        if (!hasToken()) {
+            throw new VdfParseException("The key \"" + key + "\" has no value");
+        }
+        if (src.charAt(pos) == '{') {
+            pos++;
+            return parseBlock();
+        }
+        return readToken();
+    }
+
+    private boolean atEnd() {
+        return pos >= src.length();
     }
 
     /** Skips whitespace, // comments and conditionals like [$WIN32]. */
     private void skipIgnorable() {
-        while (pos < src.length()) {
+        while (!atEnd()) {
             char c = src.charAt(pos);
             if (Character.isWhitespace(c)) {
                 pos++;
-            } else if (c == '/' && pos + 1 < src.length() && src.charAt(pos + 1) == '/') {
-                while (pos < src.length() && src.charAt(pos) != '\n') {
-                    pos++;
-                }
+            } else if (src.startsWith("//", pos)) {
+                skipTo('\n');
             } else if (c == '[') {
-                while (pos < src.length() && src.charAt(pos) != ']') {
-                    pos++;
-                }
-                if (pos < src.length()) {
-                    pos++;
-                }
+                skipTo(']');
+                pos = Math.min(pos + 1, src.length()); // the closing bracket, if there is one
             } else {
                 return;
             }
         }
     }
 
+    /** Advances to the next {@code stop} character, or to the end of the input if there is none. */
+    private void skipTo(char stop) {
+        int found = src.indexOf(stop, pos);
+        pos = found < 0 ? src.length() : found;
+    }
+
     private String readToken() {
-        if (src.charAt(pos) == '"') {
-            return readQuoted();
-        }
+        return src.charAt(pos) == '"' ? readQuoted() : readUnquoted();
+    }
+
+    private String readUnquoted() {
         int start = pos;
         while (pos < src.length()) {
             char c = src.charAt(pos);
@@ -130,6 +144,6 @@ public final class VdfParser {
             sb.append(c);
             pos++;
         }
-        throw new VdfParseException("String ohne schließendes Anführungszeichen");
+        throw new VdfParseException("A string has no closing quote");
     }
 }

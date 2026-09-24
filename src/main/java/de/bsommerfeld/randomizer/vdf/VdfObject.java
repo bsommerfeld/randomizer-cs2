@@ -9,40 +9,32 @@ import java.util.Optional;
  * Node of a parsed VDF document: ordered key-value pairs whose values are
  * either {@link String} or nested {@link VdfObject} instances.
  *
- * <p>Mutable so it can serve as an editable working copy: {@link #set} and {@link #remove} change
- * entries, {@link #copy} forks an independent deep clone (e.g. to edit without touching the loaded
- * original). Reading via {@link #entries()} stays an unmodifiable view.
+ * <p>Read-only for callers: only the parser fills a node, {@link #mergedWith} builds new ones and
+ * {@link #entries()} is an unmodifiable view.
  */
 public final class VdfObject {
 
     private final Map<String, Object> entries = new LinkedHashMap<>();
 
-    /** Generic insert used by the parser; the public, type-safe entry points are the {@code set} overloads. */
+    /** Insert used by the parser while it builds the document. */
     void put(String key, Object value) {
         entries.put(key, value);
     }
 
-    /** Sets or replaces a string entry. */
-    public void set(String key, String value) {
-        entries.put(key, value);
-    }
-
-    /** Sets or replaces a nested-object entry. */
-    public void set(String key, VdfObject value) {
-        entries.put(key, value);
-    }
-
-    /** Removes the entry for {@code key} if present. */
-    public void remove(String key) {
-        entries.remove(key);
-    }
-
-    /** An independent deep copy: nested objects are cloned, so edits don't leak into the original. */
-    public VdfObject copy() {
-        VdfObject clone = new VdfObject();
-        entries.forEach((key, value) ->
-                clone.entries.put(key, value instanceof VdfObject nested ? nested.copy() : value));
-        return clone;
+    /**
+     * This node with {@code override} laid on top: where both sides hold a nested object the two
+     * merge key by key, every other entry of {@code override} replaces this one's. Keys keep this
+     * node's order, keys only {@code override} has are appended. Neither input changes. Nested nodes
+     * only one side has are shared, nothing outside the parser can change a node.
+     */
+    public VdfObject mergedWith(VdfObject override) {
+        VdfObject merged = new VdfObject();
+        merged.entries.putAll(entries);
+        override.entries.forEach((key, value) -> merged.entries.put(key,
+                value instanceof VdfObject theirs && entries.get(key) instanceof VdfObject ours
+                        ? ours.mergedWith(theirs)
+                        : value));
+        return merged;
     }
 
     public Optional<String> getString(String key) {
@@ -55,10 +47,6 @@ public final class VdfObject {
 
     public Map<String, Object> entries() {
         return Collections.unmodifiableMap(entries);
-    }
-
-    public boolean isEmpty() {
-        return entries.isEmpty();
     }
 
     /** Recursively converts the node into plain maps, e.g. for JSON serialization. */

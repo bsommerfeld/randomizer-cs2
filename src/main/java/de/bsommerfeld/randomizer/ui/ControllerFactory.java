@@ -1,58 +1,52 @@
 package de.bsommerfeld.randomizer.ui;
 
+import de.bsommerfeld.randomizer.action.ActionRunner;
+import de.bsommerfeld.randomizer.action.FireGate;
 import de.bsommerfeld.randomizer.config.AppPreferences;
 import de.bsommerfeld.randomizer.config.ConfigRepository;
-import de.bsommerfeld.randomizer.config.ConfigSaver;
-import de.bsommerfeld.randomizer.config.ConfigVerifier;
-import de.bsommerfeld.randomizer.config.crosshair.Crosshair;
-import de.bsommerfeld.randomizer.config.crosshair.CrosshairRandomizer;
-import de.bsommerfeld.randomizer.config.crosshair.CrosshairStandard;
 import de.bsommerfeld.randomizer.config.keybinds.KeybindConfig;
-import de.bsommerfeld.randomizer.exec.ExecApplier;
 import de.bsommerfeld.randomizer.gsi.GsiService;
+import de.bsommerfeld.randomizer.steam.SteamLocator;
 import de.bsommerfeld.randomizer.ui.config.ConfigTabController;
-import de.bsommerfeld.randomizer.ui.crosshair.CrosshairController;
+import de.bsommerfeld.randomizer.ui.config.MergedConfigTabController;
 import de.bsommerfeld.randomizer.ui.gsi.GsiTabController;
 import de.bsommerfeld.randomizer.ui.overview.OverviewController;
+import de.bsommerfeld.randomizer.ui.randomizer.RandomizerTabController;
 import javafx.util.Callback;
 
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-/**
- * The controller registry for the FXML loader: maps each controller class to its construction
- * with the right dependencies. A new tab is wired by adding one registry entry - no existing
- * wiring changes (open/closed principle).
- */
+/** Builds each controller the FXML loader asks for, with its dependencies. */
 public final class ControllerFactory {
 
     private ControllerFactory() {
     }
 
-    public static Callback<Class<?>, Object> create(ConfigRepository<KeybindConfig> defaultConfig,
-                                                    ConfigRepository<KeybindConfig> userConfig,
-                                                    ConfigRepository<Crosshair> crosshairConfig,
-                                                    CrosshairStandard crosshairStandard,
-                                                    ExecApplier execApplier,
-                                                    AppPreferences preferences,
-                                                    CrosshairRandomizer crosshairRandomizer,
-                                                    ConfigSaver configSaver,
-                                                    ConfigVerifier configVerifier,
-                                                    GsiService gsiService) {
+    public static Callback<Class<?>, Object> create(AppPreferences preferences,
+                                                    SteamLocator steamLocator,
+                                                    GsiService gsiService,
+                                                    BooleanSupplier cs2Running,
+                                                    ActionRunner actionRunner,
+                                                    FireGate fireGate) {
+        ConfigRepository defaultConfig = new ConfigRepository(KeybindConfig.defaults(steamLocator), preferences);
+        ConfigRepository userConfig = new ConfigRepository(KeybindConfig.custom(steamLocator), preferences);
         Map<Class<?>, Supplier<Object>> registry = Map.of(
-                MainController.class, () -> new MainController(defaultConfig, userConfig),
+                MainController.class,
+                () -> new MainController(defaultConfig, userConfig, cs2Running),
                 ConfigTabController.class, ConfigTabController::new,
-                GsiTabController.class, () -> new GsiTabController(gsiService),
+                MergedConfigTabController.class, MergedConfigTabController::new,
+                GsiTabController.class, () -> new GsiTabController(gsiService, cs2Running),
                 OverviewController.class, () -> new OverviewController(gsiService),
-                CrosshairController.class,
-                () -> new CrosshairController(crosshairConfig, crosshairStandard, execApplier,
-                        preferences, crosshairRandomizer, configSaver, configVerifier));
+                RandomizerTabController.class,
+                () -> new RandomizerTabController(actionRunner, fireGate, preferences));
         return type -> {
             Supplier<Object> supplier = registry.get(type);
             if (supplier == null) {
-                throw new IllegalStateException("Kein Controller registriert für " + type.getName());
+                throw new IllegalStateException("No controller registered for " + type.getName());
             }
-            return supplier.get();
+            return supplier.get(); 
         };
     }
 }
