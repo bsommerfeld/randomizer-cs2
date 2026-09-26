@@ -27,16 +27,16 @@ final class Reloading {
     static List<List<Step>> routes(Player player) {
         Weapon inHand = player.getActiveWeapon();
         if (canReload(inHand)) {
-            return List.of(List.of(new Step(COMMAND, Press.tap())));
+            return List.of(List.of(new Step.OnKey(COMMAND, Press.tap())));
         }
         List<List<Step>> routes = new ArrayList<>();
         if (canReloadAfterAShot(inHand)) {
-            routes.add(List.of(new Step("+attack", FireModes.singleShot(inHand)), new Step(COMMAND, HELD_UNTIL_READY)));
+            routes.add(List.of(new Step.OnKey("+attack", FireModes.singleShot(inHand)), new Step.OnKey(COMMAND, HELD_UNTIL_READY)));
         }
         for (Weapon carried : player.weapons) {
             List<String> slot = Slots.commandsFor(carried.info);
             if (canReload(carried) && !slot.isEmpty()) {
-                routes.add(List.of(new Step(slot, Press.tap()), new Step(COMMAND, HELD_UNTIL_READY)));
+                routes.add(List.of(new Step.OnKey(slot, Press.tap()), new Step.OnKey(COMMAND, HELD_UNTIL_READY)));
             }
         }
         return routes;

@@ -18,6 +18,7 @@ import de.bsommerfeld.randomizer.input.Keys.Key;
  */
 public final class JnaGameInput implements GameInput {
 
+    private static final int MOUSEEVENTF_MOVE = 0x0001;
     private static final int MOUSEEVENTF_XDOWN = 0x0080;
     private static final int MOUSEEVENTF_XUP = 0x0100;
 
@@ -72,9 +73,22 @@ public final class JnaGameInput implements GameInput {
                 .isPresent();
     }
 
-    /** False when Windows did not insert the event, SendInput then reports 0 events sent. */
+    /**
+     * A relative move. CS2 reads the mouse as raw deltas, an absolute move (what {@code java.awt.Robot}
+     * sends) would stop at the screen edge. Windows' pointer speed and acceleration apply only to the
+     * cursor, the game gets the counts as sent.
+     */
+    @Override
+    public boolean move(int dx, int dy) {
+        return send(mouseInput(dx, dy, MOUSEEVENTF_MOVE, 0));
+    }
+
     private static boolean send(Key key, boolean release) {
-        WinUser.INPUT input = key.mouse() ? mouseInput(key.code(), release) : keyboardInput(key.code(), release);
+        return send(key.mouse() ? mouseInput(key.code(), release) : keyboardInput(key.code(), release));
+    }
+
+    /** False when Windows did not insert the event, SendInput then reports 0 events sent. */
+    private static boolean send(WinUser.INPUT input) {
         return User32.INSTANCE.SendInput(new WinDef.DWORD(1), (WinUser.INPUT[]) input.toArray(1), input.size())
                 .intValue() == 1;
     }
@@ -93,14 +107,18 @@ public final class JnaGameInput implements GameInput {
     }
 
     private static WinUser.INPUT mouseInput(int button, boolean release) {
+        // MOUSE4 and MOUSE5 share one flag pair and say which of the two in mouseData (XBUTTON1 = 1, XBUTTON2 = 2).
+        return mouseInput(0, 0, mouseFlag(button, release), button > 3 ? button - 3 : 0);
+    }
+
+    private static WinUser.INPUT mouseInput(int dx, int dy, int flags, int mouseData) {
         WinUser.INPUT input = new WinUser.INPUT();
         input.type = new WinDef.DWORD(WinUser.INPUT.INPUT_MOUSE);
         input.input.setType("mi");
-        input.input.mi.dx = new WinDef.LONG(0);
-        input.input.mi.dy = new WinDef.LONG(0);
-        // MOUSE4 and MOUSE5 share one flag pair and say which of the two in mouseData (XBUTTON1 = 1, XBUTTON2 = 2).
-        input.input.mi.mouseData = new WinDef.DWORD(button > 3 ? button - 3 : 0);
-        input.input.mi.dwFlags = new WinDef.DWORD(mouseFlag(button, release));
+        input.input.mi.dx = new WinDef.LONG(dx);
+        input.input.mi.dy = new WinDef.LONG(dy);
+        input.input.mi.mouseData = new WinDef.DWORD(mouseData);
+        input.input.mi.dwFlags = new WinDef.DWORD(flags);
         input.input.mi.time = new WinDef.DWORD(0);
         input.input.mi.dwExtraInfo = new BaseTSD.ULONG_PTR(0);
         return input;

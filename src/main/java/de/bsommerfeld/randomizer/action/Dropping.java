@@ -39,16 +39,16 @@ final class Dropping {
     static List<List<Step>> routes(Player player) {
         List<List<Step>> routes = new ArrayList<>();
         if (canBeDropped(player.getActiveWeapon())) {
-            routes.add(List.of(new Step(COMMAND, Press.tap())));
+            routes.add(List.of(new Step.OnKey(COMMAND, Press.tap())));
         }
-        List<Step> switches = player.weapons.stream()
+        List<Step.OnKey> switches = player.weapons.stream()
                 .filter(Dropping::canBeDropped)
                 .map(weapon -> weapon.info)
                 .sorted(IN_SLOT_ORDER)
                 .map(Slots::commandsFor)
                 .filter(commands -> !commands.isEmpty())
                 .limit(MOST_WEAPONS)
-                .map(commands -> new Step(commands, SWITCH))
+                .map(commands -> new Step.OnKey(commands, SWITCH))
                 .toList();
         for (int selection = 1; selection < 1 << switches.size(); selection++) {
             routes.add(switchAndDropEach(switches, selection));
@@ -62,12 +62,12 @@ final class Dropping {
     }
 
     /** {@code selection} has bit i set when the weapon that {@code switches.get(i)} draws goes. */
-    private static List<Step> switchAndDropEach(List<Step> switches, int selection) {
+    private static List<Step> switchAndDropEach(List<Step.OnKey> switches, int selection) {
         List<Step> route = new ArrayList<>();
         for (int i = 0; i < switches.size(); i++) {
             if ((selection & 1 << i) != 0) {
                 route.add(switches.get(i));
-                route.add(new Step(COMMAND, Press.tap()));
+                route.add(new Step.OnKey(COMMAND, Press.tap()));
             }
         }
         return route;

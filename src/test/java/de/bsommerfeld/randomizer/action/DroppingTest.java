@@ -10,13 +10,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DroppingTest {
 
-    private static final Step DROP = new Step("drop", Press.tap());
-    private static final Step SLOT1 = new Step("slot1", Press.held(100, 200));
-    private static final Step SLOT2 = new Step("slot2", Press.held(100, 200));
-    private static final Step SLOT5 = new Step("slot5", Press.held(100, 200));
-    private static final Step FLASH = new Step(List.of("slot7", "slot4"), Press.held(100, 200));
-    private static final Step SMOKE = new Step(List.of("slot8", "slot4"), Press.held(100, 200));
-    private static final Step ZEUS = new Step("slot11", Press.held(100, 200));
+    private static final Step DROP = new Step.OnKey("drop", Press.tap());
+    private static final Step SLOT1 = new Step.OnKey("slot1", Press.held(100, 200));
+    private static final Step SLOT2 = new Step.OnKey("slot2", Press.held(100, 200));
+    private static final Step SLOT5 = new Step.OnKey("slot5", Press.held(100, 200));
+    private static final Step FLASH = new Step.OnKey(List.of("slot7", "slot4"), Press.held(100, 200));
+    private static final Step SMOKE = new Step.OnKey(List.of("slot8", "slot4"), Press.held(100, 200));
+    private static final Step ZEUS = new Step.OnKey("slot11", Press.held(100, 200));
 
     @Test
     void theWeaponInHandAloneOrAnySelectionOfTheCarriedOnesInSlotOrder() {

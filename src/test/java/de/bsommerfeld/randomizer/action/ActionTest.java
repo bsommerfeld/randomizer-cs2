@@ -16,8 +16,8 @@ class ActionTest {
                 "{\"name\":\"weapon_knife\",\"state\":\"active\"}",
                 "{\"name\":\"weapon_glock\",\"state\":\"holstered\"}");
 
-        assertEquals(List.of(List.of(new Step("slot2", Press.tap()))), Action.slot(2).routes().apply(pistolAndKnife));
-        assertEquals(List.of(List.of(new Step("slot3", Press.tap()))), Action.slot(3).routes().apply(pistolAndKnife));
+        assertEquals(List.of(List.of(new Step.OnKey("slot2", Press.tap()))), Action.slot(2).routes().apply(pistolAndKnife));
+        assertEquals(List.of(List.of(new Step.OnKey("slot3", Press.tap()))), Action.slot(3).routes().apply(pistolAndKnife));
         assertEquals(List.of(), Action.slot(1).routes().apply(pistolAndKnife), "no primary");
         assertEquals(List.of(), Action.slot(4).routes().apply(pistolAndKnife), "no grenade");
         assertEquals(List.of(), Action.slot(2).routes().apply(playerCarrying()), "no weapon known");
@@ -29,7 +29,7 @@ class ActionTest {
                 .filter(action -> action.command().equals("+attack2"))
                 .findFirst().orElseThrow();
 
-        assertEquals(List.of(List.of(new Step("+attack2", Press.held(100, 800)))),
+        assertEquals(List.of(List.of(new Step.OnKey("+attack2", Press.held(100, 800)))),
                 secondary.routes().apply(playerCarrying("{\"name\":\"weapon_awp\",\"state\":\"active\"}")));
         assertEquals(List.of(), secondary.routes().apply(playerCarrying("{\"name\":\"weapon_ak47\",\"state\":\"active\"}")));
         assertEquals(List.of(), secondary.routes().apply(playerCarrying()), "no weapon known");
@@ -41,6 +41,6 @@ class ActionTest {
                 "{\"name\":\"weapon_knife\",\"state\":\"active\"}",
                 "{\"name\":\"weapon_flashbang\",\"state\":\"holstered\"}");
 
-        assertEquals(List.of(List.of(new Step("slot4", Press.tap()))), Action.slot(4).routes().apply(knifeAndFlash));
+        assertEquals(List.of(List.of(new Step.OnKey("slot4", Press.tap()))), Action.slot(4).routes().apply(knifeAndFlash));
     }
 }

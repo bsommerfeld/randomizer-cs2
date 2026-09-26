@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ReloadingTest {
 
     private static final String KNIFE = "{\"name\":\"weapon_knife\",\"type\":\"Knife\",\"state\":\"%s\"}";
-    private static final Step RELOAD_HELD = new Step("+reload", Press.held(1500, 2000));
+    private static final Step RELOAD_HELD = new Step.OnKey("+reload", Press.held(1500, 2000));
 
     @Test
     void aMagazineThatIsNotFullIsReloadedWithOneTap() {
@@ -18,7 +18,7 @@ class ReloadingTest {
                 gun("weapon_ak47", "Rifle", 12, 30, 90, "active"),
                 gun("weapon_glock", "Pistol", 3, 20, 120, "holstered")));
 
-        assertEquals(List.of(List.of(new Step("+reload", Press.tap()))), routes, "no switch to the pistol either");
+        assertEquals(List.of(List.of(new Step.OnKey("+reload", Press.tap()))), routes, "no switch to the pistol either");
     }
 
     @Test
@@ -29,15 +29,15 @@ class ReloadingTest {
                 KNIFE.formatted("holstered")));
 
         assertEquals(List.of(
-                List.of(new Step("+attack", Press.tap()), RELOAD_HELD),
-                List.of(new Step("slot2", Press.tap()), RELOAD_HELD)), routes);
+                List.of(new Step.OnKey("+attack", Press.tap()), RELOAD_HELD),
+                List.of(new Step.OnKey("slot2", Press.tap()), RELOAD_HELD)), routes);
     }
 
     @Test
     void theRevolverGetsTheHoldItsHammerNeedsForTheOneShot() {
         List<List<Step>> routes = Reloading.routes(playerCarrying(gun("weapon_revolver", "Pistol", 8, 8, 8, "active")));
 
-        assertEquals(List.of(List.of(new Step("+attack", Press.held(500, 700)), RELOAD_HELD)), routes);
+        assertEquals(List.of(List.of(new Step.OnKey("+attack", Press.held(500, 700)), RELOAD_HELD)), routes);
     }
 
     @Test
@@ -47,7 +47,7 @@ class ReloadingTest {
                 gun("weapon_awp", "SniperRifle", 4, 5, 30, "holstered"),
                 gun("weapon_glock", "Pistol", 20, 20, 120, "holstered")));
 
-        assertEquals(List.of(List.of(new Step("slot1", Press.tap()), RELOAD_HELD)), routes, "the glock is full");
+        assertEquals(List.of(List.of(new Step.OnKey("slot1", Press.tap()), RELOAD_HELD)), routes, "the glock is full");
     }
 
     @Test

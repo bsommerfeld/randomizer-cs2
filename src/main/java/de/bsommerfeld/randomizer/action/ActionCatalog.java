@@ -12,6 +12,15 @@ public final class ActionCatalog {
      */
     private static final Press JUMPS = Press.paced(500, 3000, 750, 900);
 
+    /**
+     * Up to 3000 counts sideways, 66 degrees at sensitivity 1 and 165 at 2.5. Up or down only a fifth
+     * of that, a view stuck on the floor is no fun for long.
+     *
+     * <p>ponytail: fixed counts, so the turn grows with the player's sensitivity. Read {@code sensitivity}
+     * from the config and aim for degrees if the spread across players is too wide.
+     */
+    private static final Step.Turn TURN = new Step.Turn(3000, 1000, 150, 600);
+
     public static final List<Action> ALL = List.of(
             Action.byWeapon("Shoot", "+attack", FireModes::primary),
             Action.byWeapon("Secondary fire", "+attack2", weapon -> weapon.info.hasSecondaryFire, FireModes::secondary),
@@ -28,7 +37,8 @@ public final class ActionCatalog {
             Action.slot(2),
             Action.slot(3),
             Action.slot(4),
-            Action.tap("Last weapon", "lastinv"));
+            Action.tap("Last weapon", "lastinv"),
+            Action.mouseMove("Mouse move", TURN));
 
     private ActionCatalog() {
     }

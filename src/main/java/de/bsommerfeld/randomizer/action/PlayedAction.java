@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * One entry of the randomizer's log: which action ran when, on which key and for how long, from the
- * first key down to the last key up.
+ * first key down to the last key up. For a mouse move {@code key} holds the counts it moved, {@code +812,-140}.
  */
 public record PlayedAction(LocalTime time, Action action, String key, int heldMillis) {
 

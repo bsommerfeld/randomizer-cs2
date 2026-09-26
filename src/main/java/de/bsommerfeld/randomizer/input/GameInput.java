@@ -13,6 +13,9 @@ public interface GameInput {
 
     void release(Key key);
 
+    /** Moves the mouse by raw counts, the way a real mouse reports a move. False when Windows dropped it, as with {@link #press}. */
+    boolean move(int dx, int dy);
+
     /** Whether input sent now would land in CS2. */
     boolean isCs2Foreground();
 }

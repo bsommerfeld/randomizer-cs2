@@ -1,8 +1,8 @@
 # Randomizer actions
 
-While CS2 runs, the randomizer waits a random time and then presses the key that the user's keybinds put on a random action: shoot, reload, drop, jump, crouch, move, switch weapons. The tab "Randomizer" starts and stops it and logs every key it pressed.
+While CS2 runs, the randomizer waits a random time and then presses the key that the user's keybinds put on a random action: shoot, reload, drop, jump, crouch, move, switch weapons. One action needs no key and moves the mouse instead. The tab "Randomizer" starts and stops it and logs every key it pressed and every mouse move.
 
-This file describes the code as of 2026-09-22 and replaces the decision log from 2026-09-20. `mvn verify` passes with 145 tests. In a live match only the shoot action has been tried so far. MOUSE1 fired and GSI recognized the AWP. The hold ranges, the other mouse buttons and the reload and drop routes are untested in play.
+This file describes the code as of 2026-09-26 and replaces the decision log from 2026-09-20. `mvn verify` passes with 150 tests. In a live match only the shoot action has been tried so far. MOUSE1 fired and GSI recognized the AWP. The hold ranges, the other mouse buttons and the reload and drop routes are untested in play.
 
 ## The loop
 
@@ -12,7 +12,7 @@ This file describes the code as of 2026-09-22 and replaces the decision log from
 until stopped:
     sleep a whole number of seconds, uniform between min and max
     if the gate is closed or CS2 is not in front: skip, draw the next wait
-    candidates = enabled actions with at least one route whose every step has a sendable key
+    candidates = enabled actions with at least one route whose every key step has a sendable key
     if there is none: skip
     draw an action uniformly from the candidates
     draw one of its routes uniformly
@@ -69,6 +69,7 @@ The foreground check goes by the process behind the foreground window, not by th
 | Schleichen | `+sprint` | held 500 to 3000 |
 | Slot 1 to Slot 4 | `slot1` to `slot4` | tap, only while the player carries a weapon in that slot |
 | Letzte Waffe | `lastinv` | tap |
+| Mouse move | none | a turn, see "Mouse move" |
 
 The ranges are first guesses. Tune them after playing.
 
@@ -76,7 +77,7 @@ The ranges are first guesses. Tune them after playing.
 
 `Action` is `record Action(String name, String command, Function<Player, List<List<Step>>> routes)`. `name` is the German text for the tab and the log. `command` is the CS2 command whose key the tab shows. `routes` takes the GSI `Player` at the moment the action comes due and returns every way to play it right now. A route is a list of `Step`s pressed in order. An action without a route makes no sense at that moment and stays out of the draw.
 
-`Step` is `record Step(List<String> commands, Press press)`. All commands of a step do the same job, the best one first. The runner presses the key of the first command that has a sendable key. A route counts only when every step has one.
+`Step` is a sealed interface with two cases. `Step.OnKey(List<String> commands, Press press)` is a key press. All commands of such a step do the same job, the best one first. The runner presses the key of the first command that has a sendable key. A route counts only when every key step has one. `Step.Turn` moves the mouse and needs no key, see "Mouse move".
 
 Most actions have one route of one step. These constructors build them:
 
@@ -148,6 +149,22 @@ The runner draws one route uniformly. With a primary and a pistol the weapon in 
 
 The direct command comes first and the group command second, for a player who took the direct one off its key. Slot 3 is never used, because a press there can land on the knife. So the Zeus goes by `slot11` alone, which CS2 binds to no key by default. A weapon the library does not list has no slot command and can only be reloaded or dropped from the hand. Nobody has checked the slot numbers against Valve's code, only against community sources.
 
+### Mouse move
+
+`Step.Turn(maxX, maxY, minMillis, maxMillis)` moves the mouse by `dx` from -maxX to maxX and `dy` from -maxY to maxY counts, both uniform. The runner spreads the move over a random time from the range, one `GameInput.move` every 10 ms. The path is meant to look like a hand, not a ruler:
+
+- `HandPath.at(t, dx, dy, bend)` gives the point after the share `t` of the time. The timing is minimum jerk (Flash and Hogan, 1985), the model for a person reaching for a target: slow at the start, fastest at half time, slow at the end.
+- `bend` bows the path to the side, by that share of its length at the halfway point. The runner draws it uniformly from -0.15 to 0.15. Start and end have no bow.
+- The runner puts every point up to 3 counts off the path in both directions, a tremor. The last point has none.
+
+Each slice moves to its point on the path, not by a step of its own, so rounding and tremor never add up and the counts sum exactly to `dx`, `dy`. The runner asks `mayPress` before every slice, the same as before every click. The catalog uses 3000 counts sideways, 600 up or down and 150 to 600 ms.
+
+A count turns the view by `sensitivity * 0.022` degrees, so 3000 counts are 66 degrees at sensitivity 1 and 165 at 2.5. The counts are fixed and the turn grows with the player's sensitivity. Reading `sensitivity` from the config would allow a range in degrees.
+
+The action's command is `Action.MOUSE_MOVE`, `mouse_move`. CS2 has no such command. The tab and the settings file only need a name for the action. The user's own mouse moves add to the turn in the game, and a move has no state that could clash the way two key downs do.
+
+The randomizer before the rewrite had the same action with `java.awt.Robot.mouseMove(x, y)`. That sets an absolute position and stops at the screen edge. CS2 reads the mouse as raw deltas, so the rewrite sends relative moves.
+
 ## Keys
 
 ### Where the keys come from
@@ -169,7 +186,7 @@ Every other name gives empty, the mouse wheel among them. Arrow keys, the numpad
 
 ### Sending
 
-`JnaGameInput` sends through `SendInput`. Keyboard keys go out with `KEYEVENTF_SCANCODE` and no virtual key, because CS2 ignores input that only carries a virtual key. Mouse buttons go out as `MOUSEINPUT`, with MOUSE4 and MOUSE5 through the X button flags. `SendInput` produces a plain OS input event. The app does not touch the game process or its memory.
+`JnaGameInput` sends through `SendInput`. Keyboard keys go out with `KEYEVENTF_SCANCODE` and no virtual key, because CS2 ignores input that only carries a virtual key. Mouse buttons go out as `MOUSEINPUT`, with MOUSE4 and MOUSE5 through the X button flags. A mouse move goes out as `MOUSEINPUT` with `MOUSEEVENTF_MOVE`, relative counts. Windows' pointer speed and acceleration apply to the cursor only, raw input carries the counts as sent. Raw input marks the move with no device handle, so `RawInputWatcher` never takes it for the user's. `SendInput` produces a plain OS input event. The app does not touch the game process or its memory.
 
 `GameInput.press` returns false when `SendInput` reports that Windows did not insert the event. Windows does that for a program with higher rights, for example CS2 started as admin while the app is not. The runner then ends the action without a log line and writes the reason to stderr.
 
@@ -209,9 +226,9 @@ The top row has the start/stop button and the status line. While the randomizer 
 The left side has two sections:
 
 - Two spinners set the wait in seconds, min from 1 to 599 and max from 2 to 600, with 5 and 30 as defaults. They push each other so min stays below max. They are not editable, because a JavaFX spinner throws on commit when the typed text is no number. Holding the arrow is quick enough.
-- Every action has a checkbox. Its label shows the key, "(nicht gebunden)" or "(Taste nicht unterstützt: <keys>)". The tab greys out an action whose own command has no sendable key. The keys of the other steps in a route, such as a slot key or `+attack` before a reload, are checked only when the action comes due.
+- Every action has a checkbox. Its label shows the key, "(nicht gebunden)" or "(Taste nicht unterstützt: <keys>)". The tab greys out an action whose own command has no sendable key. The mouse move shows no key and is never greyed out. The keys of the other steps in a route, such as a slot key or `+attack` before a reload, are checked only when the action comes due.
 
-The right side is the log, in a monospaced font. A line reads `21:14:03  Schießen       MOUSE1  840 ms`, with time, action, key and the time from first key down to last key up. There is no click count. Every step of a route gets its own line under the action's name. The newest line is on top. The log keeps 1000 lines in memory and nothing on disk, so it survives stop and start and is empty after an app restart.
+The right side is the log, in a monospaced font. A line reads `21:14:03  Schießen       MOUSE1  840 ms`, with time, action, key and the time from first key down to last key up. There is no click count. A mouse move logs the counts it sent in the key column, `+812,-140`, and the time it took. Every step of a route gets its own line under the action's name. The newest line is on top. The log keeps 1000 lines in memory and nothing on disk, so it survives stop and start and is empty after an app restart.
 
 The settings live in `%LOCALAPPDATA%\randomizer-cs2\app.properties`:
 
@@ -238,8 +255,9 @@ Package `action` holds the logic, without JavaFX or JNA:
 | Class | Job |
 |---|---|
 | `Action`, `Step`, `Press` | what an action presses, see "Actions" |
-| `ActionCatalog` | the 16 actions |
+| `ActionCatalog` | the 17 actions |
 | `FireModes`, `Reloading`, `Dropping`, `Slots` | pure functions of the GSI `Weapon` or `Player` |
+| `HandPath` | the path of a mouse move, a pure function of time |
 | `BoundKeys` | from command to keys, read from the keybind files |
 | `FireGate` | the gate over `GsiService` and the window in front |
 | `ActionRunner` | the loop, holds and clicks, the reaction to the user's key ups |
@@ -250,7 +268,7 @@ Package `input` is the only place that sends or reads input:
 | Class | Job |
 |---|---|
 | `Keys` | from CS2 key name to scancode or mouse button |
-| `GameInput`, `JnaGameInput` | press, release, and whether CS2 is in front |
+| `GameInput`, `JnaGameInput` | press, release, mouse move, and whether CS2 is in front |
 | `UserKeys`, `RawInputWatcher`, `PhysicalKeys` | the user's own keys: the interface, the Raw Input reader and the state it feeds |
 
 `GameInput` and `UserKeys` are interfaces because tests cannot call `SendInput` or read real devices. `ActionRunnerTest` puts fakes behind both.
@@ -281,8 +299,9 @@ JUnit 5. Only the main view smoke test starts JavaFX.
 
 | Test | What it covers |
 |---|---|
-| `ActionRunnerTest` | wait, press and release; key down again after the user's key up; key up left out while the user holds the key; spammed and paced clicking; press by weapon; routes pressed in order with one log line per step; a step's first command with a key; an action without a route or key stays out of the draw; a closed gate or CS2 in the background drops the action; the rest of a route and of a burst is left out once the gate closes; a stop between two steps sends nothing more; a blocked key down leaves no log line; a failed cycle does not end the loop; disabled actions; a stop during a hold releases the key; equal bounds; stop and start again |
+| `ActionRunnerTest` | wait, press and release; key down again after the user's key up; key up left out while the user holds the key; spammed and paced clicking; press by weapon; routes pressed in order with one log line per step; a step's first command with a key; an action without a route or key stays out of the draw; a closed gate or CS2 in the background drops the action; the rest of a route and of a burst is left out once the gate closes; a stop between two steps sends nothing more; a blocked key down leaves no log line; a failed cycle does not end the loop; disabled actions; a stop during a hold releases the key; equal bounds; stop and start again; a mouse move glides in 10 ms slices that add up to the logged counts and needs no key; a closed gate ends a mouse move |
 | `FireGateTest` | every closed reason and the open case, from GSI JSON payloads |
+| `HandPathTest` | slow start and end, fastest at half time, the bow and its side |
 | `FireModesTest`, `ReloadingTest`, `DroppingTest` | the weapon rules and the routes, with knife, Zeus, grenades, bomb and weapons the library does not list |
 | `BoundKeysTest` | first sendable key, later file wins, custom file without `"config"`, a command only on the wheel |
 | `KeysTest` | letters, digits, function keys, named keys in any case, mouse buttons, unknown names |
@@ -302,10 +321,10 @@ JUnit 5. Only the main view smoke test starts JavaFX.
 - How far apart two payloads get, freezetime and a long death included. The silence check assumes at most 10 s. The event log of the GSI tab hides the heartbeat, but the game-state JSON there shows `provider.timestamp` changing with every payload.
 - Whether pauses and timeouts reach a playing client in `round.phase` or in `phaseCountdowns.phase`. The gate reads both, so either works, but nobody has seen either one in a match yet.
 - The mouse buttons other than MOUSE1, all hold ranges, the reload and drop routes, and the slot numbers from the library.
+- The mouse move. Whether CS2 turns the view on `SendInput` moves at all, and whether 3000 counts are too much.
 
 ## Out of scope, with the way in
 
-- **Random mouse movement.** A mouse-move case next to the key press, for example `Step` as a sealed interface, and a `move(dx, dy)` on `GameInput`.
 - **Actions triggered by GSI events**, such as a drop after a kill. A second trigger next to the timer. `GsiService` would need typed event subscriptions, because today it hands out formatted `GsiEvent`s only.
 - **A global start and stop hotkey.** `RegisterHotKey` through JNA, calling the same `start()` and `stop()`.
 - **Weights and a repeat guard for the draw.** The draw lives in `ActionRunner.candidates` and `pick`, nowhere else.

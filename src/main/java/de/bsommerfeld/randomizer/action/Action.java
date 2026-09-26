@@ -21,6 +21,12 @@ import java.util.function.Predicate;
  */
 public record Action(String name, String command, Function<Player, List<List<Step>>> routes) {
 
+    /**
+     * The command of the mouse move, which presses no key. CS2 has no such command. The tab and the
+     * settings file only need a name for the action.
+     */
+    public static final String MOUSE_MOVE = "mouse_move";
+
     /** An action that holds its key the same way whatever the weapon. */
     public Action(String name, String command, int minHoldMillis, int maxHoldMillis) {
         this(name, command, Press.held(minHoldMillis, maxHoldMillis));
@@ -28,7 +34,7 @@ public record Action(String name, String command, Function<Player, List<List<Ste
 
     /** An action of one key that goes down the same way whatever the player carries. */
     Action(String name, String command, Press press) {
-        this(name, command, anyPlayer -> List.of(List.of(new Step(command, press))));
+        this(name, command, anyPlayer -> List.of(List.of(new Step.OnKey(command, press))));
     }
 
     /**
@@ -43,12 +49,16 @@ public record Action(String name, String command, Function<Player, List<List<Ste
     static Action byWeapon(String name, String command, Predicate<Weapon> reactsTo, Function<Weapon, Press> pressWith) {
         return new Action(name, command, player -> {
             Weapon inHand = player.getActiveWeapon();
-            return reactsTo.test(inHand) ? List.of(List.of(new Step(command, pressWith.apply(inHand)))) : List.of();
+            return reactsTo.test(inHand) ? List.of(List.of(new Step.OnKey(command, pressWith.apply(inHand)))) : List.of();
         });
     }
 
     static Action tap(String name, String command) {
         return new Action(name, command, Press.tap());
+    }
+
+    static Action mouseMove(String name, Step.Turn turn) {
+        return new Action(name, MOUSE_MOVE, anyPlayer -> List.of(List.of(turn)));
     }
 
     /**
@@ -57,7 +67,7 @@ public record Action(String name, String command, Function<Player, List<List<Ste
      */
     static Action slot(int slot) {
         String command = "slot" + slot;
-        List<List<Step>> press = List.of(List.of(new Step(command, Press.tap())));
+        List<List<Step>> press = List.of(List.of(new Step.OnKey(command, Press.tap())));
         return new Action("Slot " + slot, command,
                 player -> player.weapons.stream().anyMatch(weapon -> weapon.info.slot == slot) ? press : List.of());
     }

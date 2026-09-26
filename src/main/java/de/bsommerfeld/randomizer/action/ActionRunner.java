@@ -39,17 +39,23 @@ public final class ActionRunner {
         void sleep(long millis) throws InterruptedException;
     }
 
-    /** A {@link Step} with its command resolved to the key CS2 has on it. */
+    /** A {@link Step.OnKey} with its command resolved to the key CS2 has on it. */
     private record KeyPress(String keyName, Key key, Press press) {
     }
 
     /** An action with the routes it can take right now, every one of them on keys that can be sent. */
-    private record Candidate(Action action, List<List<KeyPress>> routes) {
+    private record Candidate(Action action, List<List<Step>> routes) {
     }
 
     /** A clicked key is down this long per click. */
     private static final int CLICK_DOWN_MIN_MILLIS = 30;
     private static final int CLICK_DOWN_MAX_MILLIS = 60;
+
+    /** A turn sends one mouse move this often, so the view glides instead of jumping. */
+    private static final int TURN_SLICE_MILLIS = 10;
+
+    /** A hand never holds the mouse still. Each point of a turn lands up to this many counts off its path. */
+    private static final int TREMOR_COUNTS = 3;
 
     private final GameInput input;
     private final BooleanSupplier gateOpen;
@@ -145,7 +151,7 @@ public final class ActionRunner {
         if (mayPress()) {
             Optional<Candidate> pick = pick(candidates(settings.enabledActions(), player.get(), keys));
             if (pick.isPresent()) {
-                play(pick.get().action(), pick(pick.get().routes()).orElseThrow());
+                play(pick.get().action(), pick(pick.get().routes()).orElseThrow(), keys);
             }
         }
     }
@@ -158,17 +164,18 @@ public final class ActionRunner {
                 .toList();
     }
 
-    /** The routes whose every step has a key that can be sent. One missing key rules the whole route out. */
-    private static List<List<KeyPress>> pressableRoutes(List<List<Step>> routes, BoundKeys keys) {
+    /** The routes whose every key step has a key that can be sent. One missing key rules the whole route out. */
+    private static List<List<Step>> pressableRoutes(List<List<Step>> routes, BoundKeys keys) {
         return routes.stream()
-                .map(route -> route.stream().map(step -> keyPress(step, keys)).toList())
-                .filter(route -> route.stream().allMatch(Optional::isPresent))
-                .map(route -> route.stream().map(Optional::orElseThrow).toList())
+                .filter(route -> route.stream().allMatch(step -> switch (step) {
+                    case Step.OnKey onKey -> keyPress(onKey, keys).isPresent();
+                    case Step.Turn _ -> true;
+                }))
                 .toList();
     }
 
     /** The step on the key of its first command that has a pressable key, empty when none has one. */
-    private static Optional<KeyPress> keyPress(Step step, BoundKeys keys) {
+    private static Optional<KeyPress> keyPress(Step.OnKey step, BoundKeys keys) {
         return step.commands().stream()
                 .flatMap(command -> keys.pressableKeyFor(command).stream())
                 .findFirst()
@@ -182,24 +189,63 @@ public final class ActionRunner {
     }
 
     /**
-     * Asked before every key down of an action, not only before its first: a burst or a route takes
-     * seconds, and the player can die, open the chat, switch windows or press stop in between.
+     * Asked before every key down and every slice of a turn, not only before the first: a burst or a
+     * route takes seconds, and the player can die, open the chat, switch windows or press stop in between.
      */
     private boolean mayPress() {
         return !Thread.currentThread().isInterrupted() && gateOpen.getAsBoolean() && input.isCs2Foreground();
     }
 
-    /** One key press after the other, each with its own line in the log. */
-    private void play(Action action, List<KeyPress> route) throws InterruptedException {
-        for (KeyPress keyPress : route) {
+    /** One step after the other, each with its own line in the log. */
+    private void play(Action action, List<Step> route, BoundKeys keys) throws InterruptedException {
+        for (Step step : route) {
             if (!mayPress()) {
                 return;
             }
-            Press press = keyPress.press();
-            int millis = between(press.minMillis(), press.maxMillis());
-            int spentMillis = press.clicks() ? click(keyPress.key(), millis, press) : hold(keyPress.key(), millis);
-            onPlayed.accept(new PlayedAction(LocalTime.now(clock), action, keyPress.keyName(), spentMillis));
+            onPlayed.accept(switch (step) {
+                case Step.OnKey onKey -> press(action, keyPress(onKey, keys).orElseThrow());
+                case Step.Turn turn -> turn(action, turn);
+            });
         }
+    }
+
+    private PlayedAction press(Action action, KeyPress keyPress) throws InterruptedException {
+        Press press = keyPress.press();
+        int millis = between(press.minMillis(), press.maxMillis());
+        int spentMillis = press.clicks() ? click(keyPress.key(), millis, press) : hold(keyPress.key(), millis);
+        return new PlayedAction(LocalTime.now(clock), action, keyPress.keyName(), spentMillis);
+    }
+
+    /**
+     * Moves the mouse by a random amount, one small move every {@link #TURN_SLICE_MILLIS} over a
+     * random time, along a {@link HandPath} with a random bow and a tremor. Stops early once
+     * {@link #mayPress()} says no before a slice. The game adds the user's own mouse moves on top, a
+     * move has no state that could clash.
+     */
+    private PlayedAction turn(Action action, Step.Turn turn) throws InterruptedException {
+        int dx = between(-turn.maxX(), turn.maxX());
+        int dy = between(-turn.maxY(), turn.maxY());
+        int slices = Math.max(1, between(turn.minMillis(), turn.maxMillis()) / TURN_SLICE_MILLIS);
+        double bend = HandPath.MAX_BEND * (2 * random.nextDouble() - 1);
+        int sentX = 0;
+        int sentY = 0;
+        int slice = 0;
+        while (slice < slices && mayPress()) {
+            slice++;
+            // Each slice goes to its point on the path, not by a step of its own, so rounding and tremor never add up.
+            HandPath.Point point = HandPath.at((double) slice / slices, dx, dy, bend);
+            boolean last = slice == slices;
+            int toX = last ? dx : (int) Math.round(point.x()) + between(-TREMOR_COUNTS, TREMOR_COUNTS);
+            int toY = last ? dy : (int) Math.round(point.y()) + between(-TREMOR_COUNTS, TREMOR_COUNTS);
+            if (!input.move(toX - sentX, toY - sentY)) {
+                throw new IllegalStateException("Windows blocked the mouse move, does CS2 run as admin?");
+            }
+            sentX = toX;
+            sentY = toY;
+            sleeper.sleep(TURN_SLICE_MILLIS);
+        }
+        return new PlayedAction(LocalTime.now(clock), action, "%+d,%+d".formatted(sentX, sentY),
+                slice * TURN_SLICE_MILLIS);
     }
 
     /**

@@ -44,7 +44,7 @@ class ActionRunnerTest {
     private static final BoundKeys JUMP_AND_RELOAD_KEYS = BoundKeys.of(List.of(
             VdfParser.parse("\"config\" { \"bindings\" { \"SPACE\" \"+jump\" \"r\" \"+reload\" } }")));
     private static final Action JUMP_THEN_RELOAD = new Action("Nachladen", "+reload", anyPlayer -> List.of(
-            List.of(new Step("+jump", Press.tap()), new Step("+reload", Press.tap()))));
+            List.of(new Step.OnKey("+jump", Press.tap()), new Step.OnKey("+reload", Press.tap()))));
 
     private static final Clock NOON =Clock.fixed(Instant.parse("2026-09-20T12:00:00Z"), ZoneOffset.UTC);
 
@@ -154,7 +154,7 @@ class ActionRunnerTest {
                 VdfParser.parse("\"config\" { \"bindings\" { \"SPACE\" \"+jump\" \"r\" \"+reload\" } }")));
         Key r = Keys.key("r").orElseThrow();
         Action jumpThenReload = new Action("Nachladen", "+reload", anyPlayer -> List.of(
-                List.of(new Step("+jump", Press.tap()), new Step("+reload", Press.held(1500, 1500)))));
+                List.of(new Step.OnKey("+jump", Press.tap()), new Step.OnKey("+reload", Press.held(1500, 1500)))));
         ActionRunner runner = runner(sleeps::add, new ActionRunner.Settings(5, 5, List.of(jumpThenReload)));
 
         runner.cycle(keys);
@@ -168,7 +168,7 @@ class ActionRunnerTest {
     @Test
     void aStepGoesByItsFirstCommandThatHasAKey() throws InterruptedException {
         Action flash = new Action("Flash", "slot7", anyPlayer -> List.of(
-                List.of(new Step(List.of("slot7", "slot4"), Press.tap()))));
+                List.of(new Step.OnKey(List.of("slot7", "slot4"), Press.tap()))));
         ActionRunner runner = runner(sleeps::add, new ActionRunner.Settings(5, 5, List.of(flash)));
 
         runner.cycle(BoundKeys.of(List.of(VdfParser.parse("\"config\" { \"bindings\" { \"4\" \"slot4\" } }"))));
@@ -183,7 +183,7 @@ class ActionRunnerTest {
     void anActionWithoutARouteOrWithAnUnboundKeyOnEveryRouteIsNotInTheDraw() throws InterruptedException {
         Action pointless = new Action("Nachladen", "+jump", anyPlayer -> List.of());
         Action needsDrop = new Action("Nachladen", "+jump", anyPlayer -> List.of(
-                List.of(new Step("drop", Press.tap()), new Step("+jump", Press.tap()))));
+                List.of(new Step.OnKey("drop", Press.tap()), new Step.OnKey("+jump", Press.tap()))));
         ActionRunner runner = runner(sleeps::add,
                 new ActionRunner.Settings(5, 5, List.of(pointless, needsDrop, JUMP)));
 
@@ -256,6 +256,37 @@ class ActionRunnerTest {
     }
 
     @Test
+    void aMouseMoveGlidesInSmallMovesThatAddUpToTheLoggedTurnAndNeedsNoKey() throws InterruptedException {
+        Action turn = Action.mouseMove("Mouse move", new Step.Turn(3000, 600, 400, 400));
+        ActionRunner runner = runner(sleeps::add, new ActionRunner.Settings(5, 5, List.of(turn)));
+
+        runner.cycle(BoundKeys.of(List.of()));
+
+        assertEquals(40, input.events.size(), "one move per 10 ms of 400 ms");
+        int sumX = input.events.stream().mapToInt(event -> Integer.parseInt(event.split(" ")[1])).sum();
+        int sumY = input.events.stream().mapToInt(event -> Integer.parseInt(event.split(" ")[2])).sum();
+        assertEquals(List.of(new PlayedAction(LocalTime.NOON, turn, "%+d,%+d".formatted(sumX, sumY), 400)), played);
+        assertTrue(Math.abs(sumX) <= 3000 && Math.abs(sumY) <= 600, played.toString());
+        assertEquals(List.of(10L), sleeps.subList(1, sleeps.size()).stream().distinct().toList());
+    }
+
+    @Test
+    void aMouseMoveStopsOnceTheGameNoLongerTakesInput() throws InterruptedException {
+        Action turn = Action.mouseMove("Mouse move", new Step.Turn(3000, 600, 400, 400));
+        ActionRunner runner = runner(millis -> {
+            sleeps.add(millis);
+            if (sleeps.size() == 4) { // the wait, then three slices
+                gateOpen = false;
+            }
+        }, new ActionRunner.Settings(5, 5, List.of(turn)));
+
+        runner.cycle(KEYS);
+
+        assertEquals(3, input.events.size(), input.events.toString());
+        assertEquals(30, played.getFirst().heldMillis());
+    }
+
+    @Test
     void aStopBetweenTwoKeysOfARouteSendsNoFurtherKey() throws InterruptedException {
         ActionRunner runner = runner(sleeps::add, new ActionRunner.Settings(5, 5, List.of(JUMP_THEN_RELOAD)));
         runner.onPlayed(entry -> Thread.currentThread().interrupt()); // stop() between the jump and the reload
@@ -270,7 +301,7 @@ class ActionRunnerTest {
     @Test
     void aBurstEndsWithTheClickBeforeTheGateCloses() throws InterruptedException {
         Action burst = new Action("Shoot", "+jump",
-                anyPlayer -> List.of(List.of(new Step("+jump", Press.spammed(5000, 5000)))));
+                anyPlayer -> List.of(List.of(new Step.OnKey("+jump", Press.spammed(5000, 5000)))));
         ActionRunner runner = runner(millis -> {
             sleeps.add(millis);
             if (sleeps.size() == 3) { // the wait, the first click, the pause after it
@@ -415,6 +446,12 @@ class ActionRunnerTest {
         @Override
         public void release(Key key) {
             events.add("release " + key);
+        }
+
+        @Override
+        public boolean move(int dx, int dy) {
+            events.add("move " + dx + " " + dy);
+            return !blocked;
         }
 
         @Override

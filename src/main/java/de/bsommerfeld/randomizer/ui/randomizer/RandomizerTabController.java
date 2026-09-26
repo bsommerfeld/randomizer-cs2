@@ -183,11 +183,12 @@ public final class RandomizerTabController {
         }
     }
 
-    /** Shows each action's key behind its name and greys out the ones that cannot fire. */
+    /** Shows each action's key behind its name and greys out the ones that cannot fire. The mouse move needs no key. */
     private void showBoundKeys(Optional<BoundKeys> keys) {
         checkBoxes.forEach((action, checkBox) -> {
-            checkBox.setGraphic(keys.map(bound -> keyHint(action, bound)).orElse(null));
-            checkBox.setDisable(keys.isPresent() && keys.get().pressableKeyFor(action.command()).isEmpty());
+            Optional<BoundKeys> keysToShow = keys.filter(any -> !action.command().equals(Action.MOUSE_MOVE));
+            checkBox.setGraphic(keysToShow.map(bound -> keyHint(action, bound)).orElse(null));
+            checkBox.setDisable(keysToShow.isPresent() && keysToShow.get().pressableKeyFor(action.command()).isEmpty());
         });
     }
 
